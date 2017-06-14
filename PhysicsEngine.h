@@ -36,6 +36,7 @@ class PhysicsEngine
 		PhysicsEngine();
 		virtual ~PhysicsEngine();
 
+		void	initializeWorld_Ring(void);
 		void	initializeWorld_AuxeticSwisscheeseCell(void);
 		void	initializeWorld_AuxeticPolygonCell(void);
 

@@ -68,7 +68,7 @@ void GraphicsEngine::drawGame(void)
 			MaterialPoint *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
-			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+			float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
 			glm::vec4 f4objectColor = _RED;
 			if(thisMP->b_Mark_Stress)
@@ -156,17 +156,18 @@ void GraphicsEngine::drawGame(void)
 
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-		float fJ2_Maximum = 1.0e-12;
-		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
-		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
-
-			CR.calculateState_J2(thisMP->d6_Stress);
-			float fJ2 = CR.d_J2;
-
-			if(fJ2 > fJ2_Maximum)
-				fJ2_Maximum = fJ2;
-		}
+		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress,2);
+//		float fJ2_Maximum = 1.0e-12;
+//		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
+//		{
+//			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+//
+//			CR.calculateState_J2(thisMP->d6_Stress);
+//			float fJ2 = CR.d_J2;
+//
+//			if(fJ2 > fJ2_Maximum)
+//				fJ2_Maximum = fJ2;
+//		}
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
@@ -228,6 +229,7 @@ void GraphicsEngine::drawGame(void)
 
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
+		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
@@ -239,8 +241,6 @@ void GraphicsEngine::drawGame(void)
 //			if(fJ2 > fJ2_Maximum)
 //				fJ2_Maximum = fJ2;
 //		}
-
-		float fJ2_Maximum = vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus;
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{

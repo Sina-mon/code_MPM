@@ -35,7 +35,7 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Cuboid(glm::dve
 				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, -dy, +dz), dOffset);
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				if(bSingleLayer != true)
+				if(bSingleLayer == false)
 				{
 					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, +dy, -dz), dOffset);
 					allMaterialPoint.push_back(thisMaterialPoint);

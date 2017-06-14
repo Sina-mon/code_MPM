@@ -16,8 +16,9 @@ int main (int argc, char ** argv)
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
 
+	thePhysicsEngine.initializeWorld_Ring();
 //	thePhysicsEngine.initializeWorld_AuxeticSwisscheeseCell();
-	thePhysicsEngine.initializeWorld_AuxeticPolygonCell();
+//	thePhysicsEngine.initializeWorld_AuxeticPolygonCell();
 
 	// graphics engine initialization -----------------------------------------
 	GraphicsEngine theGraphicsEngine;
