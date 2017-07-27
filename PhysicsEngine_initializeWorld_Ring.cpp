@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	GridPoint_Factory		GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001);
-	glm::ivec3 i3_Cells = glm::ivec3(100, 60, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.002);
+	glm::ivec3 i3_Cells = glm::ivec3(50, 30, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -53,16 +53,16 @@ void PhysicsEngine::initializeWorld_Ring(void)
 
 		if(fabs(dx - 0.0) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dx - d3_Length_Grid.x) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dy - 0.0) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
-//			thisGridPoint->b3_Fixed.y = true;
+//			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
+			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
 		{
@@ -94,13 +94,14 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
 	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
-	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 1.0*d3_Length_Cell.y;
+	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 3.0*d3_Length_Cell.y;
 //	d3Center_Ring.z = 0.5*dThickness;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
 
-		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+//		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Ring, glm::dvec3(0.004, 2.0*dRadius_Outer, dLength_Ring), d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
@@ -142,7 +143,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 0.5*d3_Length_Cell.y;
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 1.5*d3_Length_Cell.y;
 		glm::dvec3 d3Dimension = glm::dvec3(d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
@@ -187,8 +188,8 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		d3Center.y = 2.0*d_Offset;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 1.5*d3_Length_Cell.y;
+		glm::dvec3 d3Dimension = glm::dvec3(d3_Length_World.x,4.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -259,9 +260,9 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.001;
+	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 2.0e-9;
+	d_TimeIncrement_Maximum = 10.0e-9;
 	d_TimeEnd = 0.5*dDiameter_Average / -dPlatenSpeed;
 	d_TimeConsole_Interval = 1.0e-5;
 
