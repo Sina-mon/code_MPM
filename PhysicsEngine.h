@@ -15,8 +15,9 @@
 #include "GridPoint.h"
 #include "GridPoint_Factory.h"
 #include "GridPoint_Mediator.h"
-#include "MaterialPoint.h"
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_BC.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
+#include "MaterialPoint_Factory_CPDI_CC.h"
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
@@ -36,7 +37,10 @@ class PhysicsEngine
 		PhysicsEngine();
 		virtual ~PhysicsEngine();
 
+		void	initializeWorld_Bar(void);
+		void	initializeWorld_Bar_CPDI(void);
 		void	initializeWorld_Ring(void);
+		void	initializeWorld_Ring_CPDI(void);
 		void	initializeWorld_AuxeticSwisscheeseCell(void);
 		void	initializeWorld_AuxeticPolygonCell(void);
 
@@ -45,6 +49,7 @@ class PhysicsEngine
 		GridPoint_Mediator mpm_GP_Mediator_Thread[_MAX_N_THREADS];
 		int		runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
+		int		runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
 		std::vector<std::array<AGPstruct, 8>> v_MP_AGP;
 
 		double d_Offset = 0.0;
@@ -61,8 +66,10 @@ class PhysicsEngine
 		double getTime_Increment(void) {return(d_TimeIncrement_Maximum);}
 		// graphics interface -------------------------------------------------
 		unsigned int	getCount_MaterialPoint(void) {return(allMaterialPoint.size());}
+		unsigned int	getCount_MaterialPoint_CPDI(void) {return(allMaterialPoint_CPDI.size());}
 		unsigned int 	getCount_GridPoint(void) {return(allGridPoint.size());}
-		std::vector<MaterialPoint *>	getMaterialPoints(void) {return(allMaterialPoint);}
+		std::vector<MaterialPoint_BC *>	getMaterialPoints(void) {return(allMaterialPoint);}
+		std::vector<MaterialPoint_CPDI_CC *>	getMaterialPoints_CPDI(void) {return(allMaterialPoint_CPDI);}
 		std::vector<GridPoint *>		getGridPoints(void) {return(allGridPoint);}
 		std::vector<GridPoint *>		getGridPoints_Kernel(void) {return(v_GridPoint_Kernel);}
 	protected:
@@ -76,12 +83,16 @@ class PhysicsEngine
 		std::vector<GridPoint *> allGridPoint;
 		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
 		std::vector<GridPoint *> v_GridPoint_Kernel;
-		std::vector<MaterialPoint *> allMaterialPoint;
-		std::vector<MaterialPoint *> v_MarkedMaterialPoints_Displacement_Monitor;
-		std::vector<MaterialPoint *> v_MarkedMaterialPoints_Displacement_Control;
-		std::vector<MaterialPoint *> v_MarkedMaterialPoints_Stress_Monitor;
-		std::vector<MaterialPoint *> v_MarkedMaterialPoints_Force_Monitor;
-		std::vector<MaterialPoint *> v_MarkedMaterialPoints_Momentum;
+		std::vector<MaterialPoint_BC *> allMaterialPoint;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Displacement_Monitor;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Displacement_Control;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Stress_Monitor;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Force_Monitor;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Momentum;
+
+		std::vector<MaterialPoint_CPDI_CC *> allMaterialPoint_CPDI;
+		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Control;
+		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Monitor;
 
 		std::vector<omp_lock_t *> v_GridPoint_Lock;
 

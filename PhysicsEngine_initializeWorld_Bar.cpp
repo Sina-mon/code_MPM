@@ -1,14 +1,14 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
+void PhysicsEngine::initializeWorld_Bar(void)
 {
 	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory		GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.06, 0.03, 0.002);
-	glm::ivec3 i3_Cells = 2*glm::ivec3(60, 30, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001/0.2);
+	glm::ivec3 i3_Cells = glm::ivec3(0.2*100, 0.2*60, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -29,7 +29,7 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 	}
 
 	// contact kernel grid ---------------------------------------------------- contact grid
-	{// initialize GP mediator
+	{// initialize GP kernel mediator
 		d3_Length_Grid_Kernel = d3_Length_Grid;
 		i3_Cells_Kernel = 1*i3_Cells;
 
@@ -40,7 +40,7 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
-	{// assign grid point boundary conditions
+	{// grid point boundary conditions
 		GridPoint *thisGridPoint = allGridPoint[index_GP];
 
 		double dx = thisGridPoint->d3_Position[0];
@@ -61,8 +61,8 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		}
 		if(fabs(dy - 0.0) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
-//			thisGridPoint->b3_Fixed.y = true;
+//			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
+			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
 		{
@@ -88,30 +88,34 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 
 	d_Offset = 1.0/2.0*d3_Length_Cell.x;
 
-	double dThickness = 2.0*d_Offset;
-	glm::dvec3 d3Dimensions_Cell = glm::dvec3(0.050346,0.02,dThickness);
-	glm::dvec3 d3Center_Cell = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
-	d3Center_Cell.y = 0.5*d3Dimensions_Cell.y + 1.0*d3_Length_Cell.y;
-	d3Center_Cell.z = 0.5*dThickness;
+	double dLength_Ring = 2.0*d_Offset;
+
+	double dThickness_Ring = 0.00344 - d_Offset;
+	double dDiameter_Average = 0.04766;
+	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
+	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
+
+//	double dThickness_Ring = 0.003;
+//	double dDiameter_Average = 0.050 - 0.5*dThickness_Ring;
+//	double dRadius_Outer = 0.025;
+//	double dRadius_Inner = 0.025-0.003;
+
+	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
+	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.0*d3_Length_Cell.y;
+//	d3Center_Ring.z = 0.5*dThickness;
 	if(true)
-	{// cell material points -------------------------------------------------- tube MP
+	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
 
-		glm::dvec3 d3Center =  d3Center_Cell;
-		glm::dvec3 d3Dimensions = d3Dimensions_Cell;
-//		double dDent = 0.0083910;
-		double dDent = 0.166666666*d3Dimensions_Cell.x;//(0.25-0.0*0.0333333333333)*d3Dimensions_Cell.x;
-		double dThickness = 1.0*0.0006;
-
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_AuxeticCell_Polygon(d3Center, d3Dimensions, dDent, dThickness, d_Offset);
-//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimensions, dOffset);
+//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+		dDiameter_Average = 0.04766;
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Ring, glm::dvec3(0.01,dDiameter_Average,2*d_Offset), d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
 //			thisMP->i_MaterialType = _VONMISESHARDENING;
 			thisMP->i_MaterialType = _PLASTIC;
-//			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
 			thisMP->d_Volume_Initial = d_Offset * d_Offset * d_Offset;
@@ -124,11 +128,10 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 			thisMP->d_ElasticModulus = 70.0e9;
 			thisMP->d_Viscosity = 0.0;
 			thisMP->d_PoissonRatio = 0.33;
-//			thisMP->d_YieldStress = 150.0e6;
-			thisMP->d_YieldStress = 1.0*150.0e6;
+			thisMP->d_YieldStress = 120.0e6;
 
-			thisMP->d_Hardening_Isotropic_C0 = 4.0e+1;
-			thisMP->d_Hardening_Isotropic_C1 = 50.0e6;
+			thisMP->d_Hardening_Isotropic_C0 = 1.0e+1;
+			thisMP->d_Hardening_Isotropic_C1 = 30.0e6;
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 //			thisMP->d3_Momentum = thisMP->d3_Mass * thisMP->d3_Velocity;
@@ -144,13 +147,11 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 			// mark for stress monitor
 		}
 	}
-
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		glm::dvec3 d3Center = d3Center_Cell;//glm::dvec3(0.5,0.5,0.5) * d3_Length_Grid;
-		d3Center.y = d3Center_Cell.y + 0.5*d3Dimensions_Cell.y + 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = 1.0*d3Dimensions_Cell;
-		d3Dimension.y = 2.0*d_Offset;
+		glm::dvec3 d3Center = d3Center_Ring;
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 1.5*d3_Length_Cell.y;
+		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -190,13 +191,11 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 			}
 		}
 	}
-
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Center = d3Center_Cell;//glm::dvec3(0.5,0.5,0.5) * d3_Length_Grid;
-		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Cell.y - 0.5*d3Dimensions_Cell.y - 1.252*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = 1.0*d3Dimensions_Cell;
-		d3Dimension.y = 2.0*d_Offset;
+		glm::dvec3 d3Center = d3Center_Ring;
+		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
+		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -248,6 +247,12 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
    		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
    		m_TimeLine.addTimePoint(0.1, glm::dvec3(0.0, dPlatenSpeed, 0.0));
 
+//   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+//   		m_TimeLine.addTimePoint(0.0025, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+//
+//   		m_TimeLine.addTimePoint(0.0025+1.0e-12, glm::dvec3(0.0, 0.0, 0.0));
+//   		m_TimeLine.addTimePoint(0.1, glm::dvec3(0.0, 0.0, 0.0));
+
 //   	m_TimeLine.addTimePoint(dTime_Line, glm::dvec3(0.0, dPlatenSpeed, 0.0));
 //		for(dTime_Line = 0.0; dTime_Line < 0.02; dTime_Line += (dTime_On+dTime_Off))
 //		{
@@ -267,11 +272,11 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.001;
+	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 1.0e-9;
-	d_TimeEnd = 0.010;//1.0e4*d_TimeIncrement_Maximum;
-	d_TimeConsole_Interval = 1.0e-6;
+	d_TimeIncrement_Maximum = 5.0e-9;
+	d_TimeEnd = 0.8*dDiameter_Average / -dPlatenSpeed;
+	d_TimeConsole_Interval = 5.0e-5;
 
 	std::string sDescription = "";
 	{
@@ -302,6 +307,8 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
 		sDescription += "Yield: " + Script(allMaterialPoint[0]->d_YieldStress, 3) + " N/m^2" + "\n";
 		sDescription += "Modulus: " + Script(allMaterialPoint[0]->d_ElasticModulus, 3) + " N/m^2" + "\n";
+		sDescription += "Hardening 0: " + Script(allMaterialPoint[0]->d_Hardening_Isotropic_C0, 3) + "\n";
+		sDescription += "Hardening 1: " + Script(allMaterialPoint[0]->d_Hardening_Isotropic_C1, 3) + "\n";
 
 		sDescription += "Global Damping: " + Script(d_DampingCoefficient, 3) + "\n";
 		sDescription += "Non-slip contact\n";

@@ -14,11 +14,12 @@ void GraphicsEngine::drawGame(void)
 
 		GLuint transformationShadowLocation = gl_ShadowProgram.getUniformLocation("transformationShadowMatrix");
 
-		std::vector<MaterialPoint *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints_CPDI();
+//		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 			// particle position
 			float fSize = glm::pow(thisMP->d_Volume, 1.0/3.0);
 			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
@@ -61,11 +62,11 @@ void GraphicsEngine::drawGame(void)
 		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
 		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
 
-		// material points ----------------------------------------------------
-		std::vector<MaterialPoint *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		// material points, classic -------------------------------------------
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
 			float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
@@ -94,6 +95,57 @@ void GraphicsEngine::drawGame(void)
 
 			gl_Particle_Mesh->Draw();
 		}
+		// material points, CPDI ----------------------------------------------
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
+		for(int index_MP = 0; index_MP < vMaterialPoint_CPDI.size(); index_MP++)
+		{
+			MaterialPoint_CPDI_CC *thisMP = vMaterialPoint_CPDI[index_MP];
+
+			// particle position
+			float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+			// particle color
+			glm::vec4 f4objectColor = _RED;
+			if(thisMP->b_Mark_Stress)
+				f4objectColor = _GREEN;
+			if(thisMP->b_Surface)
+				f4objectColor = _BLUE;
+			if(thisMP->b_DisplacementControl)
+				f4objectColor = _WHITE;
+			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+			// shadow
+			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			// camera and model transformation matices
+			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+			gl_Particle_Mesh->Draw();
+
+			for(int index_Corner = 0; index_Corner < 4; index_Corner++)
+			{
+				// particle position
+				float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+				// particle color
+				glm::vec4 f4objectColor = _GRAY;
+				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+				// shadow
+				glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+				glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+				// camera and model transformation matices
+				Transformation glTransformation(thisMP->d3_Corner[index_Corner], glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+				glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+				glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+				gl_Particle_Mesh->Draw();
+			}
+		}
 		// grid points --------------------------------------------------------
 		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
 
@@ -104,7 +156,7 @@ void GraphicsEngine::drawGame(void)
 			if(thisGP->b3_Fixed == glm::bvec3{false, false, false})	continue;
 
 			// particle position
-			float fSize = 0.00001;
+			float fSize = 0.0001;
 			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
 			// particle color
 			glm::vec4 f4objectColor = _GRAY;
@@ -152,15 +204,17 @@ void GraphicsEngine::drawGame(void)
 		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
 		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
 
-		std::vector<MaterialPoint *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
 
+		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
 		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress,2);
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
-//			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+//			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 //
 //			CR.calculateState_J2(thisMP->d6_Stress);
 //			float fJ2 = CR.d_J2;
@@ -168,10 +222,9 @@ void GraphicsEngine::drawGame(void)
 //			if(fJ2 > fJ2_Maximum)
 //				fJ2_Maximum = fJ2;
 //		}
-
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
@@ -225,15 +278,17 @@ void GraphicsEngine::drawGame(void)
 		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
 		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
 
-		std::vector<MaterialPoint *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
 
+		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
 		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
-//			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+//			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 //
 //			CR.calculateState_J2(thisMP->d6_Strain_Plastic);
 //			float fJ2 = CR.d_J2;
@@ -244,7 +299,7 @@ void GraphicsEngine::drawGame(void)
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
@@ -672,20 +727,20 @@ void GraphicsEngine::drawGame(void)
 		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
 		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
 
-		std::vector<MaterialPoint *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
 
 		float fKernelGradient_Maximum = 0.0;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
-			if(glm::length(thisMP->d3_Kernel_Gradient) > fKernelGradient_Maximum)
-				fKernelGradient_Maximum = glm::length(thisMP->d3_Kernel_Gradient);
+//			if(glm::length(thisMP->d3_Kernel_Gradient) > fKernelGradient_Maximum)
+//				fKernelGradient_Maximum = glm::length(thisMP->d3_Kernel_Gradient);
 		}
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
-			MaterialPoint *thisMP = vMaterialPoint[index_MP];
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
 			float fSize = 0.0001;// for problems with dimensions of 1m
@@ -707,7 +762,7 @@ void GraphicsEngine::drawGame(void)
 			{
 				glBegin(GL_LINES);
 					glm::vec3 f3Start = thisMP->d3_Position;
-					glm::vec3 f3End = glm::vec3(thisMP->d3_Position) + fSize/fKernelGradient_Maximum * glm::vec3(thisMP->d3_Kernel_Gradient);
+					glm::vec3 f3End = thisMP->d3_Position;// + fSize/fKernelGradient_Maximum * glm::vec3(thisMP->d3_Kernel_Gradient);
 					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
 					glVertex3f(f3End.x, f3End.y, f3End.z);
 				glEnd();

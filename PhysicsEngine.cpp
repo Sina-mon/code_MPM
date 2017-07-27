@@ -54,13 +54,21 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 	glm::dvec3 d3Strain = glm::dvec3(0.0,0.0,0.0);
 	for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_Stress_Monitor.size(); index_MP++)
 	{// calculate debug values
-		MaterialPoint *thisMP = v_MarkedMaterialPoints_Stress_Monitor[index_MP];
+		MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Stress_Monitor[index_MP];
 
 		d3Stress += glm::dvec3(thisMP->d6_Stress[0], thisMP->d6_Stress[1], thisMP->d6_Stress[2]);
 		d3Strain += glm::dvec3(thisMP->d6_Strain[0], thisMP->d6_Strain[1], thisMP->d6_Strain[2]);
 	}
 	d3Stress /= v_MarkedMaterialPoints_Stress_Monitor.size();
 	d3Strain /= v_MarkedMaterialPoints_Stress_Monitor.size();
+
+//	for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
+//	{// calculate debug values
+//		MaterialPoint_BC *thisMP = allMaterialPoint_CPDI[index_MP];
+//
+//		d3Strain += glm::dvec3(thisMP->d6_Strain[0], thisMP->d6_Strain[1], thisMP->d6_Strain[2]);
+//	}
+//	d3Strain /= allMaterialPoint_CPDI.size();
 
 	glm::dvec3 d3Force = glm::dvec3(0.0,0.0,0.0);
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
@@ -73,7 +81,13 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 	double dKineticEnergy = 0.0;
 	for(int index = 0; index < allMaterialPoint.size(); index++)
 	{
-		MaterialPoint *thisMP = allMaterialPoint[index];
+		MaterialPoint_BC *thisMP = allMaterialPoint[index];
+
+		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
+	}
+	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
+	{
+		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
 
 		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
 	}
@@ -88,6 +102,8 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 //	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,6);
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
         strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,6);
+	if(v_MarkedMaterialPoints_CPDI_Displacement_Monitor.size() > 0)
+        strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_CPDI_Displacement_Monitor[0]->d3_Position.y,6);
 	if(v_MarkedMaterialPoints_Stress_Monitor.size() > 0)
 	{
 		strConsole += "\tStrain_y: " + Script(d3Strain.y,6);
