@@ -22,9 +22,9 @@ class MaterialPoint_Factory_CPDI_CC : public MaterialPoint_Factory_BC
 		{
 			double dVolume = 0.0;
 
-			glm::dvec4 x = glm::dvec4(pMP->d3_Corner[0].x, pMP->d3_Corner[1].x, pMP->d3_Corner[2].x, pMP->d3_Corner[3].x);
-			glm::dvec4 y = glm::dvec4(pMP->d3_Corner[0].y, pMP->d3_Corner[1].y, pMP->d3_Corner[2].y, pMP->d3_Corner[3].y);
-			glm::dvec4 z = glm::dvec4(pMP->d3_Corner[0].z, pMP->d3_Corner[1].z, pMP->d3_Corner[2].z, pMP->d3_Corner[3].z);
+			glm::dvec4 x = glm::dvec4(pMP->a_Corner[0].d3_Position.x, pMP->a_Corner[1].d3_Position.x, pMP->a_Corner[2].d3_Position.x, pMP->a_Corner[3].d3_Position.x);
+			glm::dvec4 y = glm::dvec4(pMP->a_Corner[0].d3_Position.y, pMP->a_Corner[1].d3_Position.y, pMP->a_Corner[2].d3_Position.y, pMP->a_Corner[3].d3_Position.y);
+			glm::dvec4 z = glm::dvec4(pMP->a_Corner[0].d3_Position.z, pMP->a_Corner[1].d3_Position.z, pMP->a_Corner[2].d3_Position.z, pMP->a_Corner[3].d3_Position.z);
 
 			double x12 = (x[0] - x[1]); double x13 = (x[0] - x[2]); double x14 = (x[0] - x[3]);
 			double x21 = (x[1] - x[0]); double x23 = (x[1] - x[2]); double x24 = (x[1] - x[3]);

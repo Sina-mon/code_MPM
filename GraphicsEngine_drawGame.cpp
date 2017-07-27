@@ -137,7 +137,7 @@ void GraphicsEngine::drawGame(void)
 				glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
 				glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
 				// camera and model transformation matices
-				Transformation glTransformation(thisMP->d3_Corner[index_Corner], glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+				Transformation glTransformation(thisMP->a_Corner[index_Corner].d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
 				glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
 				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
 				glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition

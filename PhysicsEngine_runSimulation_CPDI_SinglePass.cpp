@@ -39,11 +39,41 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			{
 				GridPoint *thisGP = allGridPoint[index_GP];
 
+				if(thisGP->b_Active == false)
+					continue;
+
+				thisGP->b_Active = false;
 				thisGP->d_Mass = 0.0;
 				thisGP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 				thisGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
 			}
 			a_Runtime[0] += omp_get_wtime() - dRuntime_Block;
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// Find AGP's and calculate shape values and gradients
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
+			{
+				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
+				thisMP->v_AGP.clear();
+
+				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints_CPDI(thisMP);
+				for(unsigned int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
+				{
+					GridPoint *thisAGP = allGridPoint[mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP]];
+					thisAGP->b_Active = true;
+					mpm_GP_Mediator_Thread[iThread_This].calculateBases_CPDI(thisMP, thisAGP->d3_Position);
+
+					// shape value and shape gradient value
+					AGPstruct thisAGPstruct;
+					thisAGPstruct.index = mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP];
+					thisAGPstruct.dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
+					thisAGPstruct.d3ShapeGradient = mpm_GP_Mediator_Thread[iThread_This].d3_ShapeGradient;
+					thisMP->v_AGP.push_back(thisAGPstruct);
+				}
+			}
+			a_Runtime[1] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -53,24 +83,20 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
 
-				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints_CPDI(thisMP);
-				for(unsigned int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-					GridPoint *thisAGP = allGridPoint[mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP]];
-					thisAGP->b_Active = true;
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
-					mpm_GP_Mediator_Thread[iThread_This].calculateBases_CPDI(thisMP, thisAGP->d3_Position);
-
-					double dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
-					glm::dvec3 d3ShapeGradient = mpm_GP_Mediator_Thread[iThread_This].d3_ShapeGradient;
+					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
+					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					// mass
 					#pragma omp atomic
 						thisAGP->d_Mass += dShapeValue * thisMP->d_Mass;
 				}
 			}
-			a_Runtime[1] += omp_get_wtime() - dRuntime_Block;
+			a_Runtime[2] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -80,17 +106,13 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
 
-				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints_CPDI(thisMP);
-				for(unsigned int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-					GridPoint *thisAGP = allGridPoint[mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP]];
-					thisAGP->b_Active = true;
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
-					mpm_GP_Mediator_Thread[iThread_This].calculateBases_CPDI(thisMP, thisAGP->d3_Position);
-
-					double dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
-					glm::dvec3 d3ShapeGradient = mpm_GP_Mediator_Thread[iThread_This].d3_ShapeGradient;
+					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
+					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					// velocity
 					if(thisAGP->d_Mass > d_Mass_Minimum)
@@ -114,7 +136,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 						thisAGP->d3_Force.z += dShapeValue*thisMP->d3_Force_External.z;
 				}
 			}
-			a_Runtime[2] += omp_get_wtime() - dRuntime_Block;
+			a_Runtime[3] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -123,6 +145,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 			{
 				GridPoint *thisGP = allGridPoint[index_GP];
+
+				if(thisGP->b_Active == false)
+					continue;
 
 				if(thisGP->d_Mass > d_Mass_Minimum)
 					thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;
@@ -154,12 +179,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
 
-				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints_CPDI(thisMP);
-
-				for(int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-					unsigned int index_GP = mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP];
-					GridPoint *thisAGP = allGridPoint[index_GP];
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 //					if(nThreads > 1)	omp_set_lock(v_GridPoint_Lock[index_GP]);
 					{
@@ -185,31 +207,22 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 
 				glm::dmat3 d33VelocityGradient = glm::dmat3(0.0);
 
-				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints_CPDI(thisMP);
-				for(unsigned int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-					GridPoint *thisAGP = allGridPoint[mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP]];
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
-					mpm_GP_Mediator_Thread[iThread_This].calculateBases_CPDI(thisMP, thisAGP->d3_Position);
-
-					double dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
-					glm::dvec3 d3ShapeGradient = mpm_GP_Mediator_Thread[iThread_This].d3_ShapeGradient;
+					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
+					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					if(thisAGP->d_Mass > d_Mass_Minimum)
 						thisMP->d3_Velocity += dShapeValue * (thisAGP->d3_Force/thisAGP->d_Mass) * dTimeIncrement;
-
-					// position
-					//thisMP->d3_Position += dShapeValue * (thisAGP->d3_Velocity) * dTimeIncrement;
 
 					// velocity gradient, to be used to calculate strains
 					d33VelocityGradient += glm::outerProduct(thisAGP->d3_Velocity, d3ShapeGradient);// this glm function does the pre-transposition that we want
 				}
 
 				thisMP->d33_DeformationGradient += (d33VelocityGradient * thisMP->d33_DeformationGradient) * dTimeIncrement;
-
-//				double dDet = glm::determinant(thisMP->d33_DeformationGradient);
-//				thisMP->d_Volume = dDet * thisMP->d_Volume_Initial;
 
 				glm::dmat3 d33DeformationGradientIncrement = glm::dmat3(1.0) + d33VelocityGradient * dTimeIncrement;
 
@@ -278,12 +291,12 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 				{
 					glm::dvec3 d3Displacement = glm::dvec3(0.0, 0.0, 0.0);
 
-					mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints(thisMP->d3_Corner[index_Corner]);
+					mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints(thisMP->a_Corner[index_Corner].d3_Position);
 					for(unsigned int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
 					{
 						GridPoint *thisAGP = allGridPoint[mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP]];
 
-						mpm_GP_Mediator_Thread[iThread_This].calculateBases_Classic(thisMP->d3_Corner[index_Corner], thisAGP->d3_Position);
+						mpm_GP_Mediator_Thread[iThread_This].calculateBases_Classic(thisMP->a_Corner[index_Corner].d3_Position, thisAGP->d3_Position);
 
 						double dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
 						glm::dvec3 d3ShapeGradient = mpm_GP_Mediator_Thread[iThread_This].d3_ShapeGradient;
@@ -291,12 +304,12 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 						d3Displacement += dShapeValue * (thisAGP->d3_Velocity) * dTimeIncrement;
 					}
 
-					thisMP->d3_Corner[index_Corner] += d3Displacement;
+					thisMP->a_Corner[index_Corner].d3_Position += d3Displacement;
 				}
 				// calculate material point position, as average of corners
 				thisMP->d3_Position = glm::dvec3(0.0, 0.0, 0.0);
 				for(unsigned int index_Corner = 0; index_Corner < 4; index_Corner++)
-					thisMP->d3_Position += 0.25 * thisMP->d3_Corner[index_Corner];
+					thisMP->d3_Position += 0.25 * thisMP->a_Corner[index_Corner].d3_Position;
 				// calculate material point volume
 				MaterialPoint_Factory_CPDI_CC MP_Factory;
 				thisMP->d_Volume = MP_Factory.getVolume(thisMP);
@@ -316,7 +329,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 
 				thisMP->d3_Position += thisMP->d3_Velocity * dTimeIncrement;
 				for(unsigned int index_Corner = 0; index_Corner < 4; index_Corner++)
-					thisMP->d3_Corner[index_Corner] += thisMP->d3_Velocity * dTimeIncrement;
+					thisMP->a_Corner[index_Corner].d3_Position += thisMP->d3_Velocity * dTimeIncrement;
 			}
 			a_Runtime[7] += omp_get_wtime() - dRuntime_Block;
 		}

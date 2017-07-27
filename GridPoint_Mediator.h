@@ -68,7 +68,7 @@ class GridPoint_Mediator
 
 			for(int index_Corner = 0; index_Corner < 4; index_Corner++)
 			{
-				glm::dvec3 d3Position = pMP->d3_Corner[index_Corner];
+				glm::dvec3 d3Position = pMP->a_Corner[index_Corner].d3_Position;
 
 				glm::ivec3 i3BottomLeftFar = d3Position / d3_Length_Cell;
 
@@ -132,7 +132,7 @@ class GridPoint_Mediator
 
 			for(int index_Corner = 0; index_Corner < 4; index_Corner++)
 			{
-				glm::dvec3 d3Position_MP = pMP->d3_Corner[index_Corner];
+				glm::dvec3 d3Position_MP = pMP->a_Corner[index_Corner].d3_Position;
 
 				glm::dvec3 d3Distance = d3Position_MP - d3Position_GP;
 
@@ -159,9 +159,9 @@ class GridPoint_Mediator
 
 			// shape gradient -------------------------------------------------
 
-			glm::dvec4 x = glm::dvec4(pMP->d3_Corner[0].x, pMP->d3_Corner[1].x, pMP->d3_Corner[2].x, pMP->d3_Corner[3].x);
-			glm::dvec4 y = glm::dvec4(pMP->d3_Corner[0].y, pMP->d3_Corner[1].y, pMP->d3_Corner[2].y, pMP->d3_Corner[3].y);
-			glm::dvec4 z = glm::dvec4(pMP->d3_Corner[0].z, pMP->d3_Corner[1].z, pMP->d3_Corner[2].z, pMP->d3_Corner[3].z);
+			glm::dvec4 x = glm::dvec4(pMP->a_Corner[0].d3_Position.x, pMP->a_Corner[1].d3_Position.x, pMP->a_Corner[2].d3_Position.x, pMP->a_Corner[3].d3_Position.x);
+			glm::dvec4 y = glm::dvec4(pMP->a_Corner[0].d3_Position.y, pMP->a_Corner[1].d3_Position.y, pMP->a_Corner[2].d3_Position.y, pMP->a_Corner[3].d3_Position.y);
+			glm::dvec4 z = glm::dvec4(pMP->a_Corner[0].d3_Position.z, pMP->a_Corner[1].d3_Position.z, pMP->a_Corner[2].d3_Position.z, pMP->a_Corner[3].d3_Position.z);
 
 			double x21 = (x[1] - x[0]); double x23 = (x[1] - x[2]); double x24 = (x[1] - x[3]);
 			double x12 = (x[0] - x[1]); double x13 = (x[0] - x[2]); double x14 = (x[0] - x[3]);

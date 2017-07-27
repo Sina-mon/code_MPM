@@ -22,56 +22,56 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createCell_Hexahe
 
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[0];
-		thisMP->d3_Corner[1] = d3Cube[1];
-		thisMP->d3_Corner[2] = d3Cube[3];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[0];
+		thisMP->a_Corner[1].d3_Position = d3Cube[1];
+		thisMP->a_Corner[2].d3_Position = d3Cube[3];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[0];
-		thisMP->d3_Corner[1] = d3Cube[4];
-		thisMP->d3_Corner[2] = d3Cube[1];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[0];
+		thisMP->a_Corner[1].d3_Position = d3Cube[4];
+		thisMP->a_Corner[2].d3_Position = d3Cube[1];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[1];
-		thisMP->d3_Corner[1] = d3Cube[2];
-		thisMP->d3_Corner[2] = d3Cube[3];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[1];
+		thisMP->a_Corner[1].d3_Position = d3Cube[2];
+		thisMP->a_Corner[2].d3_Position = d3Cube[3];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[1];
-		thisMP->d3_Corner[1] = d3Cube[6];
-		thisMP->d3_Corner[2] = d3Cube[2];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[1];
+		thisMP->a_Corner[1].d3_Position = d3Cube[6];
+		thisMP->a_Corner[2].d3_Position = d3Cube[2];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[1];
-		thisMP->d3_Corner[1] = d3Cube[4];
-		thisMP->d3_Corner[2] = d3Cube[5];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[1];
+		thisMP->a_Corner[1].d3_Position = d3Cube[4];
+		thisMP->a_Corner[2].d3_Position = d3Cube[5];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = d3Cube[1];
-		thisMP->d3_Corner[1] = d3Cube[5];
-		thisMP->d3_Corner[2] = d3Cube[6];
-		thisMP->d3_Corner[3] = d3Cube[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = d3Cube[1];
+		thisMP->a_Corner[1].d3_Position = d3Cube[5];
+		thisMP->a_Corner[2].d3_Position = d3Cube[6];
+		thisMP->a_Corner[3].d3_Position = d3Cube[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 
@@ -85,56 +85,56 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createCell_Hexahe
 
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[0];
-		thisMP->d3_Corner[1] = vCorner[1];
-		thisMP->d3_Corner[2] = vCorner[3];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[0];
+		thisMP->a_Corner[1].d3_Position = vCorner[1];
+		thisMP->a_Corner[2].d3_Position = vCorner[3];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[0];
-		thisMP->d3_Corner[1] = vCorner[4];
-		thisMP->d3_Corner[2] = vCorner[1];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[0];
+		thisMP->a_Corner[1].d3_Position = vCorner[4];
+		thisMP->a_Corner[2].d3_Position = vCorner[1];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[1];
-		thisMP->d3_Corner[1] = vCorner[2];
-		thisMP->d3_Corner[2] = vCorner[3];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[1];
+		thisMP->a_Corner[1].d3_Position = vCorner[2];
+		thisMP->a_Corner[2].d3_Position = vCorner[3];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[1];
-		thisMP->d3_Corner[1] = vCorner[6];
-		thisMP->d3_Corner[2] = vCorner[2];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[1];
+		thisMP->a_Corner[1].d3_Position = vCorner[6];
+		thisMP->a_Corner[2].d3_Position = vCorner[2];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[1];
-		thisMP->d3_Corner[1] = vCorner[4];
-		thisMP->d3_Corner[2] = vCorner[5];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[1];
+		thisMP->a_Corner[1].d3_Position = vCorner[4];
+		thisMP->a_Corner[2].d3_Position = vCorner[5];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 	{
 		MaterialPoint_CPDI_CC *thisMP = new MaterialPoint_CPDI_CC();
-		thisMP->d3_Corner[0] = vCorner[1];
-		thisMP->d3_Corner[1] = vCorner[5];
-		thisMP->d3_Corner[2] = vCorner[6];
-		thisMP->d3_Corner[3] = vCorner[7];
-		thisMP->d3_Position = 0.25*(thisMP->d3_Corner[0]+thisMP->d3_Corner[1]+thisMP->d3_Corner[2]+thisMP->d3_Corner[3]);
+		thisMP->a_Corner[0].d3_Position = vCorner[1];
+		thisMP->a_Corner[1].d3_Position = vCorner[5];
+		thisMP->a_Corner[2].d3_Position = vCorner[6];
+		thisMP->a_Corner[3].d3_Position = vCorner[7];
+		thisMP->d3_Position = 0.25*(thisMP->a_Corner[0].d3_Position+thisMP->a_Corner[1].d3_Position+thisMP->a_Corner[2].d3_Position+thisMP->a_Corner[3].d3_Position);
 		vMaterialPoints.push_back(thisMP);
 	}
 

@@ -13,6 +13,13 @@ enum MaterialType
 	_GASS,
 };
 
+struct AGPstruct
+{
+	unsigned int index = 0;
+	double dShapeValue = 0.0;
+	glm::dvec3 d3ShapeGradient = glm::dvec3(0.0, 0.0, 0.0);
+};
+
 class MaterialPoint_BC
 {
 	public:

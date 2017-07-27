@@ -78,9 +78,9 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Tube
 
 		for(int index_Corner = 0; index_Corner < 4; index_Corner++)
 		{
-			glm::dvec4 d4Position = glm::dvec4(thisMaterialPoint->d3_Corner[index_Corner], 1.0);
+			glm::dvec4 d4Position = glm::dvec4(thisMaterialPoint->a_Corner[index_Corner].d3_Position, 1.0);
 
-			thisMaterialPoint->d3_Corner[index_Corner] = glm::dvec3(m4Transformation_Combined * d4Position);
+			thisMaterialPoint->a_Corner[index_Corner].d3_Position = glm::dvec3(m4Transformation_Combined * d4Position);
 		}
 	}
 
