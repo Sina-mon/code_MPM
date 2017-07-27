@@ -3,7 +3,7 @@
 // ----------------------------------------------------------------------------
 void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 {
-	MaterialPoint_Factory	MP_Factory;
+	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory		GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
@@ -103,11 +103,11 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		double dDent = 0.166666666*d3Dimensions_Cell.x;//(0.25-0.0*0.0333333333333)*d3Dimensions_Cell.x;
 		double dThickness = 1.0*0.0006;
 
-		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_AuxeticCell_Polygon(d3Center, d3Dimensions, dDent, dThickness, d_Offset);
-//		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimensions, dOffset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_AuxeticCell_Polygon(d3Center, d3Dimensions, dDent, dThickness, d_Offset);
+//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimensions, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
 //			thisMP->i_MaterialType = _VONMISESHARDENING;
 			thisMP->i_MaterialType = _PLASTIC;
@@ -136,7 +136,7 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 			// all MPs
 			allMaterialPoint.push_back(thisMP);
 			// moment log
@@ -152,10 +152,10 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		glm::dvec3 d3Dimension = 1.0*d3Dimensions_Cell;
 		d3Dimension.y = 2.0*d_Offset;
 
-		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
@@ -177,7 +177,7 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 			// all MPs
 			allMaterialPoint.push_back(thisMP);
 			// displacement control
@@ -198,10 +198,10 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		glm::dvec3 d3Dimension = 1.0*d3Dimensions_Cell;
 		d3Dimension.y = 2.0*d_Offset;
 
-		std::vector<MaterialPoint *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
@@ -223,7 +223,7 @@ void PhysicsEngine::initializeWorld_AuxeticPolygonCell(void)
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 			// all MPs
 			allMaterialPoint.push_back(thisMP);
 			// stress monitor

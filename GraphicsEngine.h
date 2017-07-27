@@ -20,7 +20,7 @@
 #include "Light.h"
 
 #include "PhysicsEngine.h"
-#include "MaterialPoint.h"
+#include "MaterialPoint_BC.h"
 #include "GridPoint.h"
 
 #define _RND(d)			((float)(rand()%d)/d)//random value between 0.0 and 1.0, with accuracy related to d
@@ -41,7 +41,7 @@ class GraphicsEngine
 		void saveScreenshot(int x, int y, int w, int h, const char * filename);
 	protected:
 		//snapshot save
-		float f_TimeSnapshot_Interval = 1.0e-4;//100.0*5.0e-8;//0.1;
+		float f_TimeSnapshot_Interval = 1.0e-3;//100.0*5.0e-8;//0.1;
 		float f_TimeSnapshot_LastSave = -1.0e12; // before creation
 		int i_TimeSnapshotCycle = 0;
 

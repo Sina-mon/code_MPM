@@ -1,15 +1,14 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Ring(void)
+void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 {
-	MaterialPoint_Factory_Classic_CC	MP_Factory;
-	GridPoint_Factory		GP_Factory;
+	MaterialPoint_Factory_CPDI_CC	MP_Factory;
+	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001/1.0);
-	glm::ivec3 i3_Cells = glm::ivec3(1*100, 1*60, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.002);
+	glm::ivec3 i3_Cells = glm::ivec3(50, 30, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -54,11 +53,11 @@ void PhysicsEngine::initializeWorld_Ring(void)
 
 		if(fabs(dx - 0.0) < dTolerance)
 		{
-//			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dx - d3_Length_Grid.x) < dTolerance)
 		{
-//			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dy - 0.0) < dTolerance)
 		{
@@ -89,64 +88,59 @@ void PhysicsEngine::initializeWorld_Ring(void)
 
 	d_Offset = 1.0/2.0*d3_Length_Cell.x;
 
-	double dLength_Ring = 2.0*d_Offset;
+	double dLength_Ring = 1.0*d_Offset;
 
-	double dThickness_Ring = 0.00344 - d_Offset;
+	double dThickness_Ring = 0.00344;// - d_Offset;
 	double dDiameter_Average = 0.04766;
 	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
 	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
 
-//	double dThickness_Ring = 0.003;
-//	double dDiameter_Average = 0.050 - 0.5*dThickness_Ring;
-//	double dRadius_Outer = 0.025;
-//	double dRadius_Inner = 0.025-0.003;
-
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
 	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.0*d3_Length_Cell.y;
-//	d3Center_Ring.z = 0.5*dThickness;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube_Smooth(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-			thisMP->i_MaterialType = _VONMISESHARDENING;
-//			thisMP->i_MaterialType = _PLASTIC;
+//			thisMP->i_MaterialType = _VONMISESHARDENING;
+			thisMP->i_MaterialType = _PLASTIC;
 			thisMP->i_ID = 1;
 
-			thisMP->d_Volume_Initial = d_Offset * d_Offset * d_Offset;
+			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 2700.0 * thisMP->d_Volume;
 			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
-			thisMP->d_ElasticModulus = 35.0e9;
+			thisMP->d_ElasticModulus = 70.0e9;
 			thisMP->d_Viscosity = 0.0;
 			thisMP->d_PoissonRatio = 0.33;
-			thisMP->d_YieldStress = 225.0e6;
+			thisMP->d_YieldStress = 250.0e6;
 
 			thisMP->d_Hardening_Isotropic_C0 = 0.0e+1;
 			thisMP->d_Hardening_Isotropic_C1 = 0.0e6;
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-//			thisMP->d3_Momentum = thisMP->d3_Mass * thisMP->d3_Velocity;
 			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain[index_MP];
 			// all MPs
-			allMaterialPoint.push_back(thisMP);
+			allMaterialPoint_CPDI.push_back(thisMP);
 			// moment log
-			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
+//			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 			// mark for stress monitor
+//			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
 		}
 	}
-	if(false)
+	if(true)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 1.5*d3_Length_Cell.y;
@@ -160,7 +154,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
-			thisMP->d_Volume_Initial = d_Offset * d_Offset * d_Offset;
+			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 7800.0 * thisMP->d_Volume;
@@ -177,20 +171,20 @@ void PhysicsEngine::initializeWorld_Ring(void)
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain[index_MP];
 			// all MPs
-			allMaterialPoint.push_back(thisMP);
+			allMaterialPoint_CPDI.push_back(thisMP);
 			// displacement control
 			if(true)
 			{
 				thisMP->b_DisplacementControl = true;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-				v_MarkedMaterialPoints_Displacement_Control.push_back(thisMP);
-				v_MarkedMaterialPoints_Displacement_Monitor.push_back(thisMP);
+				v_MarkedMaterialPoints_CPDI_Displacement_Control.push_back(thisMP);
+				v_MarkedMaterialPoints_CPDI_Displacement_Monitor.push_back(thisMP);
 			}
 		}
 	}
-	if(false)
+	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
@@ -204,7 +198,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
-			thisMP->d_Volume_Initial = d_Offset * d_Offset * d_Offset;
+			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 7800.0 * thisMP->d_Volume;
@@ -216,21 +210,20 @@ void PhysicsEngine::initializeWorld_Ring(void)
 			thisMP->d_YieldStress = 200.0e6;
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-//			thisMP->d3_Momentum = thisMP->d3_Mass * thisMP->d3_Velocity;
 			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
+			MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain[index_MP];
 			// all MPs
-			allMaterialPoint.push_back(thisMP);
+			allMaterialPoint_CPDI.push_back(thisMP);
 			// stress monitor
 //			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
 		}
 	}
 
 	// sina, be careful, this requires the number of adjacent grid points to be exactly 8
-	v_MP_AGP.resize(allMaterialPoint.size());
+//	v_MP_AGP.resize(allMaterialPoint.size());
 
 	double dPlatenSpeed = -1.0;
 	double dTime_On  = 0.2e-3;
@@ -265,17 +258,17 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	}
 
 	double dMass_Domain = 0.0;
-	for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
+	for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
 	{// calculate debug values
-		dMass_Domain += allMaterialPoint[index_MP]->d_Mass;
+		dMass_Domain += allMaterialPoint_CPDI[index_MP]->d_Mass;
 	}
 
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 5.0e-9;
-	d_TimeEnd = 0.8*dDiameter_Average / -dPlatenSpeed;
-	d_TimeConsole_Interval = 5.0e-5;
+	d_TimeIncrement_Maximum = 10.0e-9;
+	d_TimeEnd = 0.8*dDiameter_Average / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";
 	{
@@ -295,19 +288,17 @@ void PhysicsEngine::initializeWorld_Ring(void)
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
 		sDescription += "Time increment: " + Script(d_TimeIncrement_Maximum, 6) + "\n";
-		sDescription += "Material Point count: " + Script(allMaterialPoint.size()) + "\n";
+		sDescription += "Material Point count: " + Script(allMaterialPoint_CPDI.size()) + "\n";
 		sDescription += "Mass: " + Script(dMass_Domain,6) + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")\n";
 		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
 		sDescription += "Material Point offset: " + Script(d_Offset,3) + "\n";
-//        if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
-//            sDescription += "Platen Speed: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Velocity.y, 3) + " m/s" + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
-		sDescription += "Yield: " + Script(allMaterialPoint[0]->d_YieldStress, 3) + " N/m^2" + "\n";
-		sDescription += "Modulus: " + Script(allMaterialPoint[0]->d_ElasticModulus, 3) + " N/m^2" + "\n";
-		sDescription += "Hardening 0: " + Script(allMaterialPoint[0]->d_Hardening_Isotropic_C0, 3) + "\n";
-		sDescription += "Hardening 1: " + Script(allMaterialPoint[0]->d_Hardening_Isotropic_C1, 3) + "\n";
+		sDescription += "Yield: " + Script(allMaterialPoint_CPDI[0]->d_YieldStress, 3) + " N/m^2" + "\n";
+		sDescription += "Modulus: " + Script(allMaterialPoint_CPDI[0]->d_ElasticModulus, 3) + " N/m^2" + "\n";
+		sDescription += "Hardening 0: " + Script(allMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C0, 3) + "\n";
+		sDescription += "Hardening 1: " + Script(allMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1, 3) + "\n";
 
 		sDescription += "Global Damping: " + Script(d_DampingCoefficient, 3) + "\n";
 		sDescription += "Non-slip contact\n";
