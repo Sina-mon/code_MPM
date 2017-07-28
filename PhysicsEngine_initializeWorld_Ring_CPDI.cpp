@@ -283,7 +283,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 		std::string strTime(buffer);
 
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "-------------------------------------------------------------\n";
+		sDescription += "CPDI formulation --------------------------------------------\n";
 		sDescription += "Process started on: " + strTime + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";

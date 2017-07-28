@@ -16,7 +16,7 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Tube
 	}
 
 	double dRadius_Average = 0.5*(dRadius_Outer + dRadius_Inner);
-	double dAngle = (2.0*_PI)/90.0;
+	double dAngle = (2.0*_PI)/180.0;
 	double dDepth = dOffset;
 	double dRadius_Offset = (dRadius_Outer - dRadius_Inner)/4.0;
 

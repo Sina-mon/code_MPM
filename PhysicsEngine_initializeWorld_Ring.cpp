@@ -7,6 +7,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	GridPoint_Factory		GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
+
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001/1.0);
 	glm::ivec3 i3_Cells = glm::ivec3(1*100, 1*60, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
@@ -53,11 +54,11 @@ void PhysicsEngine::initializeWorld_Ring(void)
 
 		if(fabs(dx - 0.0) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dx - d3_Length_Grid.x) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dy - 0.0) < dTolerance)
 		{
