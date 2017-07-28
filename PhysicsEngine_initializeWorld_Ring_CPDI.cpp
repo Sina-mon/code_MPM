@@ -121,7 +121,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 			thisMP->d_ElasticModulus = 70.0e9;
 			thisMP->d_Viscosity = 0.0;
 			thisMP->d_PoissonRatio = 0.33;
-			thisMP->d_YieldStress = 250.0e6;
+			thisMP->d_YieldStress = 150.0e6;
 
 			thisMP->d_Hardening_Isotropic_C0 = 0.0e+1;
 			thisMP->d_Hardening_Isotropic_C1 = 0.0e6;
@@ -283,7 +283,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 		std::string strTime(buffer);
 
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "-------------------------------------------------------------\n";
+		sDescription += "CPDI formulation --------------------------------------------\n";
 		sDescription += "Process started on: " + strTime + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
