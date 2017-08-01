@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.002);
-	glm::ivec3 i3_Cells = glm::ivec3(50, 30, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.080, 0.002);
+	glm::ivec3 i3_Cells = glm::ivec3(400, 320, 8);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -61,8 +61,8 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 		}
 		if(fabs(dy - 0.0) < dTolerance)
 		{
-//			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
-			thisGridPoint->b3_Fixed.y = true;
+			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
+//			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
 		{
@@ -70,11 +70,11 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 		}
 		if(fabs(dz - 0.0) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.z = true;
+//			thisGridPoint->b3_Fixed.z = true;
 		}
 		if(fabs(dz - d3_Length_Grid.z) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.z = true;
+//			thisGridPoint->b3_Fixed.z = true;
 		}
 	}
 
@@ -86,9 +86,9 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 1.0/2.0*d3_Length_Cell.x;
+	d_Offset = 1.0/1.0*d3_Length_Cell.x;
 
-	double dLength_Ring = 1.0*d_Offset;
+	double dLength_Ring = 0.0010;//1.0*d_Offset;
 
 	double dThickness_Ring = 0.00344;// - d_Offset;
 	double dDiameter_Average = 0.04766;
@@ -96,13 +96,13 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
 
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
-	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.0*d3_Length_Cell.y;
+	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.2*d3_Length_Cell.y;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube_Smooth(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
-//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube_Smooth(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, dLength_Ring/1.0);
+//		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Ring, glm::dvec3(0.005,0.056,0.001), d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -143,8 +143,8 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 1.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.2*d3_Length_Cell.y;
+		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -188,7 +188,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	{// bottom platen material points ----------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -266,7 +266,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 10.0e-9;
+	d_TimeIncrement_Maximum = 1.0e-8;
 	d_TimeEnd = 0.8*dDiameter_Average / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5;
 

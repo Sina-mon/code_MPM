@@ -18,7 +18,7 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Tube
 	double dRadius_Average = 0.5*(dRadius_Outer + dRadius_Inner);
 	double dAngle = (2.0*_PI)/180.0;
 	double dDepth = dOffset;
-	double dRadius_Offset = (dRadius_Outer - dRadius_Inner)/4.0;
+	double dRadius_Offset = (dRadius_Outer - dRadius_Inner)/12.0;
 
 	for(double dRadius_Inner_Cell = dRadius_Inner; dRadius_Inner_Cell < dRadius_Outer-0.5*dRadius_Offset; dRadius_Inner_Cell += dRadius_Offset)
 	{
@@ -69,48 +69,6 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Tube
 		}
 	}
 
-//	for(double dx = 0.5*dOffset; dx <= dRadius_Outer; dx += dOffset)
-//	{//create a quarter
-//		for(double dy = 0.5*dOffset; dy <= dRadius_Outer; dy += dOffset)
-//		{
-//			for(double dz = dz_Start; dz <= 0.5*dLength; dz += dOffset)
-//			{
-//				double dRadialDistance = glm::sqrt(dx*dx + dy*dy);
-//				if(dRadius_Inner*dRadius_Inner < dx*dx + dy*dy && dx*dx + dy*dy < dRadius_Outer*dRadius_Outer)
-//				{
-//					std::vector<MaterialPoint_BC *> vMP;
-//
-//					vMP = this->createCell_Hexahedron(glm::dvec3(+dx, +dy, +dz), dOffset);
-//					allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//					vMP = this->createCell_Hexahedron(glm::dvec3(-dx, +dy, +dz), dOffset);
-//					allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//					vMP = this->createCell_Hexahedron(glm::dvec3(-dx, -dy, +dz), dOffset);
-//					allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//					vMP = this->createCell_Hexahedron(glm::dvec3(+dx, -dy, +dz), dOffset);
-//					allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//					if(bSingleLayer == false)
-//					{
-//						vMP = this->createCell_Hexahedron(glm::dvec3(+dx, +dy, -dz), dOffset);
-//						allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//						vMP = this->createCell_Hexahedron(glm::dvec3(-dx, +dy, -dz), dOffset);
-//						allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//						vMP = this->createCell_Hexahedron(glm::dvec3(-dx, -dy, -dz), dOffset);
-//						allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//
-//						vMP = this->createCell_Hexahedron(glm::dvec3(+dx, -dy, -dz), dOffset);
-//						allMaterialPoint.insert(allMaterialPoint.end(), vMP.begin(), vMP.end());
-//					}
-//				}
-//			}
-//		}
-//	}
-//
 	for(unsigned int index = 0; index < allMaterialPoint.size(); index++)
 	{
 		MaterialPoint_CPDI_CC *thisMaterialPoint = (MaterialPoint_CPDI_CC *)allMaterialPoint[index];
