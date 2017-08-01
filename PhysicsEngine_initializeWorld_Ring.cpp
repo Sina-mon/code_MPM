@@ -8,7 +8,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001/1.0);
-	glm::ivec3 i3_Cells = glm::ivec3(1*100, 1*60, 1);
+	glm::ivec3 i3_Cells = glm::ivec3(1.0*100, 1.0*60, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -86,19 +86,19 @@ void PhysicsEngine::initializeWorld_Ring(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 1.0/4.0*d3_Length_Cell.x;
+	d_Offset = 1.0/2.0*d3_Length_Cell.x;
 
 	double dLength_Ring = 2.0*d_Offset;
 
-	double dThickness_Ring = 0.00344 - d_Offset;
+	double dThickness_Ring = 0.00344;// - d_Offset;
 	double dDiameter_Average = 0.04766;
 	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
 	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
 
-//	double dThickness_Ring = 0.003;
-//	double dDiameter_Average = 0.050 - 0.5*dThickness_Ring;
-//	double dRadius_Outer = 0.025;
-//	double dRadius_Inner = 0.025-0.003;
+//	double dThickness_Ring = 0.00280;// - d_Offset;
+//	double dDiameter_Average = 0.04790;
+//	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
+//	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
 
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
 	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.0*d3_Length_Cell.y;
@@ -120,14 +120,15 @@ void PhysicsEngine::initializeWorld_Ring(void)
 			thisMP->d_Volume_Initial = d_Offset * d_Offset * d_Offset;
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
+//			double dMass = 7800.0 * thisMP->d_Volume;
 			double dMass = 2700.0 * thisMP->d_Volume;
 			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
-			thisMP->d_ElasticModulus = 35.0e9;
+			thisMP->d_ElasticModulus = 70.0e9;
 			thisMP->d_Viscosity = 0.0;
 			thisMP->d_PoissonRatio = 0.33;
-			thisMP->d_YieldStress = 225.0e6;
+			thisMP->d_YieldStress = 150.0e6;
 
 			thisMP->d_Hardening_Isotropic_C0 = 0.0e+1;
 			thisMP->d_Hardening_Isotropic_C1 = 0.0e6;
@@ -278,12 +279,8 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	v_MP_AGP.resize(allMaterialPoint.size());
 
 	double dPlatenSpeed = -1.0;
-	double dTime_On  = 0.2e-3;
-	double dTime_Off = 0.8e-3;
-//	double dTime_On  = 0.5e-3;
-//	double dTime_Off = 0.5e-3;
-//	double dTime_On  = 1.0e-3;
-//	double dTime_Off = 0.0e-3;
+//	double dTime_On  = 0.2e-3;
+//	double dTime_Off = 0.8e-3;
 	if(true)
 	{// timeline events -------------------------------------------------------
 	    double dTime_Line = 0.0;
@@ -318,7 +315,7 @@ void PhysicsEngine::initializeWorld_Ring(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 5.0e-9;
+	d_TimeIncrement_Maximum = 2.0e-9;
 	d_TimeEnd = 0.8*dDiameter_Average / -dPlatenSpeed;
 	d_TimeConsole_Interval = 5.0e-5;
 
