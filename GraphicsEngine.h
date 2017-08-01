@@ -20,7 +20,7 @@
 #include "Light.h"
 
 #include "PhysicsEngine.h"
-#include "MaterialPoint.h"
+#include "MaterialPoint_BC.h"
 #include "GridPoint.h"
 
 #define _RND(d)			((float)(rand()%d)/d)//random value between 0.0 and 1.0, with accuracy related to d

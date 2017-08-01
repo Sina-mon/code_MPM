@@ -1,9 +1,9 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_AuxeticCell(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dOffset)
+std::vector<MaterialPoint_BC *> MaterialPoint_Factory_Classic_CC::createDomain_AuxeticCell(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dOffset)
 {
-	std::vector<MaterialPoint *> allMaterialPoint;
+	std::vector<MaterialPoint_BC *> allMaterialPoint;
 
 	double dThickness = 0.0002;//2.0 * dOffset;
 	double dMiddle_1 = 0.2;
@@ -39,22 +39,22 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_AuxeticCell(glm
 		{
 			for(double dz = -0.5*d3Dimension.z; dz <= +0.5*d3Dimension.z; dz += dOffset)
 			{
-				MaterialPoint *thisMaterialPoint;
+				MaterialPoint_BC *thisMaterialPoint;
 
 				glm::dvec3 d3Coordinate = glm::dvec3(dx, dy, dz);
 
 				if(isInside(d3Coordinate, vVertex_Total) == true && isInside(d3Coordinate, vVertex_Top) == false && isInside(d3Coordinate, vVertex_Bottom) == false)
 				{
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.y, +d3Coordinate.x, +d3Coordinate.z), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.y, +d3Coordinate.x, +d3Coordinate.z));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.y, +d3Coordinate.x, +d3Coordinate.z), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.y, +d3Coordinate.x, +d3Coordinate.z));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.y, -d3Coordinate.x, +d3Coordinate.z), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.y, -d3Coordinate.x, +d3Coordinate.z));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.y, -d3Coordinate.x, +d3Coordinate.z), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.y, -d3Coordinate.x, +d3Coordinate.z));
 					allMaterialPoint.push_back(thisMaterialPoint);
 				}
 			}

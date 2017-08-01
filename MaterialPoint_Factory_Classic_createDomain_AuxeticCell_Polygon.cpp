@@ -1,9 +1,9 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_AuxeticCell_Polygon(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dDent, double dThickness, double dOffset)
+std::vector<MaterialPoint_BC *> MaterialPoint_Factory_Classic_CC::createDomain_AuxeticCell_Polygon(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dDent, double dThickness, double dOffset)
 {
-	std::vector<MaterialPoint *> allMaterialPoint;
+	std::vector<MaterialPoint_BC *> allMaterialPoint;
 
 	double dLength_Incline = glm::sqrt(glm::pow(0.5*d3Dimension.x - 2.0*dDent, 2.0) + glm::pow(0.5*d3Dimension.y, 2.0));
 	double dAngle_Sine = 0.5*d3Dimension.y / dLength_Incline;
@@ -70,7 +70,7 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_AuxeticCell_Pol
 		{
 			for(double dz = 0.5*dOffset; dz <= 0.5*d3Dimension.z; dz += dOffset)
 			{
-				MaterialPoint *thisMaterialPoint;
+				MaterialPoint_BC *thisMaterialPoint;
 
 				glm::dvec3 d3Coordinate = glm::dvec3(dx, dy, dz);
 
@@ -81,28 +81,28 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_AuxeticCell_Pol
 				if(isInside(d3Coordinate, vVertex_Left) == true)
 					continue;
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, +d3Coordinate.y, +d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, +d3Coordinate.y, +d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, +d3Coordinate.y, +d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, +d3Coordinate.y, +d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, -d3Coordinate.y, +d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, -d3Coordinate.y, +d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, -d3Coordinate.y, +d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, -d3Coordinate.y, +d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, +d3Coordinate.y, -d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, +d3Coordinate.y, -d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, +d3Coordinate.y, -d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, +d3Coordinate.y, -d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, -d3Coordinate.y, -d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+d3Coordinate.x, -d3Coordinate.y, -d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, -d3Coordinate.y, -d3Coordinate.z), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-d3Coordinate.x, -d3Coordinate.y, -d3Coordinate.z));
 				allMaterialPoint.push_back(thisMaterialPoint);
 			}
 		}

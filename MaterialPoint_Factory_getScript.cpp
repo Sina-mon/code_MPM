@@ -1,7 +1,7 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::string MaterialPoint_Factory::getScript(MaterialPoint *thisMaterialPoint)
+std::string MaterialPoint_Factory_Classic_CC::getScript(MaterialPoint_BC *thisMaterialPoint)
 {
 	std::stringstream Stream;
 	Stream.clear();

@@ -1,9 +1,9 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Polygon(std::vector<glm::dvec3> vVertex, double dOffset)
+std::vector<MaterialPoint_BC *> MaterialPoint_Factory_Classic_CC::createDomain_Polygon(std::vector<glm::dvec3> vVertex, double dOffset)
 {
-	std::vector<MaterialPoint *> allMaterialPoint;
+	std::vector<MaterialPoint_BC *> allMaterialPoint;
 
 	glm::dvec3 d3Coordinates_Min = vVertex[0];
 	glm::dvec3 d3Coordinates_Max = vVertex[0];
@@ -37,14 +37,14 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Polygon(std::ve
 		{
 			for(double dz = d3Coordinates_Min.z; dz <= d3Coordinates_Max.z; dz += dOffset)
 			{
-				MaterialPoint *thisMaterialPoint;
+				MaterialPoint_BC *thisMaterialPoint;
 
 //						double dz = vVertex[0].z;
 				glm::dvec3 d3Coordinate = glm::dvec3(dx, dy, dz);
 
 				if(isInside(d3Coordinate, vVertex) == true)
 				{
-					thisMaterialPoint = createMaterialPoint(d3Coordinate, dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Coordinate);
 					allMaterialPoint.push_back(thisMaterialPoint);
 				}
 			}

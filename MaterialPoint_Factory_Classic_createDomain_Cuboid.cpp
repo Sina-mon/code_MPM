@@ -1,9 +1,9 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Cuboid(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dOffset)
+std::vector<MaterialPoint_BC *> MaterialPoint_Factory_Classic_CC::createDomain_Cuboid(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dOffset)
 {
-	std::vector<MaterialPoint *> allMaterialPoint;
+	std::vector<MaterialPoint_BC *> allMaterialPoint;
 
 	// if the z-dimension is set to zero, create only one layer of material points
 	// otherwise create even number of layers that are symmetric relative to the x-y plane
@@ -21,32 +21,32 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Cuboid(glm::dve
 		{
 			for(double dz = dz_Start; dz <= 0.5*d3Dimension.z; dz += dOffset)
 			{
-				MaterialPoint *thisMaterialPoint;
+				MaterialPoint_BC *thisMaterialPoint;
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, +dy, +dz), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, +dy, +dz));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, +dy, +dz), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, +dy, +dz));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, -dy, +dz), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, -dy, +dz));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
-				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, -dy, +dz), dOffset);
+				thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, -dy, +dz));
 				allMaterialPoint.push_back(thisMaterialPoint);
 
 				if(bSingleLayer == false)
 				{
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, +dy, -dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, +dy, -dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, +dy, -dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, +dy, -dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, -dy, -dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(-dx, -dy, -dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, -dy, -dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(d3Center + glm::dvec3(+dx, -dy, -dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 				}
 			}

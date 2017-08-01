@@ -1,7 +1,7 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_BC.h"
 
 // ----------------------------------------------------------------------------
-bool MaterialPoint_Factory::isInside(glm::dvec3 d3Coordinate, std::vector<glm::dvec3> vVertex)
+bool MaterialPoint_Factory_BC::isInside(glm::dvec3 d3Coordinate, std::vector<glm::dvec3> vVertex)
 {
 	bool bInside = true;
 
@@ -20,7 +20,7 @@ bool MaterialPoint_Factory::isInside(glm::dvec3 d3Coordinate, std::vector<glm::d
 	return(bInside);
 }
 // ----------------------------------------------------------------------------
-bool MaterialPoint_Factory::isInside(glm::dvec3 d3Coordinate, glm::dvec3 d3Center, glm::dvec2 d2Radii)
+bool MaterialPoint_Factory_BC::isInside(glm::dvec3 d3Coordinate, glm::dvec3 d3Center, glm::dvec2 d2Radii)
 {
 	bool bInside = true;
 

@@ -72,7 +72,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = allMaterialPoint[index_MP];
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
 
 				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints(thisMP->d3_Position);
 
@@ -85,7 +85,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 					v_MP_AGP[index_MP][index_AGP].index = mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP];
 
 					// shape value and shape gradient value
-					mpm_GP_Mediator_Thread[iThread_This].calculateBases(thisMP->d3_Position, thisAGP->d3_Position);
+					mpm_GP_Mediator_Thread[iThread_This].calculateBases_Classic(thisMP->d3_Position, thisAGP->d3_Position);
 //					BasesFunction_Thread.calculateBases(thisMP->d3_Position, thisAGP->d3_Position, mpm_GP_Mediator_Thread[iThread_This].d3_Length_Cell);
 
 					v_MP_AGP[index_MP][index_AGP].dShapeValue = mpm_GP_Mediator_Thread[iThread_This].d_ShapeValue;
@@ -106,7 +106,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = allMaterialPoint[index_MP];
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
 
 				if(thisMP->b_DisplacementControl == true)
 					continue;
@@ -151,7 +151,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = allMaterialPoint[index_MP];
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
 
 				if(thisMP->b_DisplacementControl == true)
 					continue;
@@ -245,7 +245,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_Displacement_Control.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = v_MarkedMaterialPoints_Displacement_Control[index_MP];
+				MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Displacement_Control[index_MP];
 
 				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints(thisMP->d3_Position);
 
@@ -271,7 +271,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = allMaterialPoint[index_MP];
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
 
 				if(thisMP->b_DisplacementControl == true)
 					continue;
@@ -360,7 +360,7 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_Displacement_Control.size(); index_MP++)
 			{
-				MaterialPoint *thisMP = v_MarkedMaterialPoints_Displacement_Control[index_MP];
+				MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Displacement_Control[index_MP];
 
 				if(m_TimeLine.v_Time.size() != 0)
 					thisMP->d3_Velocity = m_TimeLine.getVelocity(d_Time);

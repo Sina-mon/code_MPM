@@ -1,9 +1,9 @@
-#include "MaterialPoint_Factory.h"
+#include "MaterialPoint_Factory_Classic_CC.h"
 
 // ----------------------------------------------------------------------------
-std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Tube(glm::dvec3 d3Center, glm::dvec3 d3Rotation, double dRadius_Outer, double dRadius_Inner, double dLength, double dOffset)
+std::vector<MaterialPoint_BC *> MaterialPoint_Factory_Classic_CC::createDomain_Tube(glm::dvec3 d3Center, glm::dvec3 d3Rotation, double dRadius_Outer, double dRadius_Inner, double dLength, double dOffset)
 {
-	std::vector<MaterialPoint *> allMaterialPoint;
+	std::vector<MaterialPoint_BC *> allMaterialPoint;
 
 	// if the z-dimension is set to zero, create only one layer of material points
 	// otherwise create even number of layers that are symmetric relative to the x-y plane
@@ -20,37 +20,36 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Tube(glm::dvec3
 		for(double dy = 0.5*dOffset; dy <= dRadius_Outer; dy += dOffset)
 		{
 			for(double dz = dz_Start; dz <= 0.5*dLength; dz += dOffset)
-//			for(double dz = 0.0; dz < 0.5*dLength; dz += dOffset)
 			{
 				double dRadialDistance = glm::sqrt(dx*dx + dy*dy);
 				if(dRadius_Inner*dRadius_Inner < dx*dx + dy*dy && dx*dx + dy*dy < dRadius_Outer*dRadius_Outer)
 				{
-					MaterialPoint *thisMaterialPoint;
+					MaterialPoint_BC *thisMaterialPoint;
 
-					thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, +dy, +dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, +dy, +dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, +dy, +dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, +dy, +dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, -dy, +dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, -dy, +dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
-					thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, -dy, +dz), dOffset);
+					thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, -dy, +dz));
 					allMaterialPoint.push_back(thisMaterialPoint);
 
 					if(bSingleLayer == false)
 					{
-						thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, +dy, -dz), dOffset);
+						thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, +dy, -dz));
 						allMaterialPoint.push_back(thisMaterialPoint);
 
-						thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, +dy, -dz), dOffset);
+						thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, +dy, -dz));
 						allMaterialPoint.push_back(thisMaterialPoint);
 
-						thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, -dy, -dz), dOffset);
+						thisMaterialPoint = createMaterialPoint(glm::dvec3(-dx, -dy, -dz));
 						allMaterialPoint.push_back(thisMaterialPoint);
 
-						thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, -dy, -dz), dOffset);
+						thisMaterialPoint = createMaterialPoint(glm::dvec3(+dx, -dy, -dz));
 						allMaterialPoint.push_back(thisMaterialPoint);
 					}
 				}
@@ -60,7 +59,7 @@ std::vector<MaterialPoint *> MaterialPoint_Factory::createDomain_Tube(glm::dvec3
 
 	for(unsigned int index = 0; index < allMaterialPoint.size(); index++)
 	{
-		MaterialPoint *thisMaterialPoint = allMaterialPoint[index];
+		MaterialPoint_BC *thisMaterialPoint = allMaterialPoint[index];
 
 		glm::dmat4 m4Transformation_Position = glm::translate(d3Center);
 		glm::dmat4 m4Transformation_RotationX = glm::rotate(d3Rotation.x, glm::dvec3(1.0, 0.0, 0.0));

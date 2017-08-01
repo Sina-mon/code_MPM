@@ -1,9 +1,7 @@
-#ifndef MATERIALPOINT_H
-#define MATERIALPOINT_H
+#ifndef MATERIALPOINT_BC_H
+#define MATERIALPOINT_BC_H
 
 #include "Definitions.h"
-////#include ".\include\glm\glm.hpp" // windows
-//#include "./include/glm/glm.hpp" // linux
 
 enum MaterialType
 {
@@ -15,15 +13,23 @@ enum MaterialType
 	_GASS,
 };
 
-class MaterialPoint
+struct AGPstruct
+{
+	unsigned int index = 0;
+	double dShapeValue = 0.0;
+	glm::dvec3 d3ShapeGradient = glm::dvec3(0.0, 0.0, 0.0);
+};
+
+class MaterialPoint_BC
 {
 	public:
-		MaterialPoint() {;}
-		virtual ~MaterialPoint() {;}
+		MaterialPoint_BC() {;}
+		virtual ~MaterialPoint_BC() {;}
 
 		bool b_DisplacementControl = false;
 		bool b_Mark_Force = false;
 		bool b_Mark_Stress = false;
+		bool b_Surface = false;
 
 		unsigned int i_ID = 0;
 		unsigned int i_MaterialType = _ELASTIC;
@@ -36,10 +42,6 @@ class MaterialPoint
 		double d_PoissonRatio = 0.0;
 		double d_YieldStress = 0.0;
 		double d_Viscosity = 0.0;
-
-		bool	b_Surface = false;
-		double		d_Kernel = 0.0;
-		glm::dvec3	d3_Kernel_Gradient = glm::dvec3(0.0, 0.0, 0.0);
 
 		glm::dvec3 d3_Position = glm::dvec3(0.0, 0.0, 0.0);
 		glm::dvec3 d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
@@ -55,8 +57,7 @@ class MaterialPoint
 		double d_Hardening_Isotropic_C0 = 0.0;
 		double d_Hardening_Isotropic_C1 = 0.0;
 	protected:
-
 	private:
 };
 
-#endif // MATERIALPOINT_H
+#endif
