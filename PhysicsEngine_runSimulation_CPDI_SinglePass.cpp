@@ -46,6 +46,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 				thisGP->d_Mass = 0.0;
 				thisGP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 				thisGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
+				thisGP->d3_Force_Temp = glm::dvec3(0.0, 0.0, 0.0);
 			}
 			a_Runtime[0] += omp_get_wtime() - dRuntime_Block;
 
@@ -160,7 +161,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 				if(thisGP->b3_Fixed.y == true)
 				{
 					thisGP->d3_Velocity.y = 0.0;
-					thisGP->d3_Force_Temp.y = thisGP->d3_Force.y;
+					thisGP->d3_Force_Temp.y += thisGP->d3_Force.y;
 					thisGP->d3_Force.y = 0.0;
 				}
 				if(thisGP->b3_Fixed.z == true)
