@@ -232,6 +232,8 @@ void GraphicsEngine::drawGame(void)
 			CR.calculateState_J2(thisMP->d6_Stress);
 			float fJ2 = CR.d_J2;
 			glm::vec4 f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+			if(fJ2 > 1.1 * fJ2_Maximum)
+				f4objectColor = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
