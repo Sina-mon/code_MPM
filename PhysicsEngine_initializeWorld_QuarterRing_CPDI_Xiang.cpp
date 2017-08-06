@@ -8,7 +8,7 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.001);
-	glm::ivec3 i3_Cells = glm::ivec3(80, 120, 2);
+	glm::ivec3 i3_Cells = glm::ivec3(160, 240, 4);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -118,7 +118,7 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
-			double dMass = 7800.0 * thisMP->d_Volume;
+			double dMass = 78000.0 * thisMP->d_Volume;
 			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
@@ -146,10 +146,10 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	}
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,d3_Length_Cell.y,dLength_Ring);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 2.5*d3_Length_Cell.y + 0.5*d3Dimension.y;
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y + 0.5*d3Dimension.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -191,7 +191,7 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,d3_Length_Cell.y,dLength_Ring);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
 		d3Center.y = 0.5*d3Dimension.y;
@@ -207,7 +207,7 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
-			double dMass = 7800.0 * thisMP->d_Volume;
+			double dMass = 78000.0 * thisMP->d_Volume;
 			thisMP->d_Mass = dMass;
 
 			thisMP->d_ElasticModulus = 210.0e9;
@@ -231,7 +231,7 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	// sina, be careful, this requires the number of adjacent grid points to be exactly 8
 //	v_MP_AGP.resize(allMaterialPoint.size());
 
-	double dPlatenSpeed = -10.0;
+	double dPlatenSpeed = -0.2;
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 //	double dTime_On  = 0.5e-3;
@@ -272,8 +272,8 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = .0e-8;
-	d_TimeEnd = 0.*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 5.0e-8;
+	d_TimeEnd = 0.5*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";
