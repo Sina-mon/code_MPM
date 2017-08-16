@@ -16,10 +16,12 @@ int main (int argc, char ** argv)
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
 
+	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStress();
+//	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStrain();
 //	thePhysicsEngine.initializeWorld_QuarterRing_CPDI_Xiang();
 //	thePhysicsEngine.initializeWorld_Ring_CPDI_Xiang();
 //	thePhysicsEngine.initializeWorld_Ring_CPDI();
-	thePhysicsEngine.initializeWorld_Bar_CPDI();
+//	thePhysicsEngine.initializeWorld_Bar_CPDI();
 //	thePhysicsEngine.initializeWorld_Bar();
 //	thePhysicsEngine.initializeWorld_Ring();
 //	thePhysicsEngine.initializeWorld_AuxeticSwisscheeseCell();
