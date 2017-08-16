@@ -156,7 +156,7 @@ void GraphicsEngine::drawGame(void)
 			if(thisGP->b3_Fixed == glm::bvec3{false, false, false})	continue;
 
 			// particle position
-			float fSize = 0.0001;
+			float fSize = 0.00005;
 			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
 			// particle color
 			glm::vec4 f4objectColor = _GRAY;
