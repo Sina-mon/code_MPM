@@ -54,6 +54,8 @@ class PhysicsEngine
 		int		runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
 		int		runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
+		int		runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
+		int		runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
 		std::vector<std::array<AGPstruct, 8>> v_MP_AGP;
 
 		double d_Offset = 0.0;

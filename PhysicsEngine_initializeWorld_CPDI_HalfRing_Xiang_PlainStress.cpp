@@ -150,7 +150,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	}
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.4*d3_Length_World.x,2.0*d3_Length_Cell.y,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,dLength_Ring);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
 		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y + 0.5*d3Dimension.y;
@@ -195,7 +195,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.4*d3_Length_World.x,2.0*d3_Length_Cell.y,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,dLength_Ring);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
 		d3Center.y = 0.5*d3Dimension.y;
@@ -232,7 +232,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 		}
 	}
 
-	double dPlatenSpeed = -0.1;
+	double dPlatenSpeed = -1.0;
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 	if(true)
@@ -270,7 +270,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 5.0e-8;
-	d_TimeEnd = 0.4*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-4;
 
 	std::string sDescription = "";

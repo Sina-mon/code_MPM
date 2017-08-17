@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.010);
-	glm::ivec3 i3_Cells = glm::ivec3(50, 30, 5);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.020, 0.060, 0.010);
+	glm::ivec3 i3_Cells = 4*glm::ivec3(10, 30, 5);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -28,16 +28,16 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
 
-	// contact kernel grid ---------------------------------------------------- contact grid
-	{// initialize GP kernel mediator
-		d3_Length_Grid_Kernel = d3_Length_Grid;
-		i3_Cells_Kernel = 1*i3_Cells;
-
-		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
-
-		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
-	}
-	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
+//	// contact kernel grid ---------------------------------------------------- contact grid
+//	{// initialize GP kernel mediator
+//		d3_Length_Grid_Kernel = d3_Length_Grid;
+//		i3_Cells_Kernel = 1*i3_Cells;
+//
+//		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
+//
+//		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
+//	}
+//	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
@@ -86,7 +86,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 0.001;
+	d_Offset = 0.25*d3_Length_Cell.x;
 
 	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
 	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
@@ -260,8 +260,8 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 1.0e-4;
+	d_TimeEnd = 0.2e-6;//0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 0.2e-6;
 
 	std::string sDescription = "";
 	{
