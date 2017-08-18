@@ -8,7 +8,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.002);
-	glm::ivec3 i3_Cells = 2*glm::ivec3(40, 60, 2);
+	glm::ivec3 i3_Cells = 1*glm::ivec3(40, 60, 2);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -98,8 +98,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	double dRadius_Outer = 0.5*dDiameter_Outer;
 	double dLength_Ring = 0.0005;//1.0*d_Offset;
 
-	int iDivision_Angular = 180;
-	int iDivision_Radial = 16;
+	int iDivision_Angular = 90;
+	int iDivision_Radial = 8;
 	int iDivision_Longitudinal = 1;
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.0,0.0,0.5)*d3_Length_Grid;
 	d3Center_Ring.x += 0.5*d3_Length_Cell.x;
@@ -267,10 +267,10 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.00;
+	d_DampingCoefficient = 0.0;
 
 	d_TimeIncrement_Maximum = 5.0e-8;
-	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 0.4*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-4;
 
 	std::string sDescription = "";

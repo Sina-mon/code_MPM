@@ -16,6 +16,7 @@ int main (int argc, char ** argv)
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
 
+//	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_FullLength();
 	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStress();
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStrain();
 //	thePhysicsEngine.initializeWorld_QuarterRing_CPDI_Xiang();

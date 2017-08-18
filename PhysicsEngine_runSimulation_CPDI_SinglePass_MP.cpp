@@ -192,6 +192,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 				if(thisGP->b_Active == false)
 					continue;
 
+				if(glm::length(thisGP->d3_Velocity) > 1.0e-9)
+					thisGP->d3_Force -= d_DampingCoefficient * glm::length(thisGP->d3_Force) * glm::normalize(thisGP->d3_Velocity);
+
 				if(thisGP->d_Mass > d_Mass_Minimum)
 					thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;
 

@@ -21,15 +21,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS 1
-
-// adjacent grid point struct to calculate AGP data once
-//struct AGPstruct
-//{
-//	unsigned int index = 0;
-//	double dShapeValue = 0.0;
-//	glm::dvec3 d3ShapeGradient = glm::dvec3(0.0, 0.0, 0.0);
-//};
+#define _MAX_N_THREADS 8
 
 class PhysicsEngine
 {
@@ -42,6 +34,7 @@ class PhysicsEngine
 		void	initializeWorld_Ring(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void);
+		void	initializeWorld_CPDI_HalfRing_Xiang_FullLength(void);
 		void	initializeWorld_QuarterRing_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI(void);
