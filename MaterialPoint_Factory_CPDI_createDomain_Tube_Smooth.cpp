@@ -16,16 +16,17 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Tube
 	}
 
 	double dRadius_Average = 0.5*(dRadius_Outer + dRadius_Inner);
-	double dAngle = (2.0*_PI)/720.0;
+
+	double dAngle = (1.0*_PI)/90.0;
 	double dDepth = dOffset;
-	double dRadius_Offset = (dRadius_Outer - dRadius_Inner)/16.0;
+	double dRadius_Offset = (dRadius_Outer - dRadius_Inner)/8.0;
 
 	for(double dRadius_Inner_Cell = dRadius_Inner; dRadius_Inner_Cell < dRadius_Outer-0.5*dRadius_Offset; dRadius_Inner_Cell += dRadius_Offset)
 	{
 		double dRadius_Outer_Cell = dRadius_Inner_Cell + dRadius_Offset;
 		for(double dz = dz_Start; dz <= 0.5*dLength; dz += dOffset)
 		{
-			for(double dTheta = 0.0; dTheta < 2.0*_PI; dTheta += dAngle)
+			for(double dTheta = -0.5*_PI; dTheta < 0.5*_PI-dAngle; dTheta += dAngle)
 			{
 				std::vector<MaterialPoint_BC *> vMaterialPoints;
 

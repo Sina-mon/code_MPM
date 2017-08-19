@@ -23,7 +23,7 @@ void GraphicsEngine::gameLoop(void)
 			i_TimeSnapshotCycle += 1;
 		}
 
-		double dTimeIncrement_Request = 1.0e3*mpm_PhysicsEngine->getTime_Increment();
+		double dTimeIncrement_Request = 0.2e3*mpm_PhysicsEngine->getTime_Increment();
 		if(iSimulationStatus == 0)
 		{
 			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass(dTimeIncrement_Request);

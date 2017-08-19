@@ -1,15 +1,14 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Ring_CPDI(void)
+void PhysicsEngine::initializeWorld_Ring_CPDI_Xiang(void)
 {
 	MaterialPoint_Factory_CPDI_CC	MP_Factory;
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.080, 0.002);
-	glm::ivec3 i3_Cells = glm::ivec3(400, 320, 8);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001);
+	glm::ivec3 i3_Cells = glm::ivec3(400, 240, 4);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -89,15 +88,16 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 
 	d_Offset = 1.0/1.0*d3_Length_Cell.x;
 
-	double dLength_Ring = 0.0010;//1.0*d_Offset;
+	double dLength_Ring = 0.00025;//1.0*d_Offset;
 
-	double dThickness_Ring = 0.00344;// - d_Offset;
-	double dDiameter_Average = 0.04766;
-	double dRadius_Outer = 0.5*dDiameter_Average + 0.5*dThickness_Ring;
-	double dRadius_Inner = 0.5*dDiameter_Average - 0.5*dThickness_Ring;
+	double dThickness_Ring = 0.00148;// - d_Offset;
+	double dDiameter_Inner = 0.0479;
+	double dDiameter_Outer = dDiameter_Inner + 2.0*dThickness_Ring;
+	double dRadius_Inner = 0.5*dDiameter_Inner;
+	double dRadius_Outer = 0.5*dDiameter_Outer;
 
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
-	d3Center_Ring.y = 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.5*d3_Length_Cell.y;
+	d3Center_Ring.y = 0.5*dDiameter_Outer + 2.5*d3_Length_Cell.y;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
@@ -115,14 +115,14 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
-			double dMass = 2700.0 * thisMP->d_Volume;
+			double dMass = 7800.0 * thisMP->d_Volume;
 			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
-			thisMP->d_ElasticModulus = 70.0e9;
+			thisMP->d_ElasticModulus = 210.0e9;
 			thisMP->d_Viscosity = 0.0;
 			thisMP->d_PoissonRatio = 0.33;
-			thisMP->d_YieldStress = 150.0e6;
+			thisMP->d_YieldStress = 350.0e6;
 
 			thisMP->d_Hardening_Isotropic_C0 = 0.0e+1;
 			thisMP->d_Hardening_Isotropic_C1 = 0.0e6;
@@ -144,8 +144,8 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*dThickness_Ring + 2.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 2.5*d3_Length_Cell.y;
+		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -189,7 +189,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	{// bottom platen material points ----------------------------------------- platen MP
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.5*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,2.0*d_Offset,dLength_Ring);
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -268,7 +268,7 @@ void PhysicsEngine::initializeWorld_Ring_CPDI(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.8*dDiameter_Average / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 0.5*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";

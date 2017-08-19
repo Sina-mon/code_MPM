@@ -161,7 +161,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 				if(thisGP->b3_Fixed.y == true)
 				{
 					thisGP->d3_Velocity.y = 0.0;
-					thisGP->d3_Force_Temp.y = thisGP->d3_Force.y;
+					thisGP->d3_Force_Temp.y += thisGP->d3_Force.y;
 					thisGP->d3_Force.y = 0.0;
 				}
 				if(thisGP->b3_Fixed.z == true)
@@ -208,7 +208,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 
 				glm::dmat3 d33VelocityGradient = glm::dmat3(0.0);
 
-				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+				//thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
@@ -218,8 +218,8 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					if(thisAGP->d_Mass > d_Mass_Minimum)
-//						thisMP->d3_Velocity += dShapeValue * (thisAGP->d3_Force/thisAGP->d_Mass) * dTimeIncrement; // and before the loop, remove thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-						thisMP->d3_Velocity += dShapeValue * thisAGP->d3_Velocity; // and before the loop, add thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+						thisMP->d3_Velocity += dShapeValue * (thisAGP->d3_Force/thisAGP->d_Mass) * dTimeIncrement; // and before the loop, remove thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+						//thisMP->d3_Velocity += dShapeValue * thisAGP->d3_Velocity; // and before the loop, add thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 
 					// velocity gradient, to be used to calculate strains
 					d33VelocityGradient += glm::outerProduct(thisAGP->d3_Velocity, d3ShapeGradient);// this glm function does the pre-transposition that we want

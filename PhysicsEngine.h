@@ -40,6 +40,8 @@ class PhysicsEngine
 		void	initializeWorld_Bar(void);
 		void	initializeWorld_Bar_CPDI(void);
 		void	initializeWorld_Ring(void);
+		void	initializeWorld_QuarterRing_CPDI_Xiang(void);
+		void	initializeWorld_Ring_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI(void);
 		void	initializeWorld_AuxeticSwisscheeseCell(void);
 		void	initializeWorld_AuxeticPolygonCell(void);
