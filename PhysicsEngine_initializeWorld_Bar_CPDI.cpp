@@ -8,7 +8,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.020, 0.060, 0.010);
-	glm::ivec3 i3_Cells = 4*glm::ivec3(10, 30, 5);
+	glm::ivec3 i3_Cells = 1*glm::ivec3(10, 30, 5);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -86,7 +86,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 0.25*d3_Length_Cell.x;
+	d_Offset = 1.0*d3_Length_Cell.x;
 
 	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
 	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
@@ -101,8 +101,9 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-			thisMP->i_MaterialType = _VONMISESHARDENING;
-//			thisMP->i_MaterialType = _PLASTIC;
+//			thisMP->i_MaterialType = _VONMISESHARDENING;
+			thisMP->i_MaterialType = _PLASTIC;
+//			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
@@ -131,7 +132,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 			// moment log
 //			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 			// mark for stress monitor
-			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+//			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
 		}
 	}
 	if(true)
@@ -218,7 +219,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	// sina, be careful, this requires the number of adjacent grid points to be exactly 8
 //	v_MP_AGP.resize(allMaterialPoint.size());
 
-	double dPlatenSpeed = +1.0;
+	double dPlatenSpeed = +0.1;
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 //	double dTime_On  = 0.5e-3;
@@ -260,8 +261,8 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.2e-6;//0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 0.2e-6;
+	d_TimeEnd = 0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";
 	{

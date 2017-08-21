@@ -305,17 +305,20 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 				else
 					vonMises_Thread.calculateIncrement_PerfectlyPlastic_6D(dE, dNu, dYield, thisMP->d6_Stress, d6StrainIncrement);
 
+				// update MP variables
 				for(int index = 0; index < 6; index++)
 					d6StressIncrement[index] = vonMises_Thread.d6StressIncrement[index];
-
 				for(int index = 0; index < 6; index++)
 					d6PlasticStrainIncrement[index] = vonMises_Thread.d6PlasticStrainIncrement[index];
-
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Stress[index] += d6StressIncrement[index];
-
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain_Plastic[index] += d6PlasticStrainIncrement[index];
+
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Strain += thisMP->d6_Stress[index]*d6StrainIncrement[index] * thisMP->d_Volume;
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Plastic += thisMP->d6_Stress[index]*d6PlasticStrainIncrement[index] * thisMP->d_Volume;
 
 				thisMP->d_BackStress_Isotropic += vonMises_Thread.dBackstress_IsotropicIncrement;
 			}
