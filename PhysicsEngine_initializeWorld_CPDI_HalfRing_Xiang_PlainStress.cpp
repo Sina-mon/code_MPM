@@ -232,7 +232,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 		}
 	}
 
-	double dPlatenSpeed = -1.0;
+	double dPlatenSpeed = -0.1;
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 	if(true)

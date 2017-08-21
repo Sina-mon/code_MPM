@@ -29,6 +29,8 @@ class MaterialPoint_BC
 		bool b_DisplacementControl = false;
 		bool b_Mark_Force = false;
 		bool b_Mark_Stress = false;
+		bool b_Mark_Energy_Strain = false;
+		bool b_Mark_Energy_Plastic = false;
 		bool b_Surface = false;
 
 		unsigned int i_ID = 0;
@@ -52,6 +54,9 @@ class MaterialPoint_BC
 		double d6_Strain[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Stress[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Strain_Plastic[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+		double d_Energy_Strain = 0.0;
+		double d_Energy_Plastic = 0.0;
 
 		double d_BackStress_Isotropic = 0.0;
 		double d_Hardening_Isotropic_C0 = 0.0;
