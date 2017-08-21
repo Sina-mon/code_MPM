@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.060, 0.001/0.2);
-	glm::ivec3 i3_Cells = glm::ivec3(0.2*100, 0.2*60, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.020, 0.060, 0.010);
+	glm::ivec3 i3_Cells = 4*glm::ivec3(10, 30, 5);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -28,16 +28,16 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
 
-	// contact kernel grid ---------------------------------------------------- contact grid
-	{// initialize GP kernel mediator
-		d3_Length_Grid_Kernel = d3_Length_Grid;
-		i3_Cells_Kernel = 1*i3_Cells;
-
-		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
-
-		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
-	}
-	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
+//	// contact kernel grid ---------------------------------------------------- contact grid
+//	{// initialize GP kernel mediator
+//		d3_Length_Grid_Kernel = d3_Length_Grid;
+//		i3_Cells_Kernel = 1*i3_Cells;
+//
+//		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
+//
+//		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
+//	}
+//	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
@@ -86,41 +86,39 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 1.0/2.0*d3_Length_Cell.x;
+	d_Offset = 0.25*d3_Length_Cell.x;
 
-	double dLength_Ring = 2.0*d_Offset;
+	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
+	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
+	d3Bar_Center.y = 0.5*d3Bar_Dimension.y + 2.0*d3_Length_Cell.y;
 
-	double dDiameter_Average = 0.04;
-
-	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.5,0.5)*d3_Length_Grid;
-	d3Center_Ring.y = 0.5*dDiameter_Average + 1.0*d3_Length_Cell.y;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = -0.0;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Ring, glm::dvec3(0.010,dDiameter_Average,2*d_Offset), d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Bar_Center, d3Bar_Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-//			thisMP->i_MaterialType = _VONMISESHARDENING;
-			thisMP->i_MaterialType = _PLASTIC;
+			thisMP->i_MaterialType = _VONMISESHARDENING;
+//			thisMP->i_MaterialType = _PLASTIC;
 			thisMP->i_ID = 1;
 
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
-			double dMass = 2700.0 * thisMP->d_Volume;
+			double dMass = 7800.0 * thisMP->d_Volume;
 			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
-			thisMP->d_ElasticModulus = 70.0e9;
+			thisMP->d_ElasticModulus = 210.0e9;
 			thisMP->d_Viscosity = 0.0;
-			thisMP->d_PoissonRatio = 0.33;
-			thisMP->d_YieldStress = 200.0e6;
+			thisMP->d_PoissonRatio = 0.3;
+			thisMP->d_YieldStress = 310.0e6;
 
-			thisMP->d_Hardening_Isotropic_C0 = 1.0e+1;
-			thisMP->d_Hardening_Isotropic_C1 = 30.0e6;
+			thisMP->d_Hardening_Isotropic_C0 = 4.0;
+			thisMP->d_Hardening_Isotropic_C1 = 150.0e6;
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, dGravity, 0.0);
@@ -138,9 +136,9 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	}
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Average + 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,1.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
+		glm::dvec3 d3Center = d3Bar_Center;
+		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3_Length_Cell.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -181,9 +179,9 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Center = d3Center_Ring;
-		d3Center.y = 0.5*d3_Length_Cell.y;//d3Center_Ring.y - 0.5*dDiameter_Average - 0.5*dThickness_Ring - 0.5*d3_Length_Cell.y;
-		glm::dvec3 d3Dimension = glm::dvec3(0.2*d3_Length_World.x,1.0*d_Offset,dLength_Ring);
+		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
+		glm::dvec3 d3Center = d3Bar_Center;
+		d3Center.y = 0.5*d3Dimension.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -261,9 +259,9 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 10.0e-9;
-	d_TimeEnd = 0.8*dDiameter_Average / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 1.0e-5;
+	d_TimeIncrement_Maximum = 1.0e-8;
+	d_TimeEnd = 0.2e-6;//0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 0.2e-6;
 
 	std::string sDescription = "";
 	{

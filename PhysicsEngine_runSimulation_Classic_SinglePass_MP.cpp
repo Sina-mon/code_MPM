@@ -3,9 +3,6 @@
 // ----------------------------------------------------------------------------
 int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total)
 {
-//	const int max_num_Threads = 1; // sina, only use 1 for now as you haven;t implemented atomics
-//	omp_set_num_threads(max_num_Threads);
-
 	omp_set_num_threads(_MAX_N_THREADS);
 
 	clock_t clockCurrent_Total;
@@ -30,8 +27,6 @@ int PhysicsEngine::runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Tot
 		dRuntime_MP = omp_get_wtime();
 		#pragma omp parallel
 		{
-//			Bases BasesFunction_Thread;
-
 			int iThread_Count = omp_get_num_threads();
 			int	iThread_This = omp_get_thread_num();
 

@@ -15,8 +15,7 @@ class MaterialPoint_Factory_CPDI_CC : public MaterialPoint_Factory_BC
 		std::vector<MaterialPoint_BC *> createCell_Hexahedron(std::vector<glm::dvec3> vCorner);
 
 		virtual std::vector<MaterialPoint_BC *> createDomain_Cuboid(glm::dvec3 d3Center, glm::dvec3 d3Dimension, double dOffset);
-		virtual std::vector<MaterialPoint_BC *> createDomain_Tube(glm::dvec3 d3Center, glm::dvec3 d3Rotation, double dRadius_Outer, double dRadius_Inner, double dLength, double dOffset);
-		virtual std::vector<MaterialPoint_BC *> createDomain_Tube_Smooth(glm::dvec3 d3Center, glm::dvec3 d3Rotation, double dRadius_Outer, double dRadius_Inner, double dLength, double dOffset);
+		virtual std::vector<MaterialPoint_BC *> createDomain_Arc(glm::dvec3 d3Center, glm::dvec3 d3Rotation, double dAngle_Start, double dAngle_End, double dRadius_Outer, double dRadius_Inner, double dLength, int iDivision_Angular, int iDivision_Radial, int iDivision_Logitudinal);
 
 		double getVolume(MaterialPoint_CPDI_CC *pMP)
 		{
