@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.001);
-	glm::ivec3 i3_Cells = 4*glm::ivec3(40, 60, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.002);
+	glm::ivec3 i3_Cells = 2*glm::ivec3(40, 60, 2);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -68,9 +68,13 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 		{
 //			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
 		}
-		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
+		if(fabs(dz - 0.0) < 1.5*d3_Length_Cell.z)
 		{
 			thisGridPoint->b3_Fixed.z = true;
+		}
+		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
+		{
+			//thisGridPoint->b3_Fixed.z = true;
 		}
 		if(fabs(dz - d3_Length_Grid.z) < dTolerance)
 		{
@@ -99,8 +103,8 @@ void PhysicsEngine::initializeWorld_QuarterRing_CPDI_Xiang(void)
 
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.0,0.0,0.5)*d3_Length_Grid;
 	d3Center_Ring.x += 0.5*d3_Length_Cell.x;
-//	d3Center_Ring.y += 0.5*d3_Length_Cell.y;
 	d3Center_Ring.y = 0.5*dDiameter_Outer + 3.5*d3_Length_Cell.y;
+	d3Center_Ring.z = d3_Length_Cell.z + 0.5*dLength_Ring;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
