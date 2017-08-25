@@ -21,6 +21,7 @@ void GraphicsEngine::gameLoop(void)
 			strFileName += ".bmp";
 			this->saveScreenshot(0, 0, i_ScreenWidth, i_ScreenHeight, strFileName.c_str());
 			i_TimeSnapshotCycle += 1;
+			std::cout << "GraphicsEngine: Screenshot saved at: " << Script(f_Time, 4) << std::endl;
 		}
 
 		double dTimeIncrement_Request = 0.2e3*mpm_PhysicsEngine->getTime_Increment();

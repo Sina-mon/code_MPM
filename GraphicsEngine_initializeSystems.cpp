@@ -5,7 +5,7 @@ void GraphicsEngine::initializeSystems(void)
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	i_ScreenWidth = i_ScreenHeight * (int)enum_Canvas::COUNT;
+//	i_ScreenWidth = i_ScreenHeight * (int)enum_Canvas::COUNT;
 	p_Window = SDL_CreateWindow("MPM Suite", 10, 30, i_ScreenWidth, i_ScreenHeight, SDL_WINDOW_OPENGL);
 	if(p_Window == NULL)	fatalError("Error int MainGame::initSystems, SDL window could not be created!");
 
@@ -60,8 +60,9 @@ void GraphicsEngine::initializeSystems(void)
 	gl_Canvas_Mesh_MP_KernelGradient	= new Mesh("./res/square.obj");
 	gl_Canvas_Texture_MP_KernelGradient	= new Texture(i_ScreenWidth, i_ScreenHeight);
 
-	float fScreenRatio = 1.0 / (int)enum_Canvas::COUNT;
-	gl_Camera = new Camera(f3_Camera_Position_Original, f3_Camera_Target_Original, _PI/180.0*30.0f, fScreenRatio*(float)(i_ScreenWidth/i_ScreenHeight), 0.01f, 0.5f);
+//	float fScreenRatio = 1.0 / (int)enum_Canvas::COUNT;
+//	gl_Camera = new Camera(f3_Camera_Position_Original, f3_Camera_Target_Original, _PI/180.0*30.0f, fScreenRatio*(float)(i_ScreenWidth/i_ScreenHeight), 0.01f, 0.5f);
+	gl_Camera = new Camera(f3_Camera_Position_Original, f3_Camera_Target_Original, _PI/180.0*30.0f, 1.0, 0.01f, 0.5f);
 
 	gl_Light = new Light(glm::vec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,-0.025));
 	gl_Light->f4_Color = glm::vec4(1.0, 1.0, 1.0, 1.0);
