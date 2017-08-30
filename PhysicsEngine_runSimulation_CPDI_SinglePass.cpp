@@ -84,6 +84,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
 
+				if(thisMP->b_DisplacementControl == true)
+					continue;
+
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
@@ -106,6 +109,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass(double dTimeIncrement_Total)
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
+
+				if(thisMP->b_DisplacementControl == true)
+					continue;
 
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{

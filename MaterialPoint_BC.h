@@ -27,6 +27,7 @@ class MaterialPoint_BC
 		virtual ~MaterialPoint_BC() {;}
 
 		bool b_DisplacementControl = false;
+		float f_DisplacementControl_Multiplier = 1.0;
 		bool b_Mark_Force = false;
 		bool b_Mark_Stress = false;
 		bool b_Mark_Energy_Strain = false;

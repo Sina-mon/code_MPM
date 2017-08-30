@@ -24,7 +24,7 @@ std::vector<MaterialPoint_BC *> MaterialPoint_Factory_CPDI_CC::createDomain_Arc(
 		double dRadius_Outer_Cell = dRadius_Inner_Cell + dOffset_Radial;
 		for(double dz = dz_Start; dz <= 0.5*dLength; dz += dOffset_Longitudinal)
 		{
-			for(double dTheta = dAngle_Start; dTheta < dAngle_End-dOffset_Angular; dTheta += dOffset_Angular)
+			for(double dTheta = dAngle_Start; dTheta < dAngle_End-0.1*dOffset_Angular; dTheta += dOffset_Angular)
 			{
 				std::vector<MaterialPoint_BC *> vMaterialPoints;
 

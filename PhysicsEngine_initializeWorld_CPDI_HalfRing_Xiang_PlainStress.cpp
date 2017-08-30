@@ -271,7 +271,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 
 	d_TimeIncrement_Maximum = 10.0e-8;
 	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 1.0e-5 / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 1.0e-3 / glm::abs(dPlatenSpeed);
 
 	std::string sDescription = "";
 	{

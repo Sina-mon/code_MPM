@@ -80,7 +80,7 @@ void GraphicsEngine::drawGame(void)
 				fSize *= 1.0;
 			}
 			if(thisMP->b_DisplacementControl)
-				f4objectColor = _WHITE;
+				f4objectColor = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -110,7 +110,7 @@ void GraphicsEngine::drawGame(void)
 			if(thisMP->b_Surface)
 				f4objectColor = _BLUE;
 			if(thisMP->b_DisplacementControl)
-				f4objectColor = _WHITE;
+				f4objectColor = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -284,7 +284,7 @@ void GraphicsEngine::drawGame(void)
 		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-		float fJ2_Maximum = 10.0*1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
+		float fJ2_Maximum = 100.0*1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{

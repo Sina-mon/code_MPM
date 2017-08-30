@@ -94,9 +94,11 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
 
+				if(thisMP->b_DisplacementControl == true)
+					continue;
+
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-//					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 					GridPoint *thisAGP_Thread = allGridPoint_Thread[iThread_This][thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
@@ -104,7 +106,6 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					// mass
-//					thisAGP->d_Mass += dShapeValue * thisMP->d_Mass;
 					thisAGP_Thread->d_Mass += dShapeValue * thisMP->d_Mass;
 				}
 			}
@@ -133,6 +134,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
+
+				if(thisMP->b_DisplacementControl == true)
+					continue;
 
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
@@ -225,9 +229,15 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			{
 				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
 
-				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				mpm_GP_Mediator_Thread[iThread_This].findAdjacentGridPoints(thisMP->d3_Position);
+
+				for(int index_AGP = 0; index_AGP < mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints.size(); index_AGP++)
 				{
-					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+					unsigned int index_GP = mpm_GP_Mediator_Thread[iThread_This].v_adjacentGridPoints[index_AGP];
+					GridPoint *thisAGP = allGridPoint[index_GP];
+//				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+//				{
+//					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 					thisAGP->d3_Velocity = thisMP->d3_Velocity;
 					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
@@ -365,14 +375,13 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
 			// displacement controlled material points ------------------------ displacement control
-			// sina, need to upadate this from classic to tetrahedra corners
 			#pragma omp for
 			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_CPDI_Displacement_Control.size(); index_MP++)
 			{
 				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
 
 				if(m_TimeLine.v_Time.size() != 0)
-					thisMP->d3_Velocity = m_TimeLine.getVelocity(d_Time);
+					thisMP->d3_Velocity = glm::dvec3(thisMP->f_DisplacementControl_Multiplier) * m_TimeLine.getVelocity(d_Time);
 
 				thisMP->d3_Position += thisMP->d3_Velocity * dTimeIncrement;
 				for(unsigned int index_Corner = 0; index_Corner < 4; index_Corner++)
