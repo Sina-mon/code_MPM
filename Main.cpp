@@ -17,8 +17,8 @@ int main (int argc, char ** argv)
 	PhysicsEngine thePhysicsEngine;
 
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_FullLength();
-	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStress();
-//	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStrain();
+//	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStress();
+	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStrain();
 //	thePhysicsEngine.initializeWorld_Bar_CPDI();
 //	thePhysicsEngine.initializeWorld_Bar();
 //	thePhysicsEngine.initializeWorld_Ring();

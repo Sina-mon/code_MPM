@@ -51,11 +51,11 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 				{
 					GridPoint *thisGP_Thread = allGridPoint_Thread[index_Thread][index_GP];
 
-					thisGP_Thread->b_Active = false;
+					//thisGP_Thread->b_Active = false;
 					thisGP_Thread->d_Mass = 0.0;
 					thisGP_Thread->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 					thisGP_Thread->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
-					thisGP_Thread->d3_Force_Temp = glm::dvec3(0.0, 0.0, 0.0);
+					//thisGP_Thread->d3_Force_Temp = glm::dvec3(0.0, 0.0, 0.0);
 				}
 			}
 			a_Runtime[0] += omp_get_wtime() - dRuntime_Block;
@@ -93,6 +93,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
+
+				if(thisMP->b_DisplacementControl == true)
+					continue;
 
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
@@ -133,6 +136,9 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 			for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
 			{
 				MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index_MP];
+
+				if(thisMP->b_DisplacementControl == true)
+					continue;
 
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
