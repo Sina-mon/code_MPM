@@ -30,6 +30,7 @@ void GraphicsEngine::gameLoop(void)
 		{
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP_Locks(dTimeIncrement_Request);
 			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP(dTimeIncrement_Request);
+//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_DoublePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP_Contact(dTimeIncrement_Request);

@@ -182,7 +182,8 @@ class GridPoint_Mediator
 			dVolume += x21*(y23*z34 - y34*z23);
 			dVolume += x32*(y34*z12 - y12*z34);
 			dVolume += x43*(y12*z23 - y23*z12);
-			dVolume /= 1.0;
+			dVolume /= 6.0;
+			//dVolume = glm::abs(dVolume);
 
 			double da[4] = {0.0, 0.0, 0.0, 0.0};
 			da[0] = y42*z32 - y32*z42;
@@ -215,7 +216,7 @@ class GridPoint_Mediator
 				d3_ShapeGradient.z += dShapeValue[index_Corner] * d3Weight[index_Corner].z;
 			}
 
-			d3_ShapeGradient *= (1.0/dVolume);
+			d3_ShapeGradient /= (6.0*dVolume);
 		}
 		void findNeighborGridPoints(glm::dvec3 d3Position, glm::ivec3 i3Node_Count, glm::dvec3 d3Length_Cell, int iLayers)
 		{// similar to getAdjacentGridPoint (iLayer=0), but can return extra layers of neighboring grid points

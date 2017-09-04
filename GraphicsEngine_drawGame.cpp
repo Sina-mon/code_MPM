@@ -431,7 +431,7 @@ void GraphicsEngine::drawGame(void)
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
-			float fValue = thisMP->d_Energy_Strain;
+			float fValue = thisMP->d_Energy_Plastic;
 			glm::vec4 f4objectColor = (1.0f-fValue/fValue_Maximum) * _BLUE + fValue/fValue_Maximum * _RED;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
