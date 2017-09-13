@@ -210,7 +210,10 @@ void GraphicsEngine::drawGame(void)
 //		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint_CPDI[0]->d_YieldStress + 0.0*vMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1,2);
+		//float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint_CPDI[0]->d_YieldStress + 0.0*vMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1,2);
+		double d6Stress_Maximum[6] = {vMaterialPoint_CPDI[0]->d_YieldStress, 0, 0, 0, 0, 0};
+		CR.calculateState_J2(d6Stress_Maximum);
+		float fJ2_Maximum = CR.d_J2 + vMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1;
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
@@ -327,9 +330,9 @@ void GraphicsEngine::drawGame(void)
 //		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-//		float fJ2_Maximum = 100.0*1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
-		double d6Strain_Yield[6] = {vMaterialPoint_CPDI[0]->d_YieldStress / vMaterialPoint_CPDI[0]->d_ElasticModulus, 0, 0, 0, 0, 0};
-		CR.calculateState_J2(d6Strain_Yield);
+//		double d6Strain_Yield[6] = {vMaterialPoint_CPDI[0]->d_YieldStress / vMaterialPoint_CPDI[0]->d_ElasticModulus, 0, 0, 0, 0, 0};
+		double d6Strain_Maximum[6] = {0.1, 0, 0, 0, 0, 0};
+		CR.calculateState_J2(d6Strain_Maximum);
 		float fJ2_Maximum = CR.d_J2;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
@@ -377,6 +380,8 @@ void GraphicsEngine::drawGame(void)
 			CR.calculateState_J2(thisMP->d6_Strain_Plastic);
 			float fJ2 = CR.d_J2;
 			glm::vec4 f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+			if(fJ2 > fJ2_Maximum)
+				f4objectColor  = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
