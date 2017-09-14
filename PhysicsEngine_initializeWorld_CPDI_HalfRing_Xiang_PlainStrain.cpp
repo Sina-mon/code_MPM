@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.080, 0.002);
-	glm::ivec3 i3_Cells = 1*glm::ivec3(40, 80, 2);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.001/2.0);
+	glm::ivec3 i3_Cells = glm::ivec3(2.0*40, 2.0*60, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -65,13 +65,14 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
 		{
 		}
-		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
+		//if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
+		if(fabs(dz - 0.0) < dTolerance)
 		{
 			thisGridPoint->b3_Fixed.z = true;
 		}
 		if(fabs(dz - d3_Length_Grid.z) < dTolerance)
 		{
-			//thisGridPoint->b3_Fixed.z = true;
+			thisGridPoint->b3_Fixed.z = true;
 		}
 	}
 
@@ -92,15 +93,15 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	double dAngle_End	= +0.5*_PI;
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
-	double dLength_Ring = 0.001;//1.0*d_Offset;
+	double dLength_Ring = d3_Length_Grid.z;
 
-	int iDivision_Angular = 180;
-	int iDivision_Radial = 6;
+	int iDivision_Angular = 360;
+	int iDivision_Radial = 16;
 	int iDivision_Longitudinal = 1;
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.0,0.0,0.5)*d3_Length_Grid;
 	d3Center_Ring.x += 1.0*d3_Length_Cell.x;
 //	d3Center_Ring.y += 0.5*d3_Length_Cell.y;
-	d3Center_Ring.y = 0.5*dDiameter_Outer + 4.1*d3_Length_Cell.y;
+	d3Center_Ring.y = 0.5*dDiameter_Outer + 4.6*d3_Length_Cell.y;
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;
@@ -113,13 +114,14 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 
 			thisMP->i_MaterialType = _VONMISESHARDENING;
 //			thisMP->i_MaterialType = _PLASTIC;
+//			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 7800.0 * thisMP->d_Volume;
-			d_Mass_Minimum = 0.001 * dMass;
+			d_Mass_Minimum = 0.000 * dMass;
 			thisMP->d_Mass = dMass;
 
 			thisMP->d_ElasticModulus = 210.0e9;
@@ -131,7 +133,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 			thisMP->d_Hardening_Isotropic_C1 = 150.0e6;
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
+			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, -dGravity, 0.0);
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
@@ -146,10 +148,10 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	}
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,d3_Length_World.z);
+		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,d3_Length_Cell.y,d3_Length_World.z);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
-		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 2.1*d3_Length_Cell.y + 0.5*d3Dimension.y;
+		d3Center.y = d3Center_Ring.y + 0.5*dDiameter_Outer + 3.1*d3_Length_Cell.y + 0.5*d3Dimension.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d3_Length_Cell.y);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -180,7 +182,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 			// all MPs
 			allMaterialPoint_CPDI.push_back(thisMP);
 			// displacement control
-			if(thisMP->d3_Position.y > d3Center.y + 0.25*d3Dimension.y)
+//			if(false)
+			//if(thisMP->d3_Position.y > d3Center.y + 0.25*d3Dimension.y)
 			{
 				thisMP->b_DisplacementControl = true;
 				thisMP->f_DisplacementControl_Multiplier = -1.0;
@@ -192,10 +195,10 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,d3_Length_World.z);
+		glm::dvec3 d3Dimension = glm::dvec3(0.8*d3_Length_World.x,1.0*d3_Length_Cell.y,dLength_Ring);
 		glm::dvec3 d3Center = d3Center_Ring;
 		d3Center.x = 0.5*d3Dimension.x;
-		d3Center.y = 0.5*d3Dimension.y;
+		d3Center.y = 0.5*d3Dimension.y + 0.2*d3_Length_Cell.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d3_Length_Cell.y);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -227,11 +230,11 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 			// stress monitor
 //			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
 			// displacement control
-//			if(thisMP->d3_Position.y < d3Center.y - 0.25*d3Dimension.y)
 			if(false)
+//			if(thisMP->d3_Position.y < d3Center.y - 0.25*d3Dimension.y)
 			{
 				thisMP->b_DisplacementControl = true;
-				thisMP->f_DisplacementControl_Multiplier = 0.0;
+				thisMP->f_DisplacementControl_Multiplier = +.0;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 				v_MarkedMaterialPoints_CPDI_Displacement_Control.push_back(thisMP);
 				v_MarkedMaterialPoints_CPDI_Displacement_Monitor.push_back(thisMP);
@@ -240,19 +243,24 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	}
 
 	double dPlatenSpeed = +1.0;
+
+	d_TimeIncrement_Maximum = 2.0e-8;
+	d_TimeEnd = 2.0*0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
+
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 	if(true)
 	{// timeline events -------------------------------------------------------
 	    double dTime_Line = 0.0;
 
-   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
-   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, dPlatenSpeed, 0.0));
-
 //   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
-//   		m_TimeLine.addTimePoint(1.0e-3, glm::dvec3(0.0, dPlatenSpeed, 0.0));
-//   		m_TimeLine.addTimePoint(1.0e-3 + 1.0e-6, glm::dvec3(0.0, 0.0, 0.0));
-//   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, 0.0, 0.0));
+//   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, dPlatenSpeed, 0.0));
+
+   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+   		m_TimeLine.addTimePoint(0.5*d_TimeEnd, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+   		m_TimeLine.addTimePoint(0.5*d_TimeEnd + 1.0e-6, glm::dvec3(0.0, -dPlatenSpeed, 0.0));
+   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, -dPlatenSpeed, 0.0));
 
 //   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, 0.0, 0.0));
 //   		m_TimeLine.addTimePoint(2.0e-3, glm::dvec3(0.0, dPlatenSpeed, 0.0));
@@ -285,10 +293,6 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.0;
 
-	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
-
 	std::string sDescription = "";
 	{
 		time_t rawtime;
@@ -314,7 +318,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void)
 //		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
 		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(0.5*_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
 		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
-		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + "\n";
+		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
 		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
 		sDescription += "Yield: " + Script(allMaterialPoint_CPDI[0]->d_YieldStress, 3) + " N/m^2" + "\n";

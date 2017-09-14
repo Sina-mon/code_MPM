@@ -101,8 +101,8 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-//			thisMP->i_MaterialType = _VONMISESHARDENING;
-			thisMP->i_MaterialType = _PLASTIC;
+			thisMP->i_MaterialType = _VONMISESHARDENING;
+//			thisMP->i_MaterialType = _PLASTIC;
 //			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
@@ -132,7 +132,11 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 			// moment log
 //			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 			// mark for stress monitor
-//			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+			if(glm::abs(thisMP->d3_Position.y - d3Bar_Center.y) < 2.0*d3_Length_Cell.y)
+			{
+				thisMP->b_Mark_Stress = true;
+				v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+			}
 		}
 	}
 	if(true)
@@ -231,7 +235,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	    double dTime_Line = 0.0;
 
    		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
-   		m_TimeLine.addTimePoint(0.1, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, dPlatenSpeed, 0.0));
 
 //   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
 //   		m_TimeLine.addTimePoint(0.0025, glm::dvec3(0.0, dPlatenSpeed, 0.0));
