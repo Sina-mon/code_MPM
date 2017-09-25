@@ -331,9 +331,12 @@ void GraphicsEngine::drawGame(void)
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
 //		double d6Strain_Yield[6] = {vMaterialPoint_CPDI[0]->d_YieldStress / vMaterialPoint_CPDI[0]->d_ElasticModulus, 0, 0, 0, 0, 0};
-		double d6Strain_Maximum[6] = {0.1, 0, 0, 0, 0, 0};
+		double d6Strain_Maximum[6] = {0.05, 0, 0, 0, 0, 0};
+		double d6Strain_Minimum[6] = {vMaterialPoint_CPDI[0]->d_YieldStress/vMaterialPoint_CPDI[0]->d_ElasticModulus, 0, 0, 0, 0, 0};
 		CR.calculateState_J2(d6Strain_Maximum);
 		float fJ2_Maximum = CR.d_J2;
+		CR.calculateState_J2(d6Strain_Minimum);
+		float fJ2_Minimum = CR.d_J2;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
 //			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
@@ -379,7 +382,9 @@ void GraphicsEngine::drawGame(void)
 			// particle color
 			CR.calculateState_J2(thisMP->d6_Strain_Plastic);
 			float fJ2 = CR.d_J2;
-			glm::vec4 f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+			glm::vec4 f4objectColor = _BLUE;
+			if(fJ2 > fJ2_Minimum)
+				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
 			if(fJ2 > fJ2_Maximum)
 				f4objectColor  = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);

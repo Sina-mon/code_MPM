@@ -91,6 +91,7 @@ class PhysicsEngine
 		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Stress_Monitor;
 		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Force_Monitor;
 		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Momentum;
+		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Monitor_Energy;
 
 		std::vector<MaterialPoint_CPDI_CC *> allMaterialPoint_CPDI;
 		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Control;

@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.002);
-	glm::ivec3 i3_Cells = glm::ivec3(1.0*40, 1.0*60, 1.0*2);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.080, 0.004/2.0);
+	glm::ivec3 i3_Cells = glm::ivec3(2.0*20, 2.0*40, 2);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -93,15 +93,16 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	double dDiameter_Outer = dDiameter_Inner + 2.0*dThickness_Ring;
 	double dDiameter_Average = 0.5*(dDiameter_Inner + dDiameter_Outer);
 
+	int iDivision_Angular = 360;
+	int iDivision_Radial = 32;
+	int iDivision_Longitudinal = 1;
+
 	double dAngle_Start	= -0.5*_PI;
 	double dAngle_End	= +0.5*_PI;
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
-	double dLength_Ring = 0.5*d3_Length_Grid.z;
+	double dLength_Ring = glm::min(0.5*d3_Length_Grid.z, 0.5*(dThickness_Ring/iDivision_Radial + 0.5*_PI*dDiameter_Average/iDivision_Angular));
 
-	int iDivision_Angular = 180;
-	int iDivision_Radial = 16;
-	int iDivision_Longitudinal = 1;
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.0,0.0,0.5)*d3_Length_Grid;
 	d3Center_Ring.x += 1.0*d3_Length_Cell.x;
 	d3Center_Ring.y = 0.5*dDiameter_Outer + 6.6*d3_Length_Cell.y;
@@ -147,6 +148,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 //			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 			// mark for stress monitor
 //			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+			// mark for energy monitor
+			v_MarkedMaterialPoints_Monitor_Energy.push_back(thisMP);
 		}
 	}
 	if(true)

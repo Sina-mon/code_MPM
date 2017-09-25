@@ -78,46 +78,16 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 		d3Force += thisGP->d3_Force_Temp;
 	}
 
-	// kinetic energy
+	// energy log
 	double dKineticEnergy = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
-	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
-
-		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
-		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
-	}
-	// strain energy
 	double dEnergy_Strain = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
-	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
-
-		dEnergy_Strain += thisMP->d_Energy_Strain;
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
-		dEnergy_Strain += thisMP->d_Energy_Strain;
-	}
-	// plastic energy
 	double dEnergy_Plastic = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
+	for(int index = 0; index < v_MarkedMaterialPoints_Monitor_Energy.size(); index++)
 	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
+		MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Monitor_Energy[index];
 
-		dEnergy_Plastic += thisMP->d_Energy_Plastic;
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
+		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
+		dEnergy_Strain += thisMP->d_Energy_Strain;
 		dEnergy_Plastic += thisMP->d_Energy_Plastic;
 	}
 
