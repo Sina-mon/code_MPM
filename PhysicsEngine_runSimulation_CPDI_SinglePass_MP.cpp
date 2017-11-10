@@ -242,7 +242,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 					thisAGP->d3_Velocity = thisMP->d3_Velocity;
 					thisAGP->d3_Momentum = thisAGP->d_Mass * thisMP->d3_Velocity;
 					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
-					thisAGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
+					thisAGP->d3_Force = glm::dvec3(0.0, -0.0, 0.0);
 				}
 			}
 			a_Runtime[5] += omp_get_wtime() - dRuntime_Block;

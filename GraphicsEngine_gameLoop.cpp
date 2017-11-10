@@ -6,9 +6,11 @@ void GraphicsEngine::gameLoop(void)
 	int iSimulationStatus = 0;
 	while(e_GameState != GameState::EXIT)
 	{
+		// removed for runtime analysis
 		drawGame();
 
 		// save snapshot
+//		if(false)	//for runtime analysis
 		if(f_Time - f_TimeSnapshot_LastSave > f_TimeSnapshot_Interval)
 		{
 			drawGame();
