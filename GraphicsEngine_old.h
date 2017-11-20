@@ -44,13 +44,13 @@ class GraphicsEngine
 
 		SDL_Window *p_Window = NULL;
 
-		float i_ScreenWidth = 0.75*4*800;
-		float i_ScreenHeight = 0.75*1*800;
+		float i_ScreenWidth = 0.75*4*600;
+		float i_ScreenHeight = 0.75*1*750;
 
 		glm::vec3 f3_World_Center = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 f3_World_Dimensions = glm::vec3(0.0, 0.0, 0.0);
 
-		glm::vec3 f3_Camera_Position_Original = glm::vec3(0.0,0.0, 0.0);
+		glm::vec3 f3_Camera_Position_Original = glm::vec3(0.0,0.0, -0.5);
 		glm::vec3 f3_Camera_Target_Original = glm::vec3(0.0,0.0,0.0);
 
 		GameState e_GameState = GameState::PLAY;
@@ -74,8 +74,8 @@ class GraphicsEngine
 		enum class enum_Canvas : int {
 			MAIN = 0,
 			SOLID,
-			J2_PLASTICSTRAIN,
 			J2_STRESS,
+			J2_PLASTICSTRAIN,
 			COUNT,
 			ENERGY_STRAIN,
 			ENERGY_PLASTIC,

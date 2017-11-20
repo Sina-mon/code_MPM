@@ -62,6 +62,8 @@ class MaterialPoint_BC
 		double d_BackStress_Isotropic = 0.0;
 		double d_Hardening_Isotropic_C0 = 0.0;
 		double d_Hardening_Isotropic_C1 = 0.0;
+
+		std::vector<AGPstruct> v_AGP;
 	protected:
 	private:
 };

@@ -38,6 +38,13 @@ class PhysicsEngine
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress_Runtime(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_FullLength(void);
+		void	initializeWorld_CPDI_HalfRing_Xu_PlainStress(void);
+		void	initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed(void);
+		void	initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);
+		void	initializeWorld_Classic_Foam(void);
+		void	initializeWorld_Classic_Foam_Bullet(void);
+		void	initializeWorld_Classic_Foam_Ring(void);
+		void	initializeWorld_Classic_Foam_HoneyComb(void);
 		void	initializeWorld_QuarterRing_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI(void);
@@ -47,6 +54,7 @@ class PhysicsEngine
 		glm::dvec3 d3_Length_World = glm::dvec3(0.0, 0.0, 0.0);
 		// MPM ----------------------------------------------------------------
 		GridPoint_Mediator mpm_GP_Mediator_Thread[_MAX_N_THREADS];
+		int		runSimulation_Classic_DoublePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
 		int		runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);

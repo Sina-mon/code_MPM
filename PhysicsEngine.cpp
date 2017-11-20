@@ -95,11 +95,11 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 	strConsole += sDescription;
 	strConsole += "\ttime: " + Script(d_Time,4);
 	strConsole += "\tRuntime: " + Script(d_Runtime_Total,3);
-	strConsole += "\tCPS: " + Script((d_Time/d_TimeIncrement_Maximum)/d_Runtime_Total,3);
+//	strConsole += "\tCPS: " + Script((d_Time/d_TimeIncrement_Maximum)/d_Runtime_Total,3);
 //	strConsole += "\tMass_P: " + Script(dMass,6);
 //	strConsole += "\tMass_N: " + Script(dMass_Negative,6);
 //	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,3) + "\t momentum_z: " + Script(dMomentum_z,3);
-	strConsole += "\t momentum_y: " + Script(dMomentum_y,4);
+//	strConsole += "\t momentum_y: " + Script(dMomentum_y,4);
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
         strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,4);
 	if(v_MarkedMaterialPoints_CPDI_Displacement_Monitor.size() > 0)

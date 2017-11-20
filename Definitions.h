@@ -11,6 +11,9 @@
 
 #define _PI 3.14159265359
 
+#define _RND(d)			((float)(rand()%d)/d)//random value between 0.0 and 1.0, with accuracy related to d
+#define _RANDOM(a,b,d)	(a + _RND((int)d) * (b - a))
+
 //-----------------------------------------------
 #define _RED	glm::vec4(1.0, 0.0, 0.0, 1.0)
 #define _GREEN	glm::vec4(0.0, 1.0, 0.0, 1.0)

@@ -93,8 +93,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress_Modulus(void
 	double dDiameter_Outer = dDiameter_Inner + 2.0*dThickness_Ring;
 	double dDiameter_Average = 0.5*(dDiameter_Inner + dDiameter_Outer);
 
-	int iDivision_Angular = 360;
-	int iDivision_Radial = 32;
+	int iDivision_Angular = 180;
+	int iDivision_Radial = 4;
 	int iDivision_Longitudinal = 1;
 
 	double dAngle_Start	= -0.5*_PI;
@@ -309,7 +309,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress_Modulus(void
 
 	d_TimeIncrement_Maximum = 2.0e-8;
 	//d_TimeEnd = 2.0*0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeEnd = 0.1*dDiameter_Outer / glm::abs(dPlatenSpeed); // for modulus
+	d_TimeEnd = 1.0e-2; // for modulus
 	d_TimeConsole_Interval = 0.1e-3 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------
