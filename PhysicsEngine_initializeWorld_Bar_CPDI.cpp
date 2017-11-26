@@ -90,7 +90,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 
 	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
 	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
-	d3Bar_Center.y = 0.5*d3Bar_Dimension.y + 2.0*d3_Length_Cell.y;
+	d3Bar_Center.y = 0.5*d3Bar_Dimension.y + 4.0*d3_Length_Cell.y;
 
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
@@ -143,7 +143,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
 		glm::dvec3 d3Center = d3Bar_Center;
-		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3_Length_Cell.y;
+		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3Dimension.y + 0.0*d3_Length_Cell.y;
 
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
@@ -184,7 +184,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
+		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,4.0*d3_Length_Cell.y,d3Bar_Dimension.z);
 		glm::dvec3 d3Center = d3Bar_Center;
 		d3Center.y = 0.5*d3Dimension.y;
 
@@ -265,7 +265,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 1.0*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";

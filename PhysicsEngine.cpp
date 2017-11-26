@@ -84,13 +84,13 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 	{
 		MaterialPoint_BC *thisMP = allMaterialPoint[index];
 
-		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
+		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
 	}
 	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
 	{
 		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
 
-		dKineticEnergy += thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
+		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
 	}
 	// strain energy
 	double dEnergy_Strain = 0.0;
