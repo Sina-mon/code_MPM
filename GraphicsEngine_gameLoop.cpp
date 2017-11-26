@@ -6,9 +6,11 @@ void GraphicsEngine::gameLoop(void)
 	int iSimulationStatus = 0;
 	while(e_GameState != GameState::EXIT)
 	{
+		// removed for runtime analysis
 		drawGame();
 
 		// save snapshot
+//		if(false)	//for runtime analysis
 		if(f_Time - f_TimeSnapshot_LastSave > f_TimeSnapshot_Interval)
 		{
 			drawGame();
@@ -28,10 +30,13 @@ void GraphicsEngine::gameLoop(void)
 //		double dTimeIncrement_Request = mpm_PhysicsEngine->getTime_End();
 		if(iSimulationStatus == 0)
 		{
-//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP_Locks(dTimeIncrement_Request);
-			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP(dTimeIncrement_Request);
+//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_DoublePass_MP(dTimeIncrement_Request);
+			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MP(dTimeIncrement_Request);
+
+//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP_Locks(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass(dTimeIncrement_Request);
+
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP_Contact(dTimeIncrement_Request);
 		}

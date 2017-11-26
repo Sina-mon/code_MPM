@@ -78,46 +78,16 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 		d3Force += thisGP->d3_Force_Temp;
 	}
 
-	// kinetic energy
+	// energy log
 	double dKineticEnergy = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
-	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
-
-		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
-		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
-	}
-	// strain energy
 	double dEnergy_Strain = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
-	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
-
-		dEnergy_Strain += thisMP->d_Energy_Strain;
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
-		dEnergy_Strain += thisMP->d_Energy_Strain;
-	}
-	// plastic energy
 	double dEnergy_Plastic = 0.0;
-	for(int index = 0; index < allMaterialPoint.size(); index++)
+	for(int index = 0; index < v_MarkedMaterialPoints_Monitor_Energy.size(); index++)
 	{
-		MaterialPoint_BC *thisMP = allMaterialPoint[index];
+		MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Monitor_Energy[index];
 
-		dEnergy_Plastic += thisMP->d_Energy_Plastic;
-	}
-	for(int index = 0; index < allMaterialPoint_CPDI.size(); index++)
-	{
-		MaterialPoint_CPDI_CC *thisMP = allMaterialPoint_CPDI[index];
-
+		dKineticEnergy += 0.5*thisMP->d_Mass * glm::pow(glm::length(thisMP->d3_Velocity),2.0);
+		dEnergy_Strain += thisMP->d_Energy_Strain;
 		dEnergy_Plastic += thisMP->d_Energy_Plastic;
 	}
 
@@ -125,10 +95,11 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 	strConsole += sDescription;
 	strConsole += "\ttime: " + Script(d_Time,4);
 	strConsole += "\tRuntime: " + Script(d_Runtime_Total,3);
+//	strConsole += "\tCPS: " + Script((d_Time/d_TimeIncrement_Maximum)/d_Runtime_Total,3);
 //	strConsole += "\tMass_P: " + Script(dMass,6);
 //	strConsole += "\tMass_N: " + Script(dMass_Negative,6);
 //	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,3) + "\t momentum_z: " + Script(dMomentum_z,3);
-//	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,6);
+//	strConsole += "\t momentum_y: " + Script(dMomentum_y,4);
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
         strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,4);
 	if(v_MarkedMaterialPoints_CPDI_Displacement_Monitor.size() > 0)
