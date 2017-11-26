@@ -86,7 +86,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 1.0*d3_Length_Cell.x;
+	double dOffset = 1.0*d3_Length_Cell.x;
 
 	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
 	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
@@ -96,7 +96,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = -0.0;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Bar_Center, d3Bar_Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Bar_Center, d3Bar_Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -145,7 +145,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		glm::dvec3 d3Center = d3Bar_Center;
 		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3Dimension.y + 0.0*d3_Length_Cell.y;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -188,7 +188,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		glm::dvec3 d3Center = d3Bar_Center;
 		d3Center.y = 0.5*d3Dimension.y;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -291,7 +291,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")\n";
 		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
-		sDescription += "Material Point offset: " + Script(d_Offset,3) + "\n";
+		sDescription += "Material Point offset: " + Script(dOffset,3) + "\n";
 //        if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
 //            sDescription += "Platen Speed: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Velocity.y, 3) + " m/s" + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";

@@ -26,7 +26,7 @@
 class PhysicsEngine
 {
 	public:
-		PhysicsEngine();
+		PhysicsEngine() {};
 		virtual ~PhysicsEngine();
 
 		void	initializeWorld_Bar(void);
@@ -38,6 +38,8 @@ class PhysicsEngine
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress_Runtime(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_FullLength(void);
+		void 	initializeWorld_CPDI_HalfRing_Fan(void);
+		void	initializeWorld_CPDI_HalfRing_Gupta_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xu_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed(void);
 		void	initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);
@@ -61,9 +63,8 @@ class PhysicsEngine
 		int		runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
 		int		runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
-		std::vector<std::array<AGPstruct, 8>> v_MP_AGP;
 
-		double d_Offset = 0.0;
+//		double d_Offset = 0.0;
 
 		glm::dvec3 d3_Length_Grid_Kernel = glm::dvec3(0.0, 0.0, 0.0);
 		glm::dvec3 d3_Length_Cell_Kernel = glm::dvec3(0.0, 0.0, 0.0);

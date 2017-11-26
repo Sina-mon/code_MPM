@@ -6,11 +6,13 @@ void GraphicsEngine::setPhysicsEngineReference(PhysicsEngine *mpmPhysicsEngine)
 	mpm_PhysicsEngine = mpmPhysicsEngine;
 
 //	f_TimeSnapshot_Interval = mpm_PhysicsEngine->getTime_End() / 100.0;
-	f_TimeSnapshot_Interval = 10.0*mpm_PhysicsEngine->getTime_ConsoleInterval();
+	f_TimeSnapshot_Interval = 20.0*mpm_PhysicsEngine->getTime_ConsoleInterval();
 
 	glm::vec3 f3Bounds = mpm_PhysicsEngine->d3_Length_World;
 
 	f3_Camera_Position_Original = 0.5f*f3Bounds;
+//	f3_Camera_Position_Original.x = 1.5*f3Bounds.x;
+//	f3_Camera_Position_Original.z = .55*(f3Bounds.x + f3Bounds.y + f3Bounds.z);
 	f3_Camera_Position_Original.z = 1.3*(f3Bounds.x + f3Bounds.y + f3Bounds.z);
 	f3_Camera_Target_Original = 0.5f*f3Bounds;
 

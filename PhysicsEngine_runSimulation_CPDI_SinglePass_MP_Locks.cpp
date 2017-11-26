@@ -355,7 +355,7 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_
 				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
 
 				if(m_TimeLine.v_Time.size() != 0)
-					thisMP->d3_Velocity = m_TimeLine.getVelocity(d_Time);
+					thisMP->d3_Velocity = glm::dvec3(thisMP->f_DisplacementControl_Multiplier) * m_TimeLine.getVelocity(d_Time);
 
 				thisMP->d3_Position += thisMP->d3_Velocity * dTimeIncrement;
 				for(unsigned int index_Corner = 0; index_Corner < 4; index_Corner++)

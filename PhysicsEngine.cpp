@@ -1,10 +1,6 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-PhysicsEngine::PhysicsEngine()
-{
-};
-// ----------------------------------------------------------------------------
 PhysicsEngine::~PhysicsEngine()
 {
 	//delete all objects created by Factory classes
@@ -98,18 +94,21 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 //	strConsole += "\tCPS: " + Script((d_Time/d_TimeIncrement_Maximum)/d_Runtime_Total,3);
 //	strConsole += "\tMass_P: " + Script(dMass,6);
 //	strConsole += "\tMass_N: " + Script(dMass_Negative,6);
-//	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,3) + "\t momentum_z: " + Script(dMomentum_z,3);
-//	strConsole += "\t momentum_y: " + Script(dMomentum_y,4);
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
         strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,4);
 	if(v_MarkedMaterialPoints_CPDI_Displacement_Monitor.size() > 0)
         strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_CPDI_Displacement_Monitor[0]->d3_Position.y,4);
+	strConsole += "\tForce_y: " + Script(d3Force.y,4);
+	if(v_MarkedMaterialPoints_Momentum.size() > 0)
+	{
+	//	strConsole += "\tmomentum_x: " + Script(dMomentum_x,3) + "\t momentum_y: " + Script(dMomentum_y,3) + "\t momentum_z: " + Script(dMomentum_z,3);
+		strConsole += "\t momentum_y: " + Script(dMomentum_y,4);
+	}
 	if(v_MarkedMaterialPoints_Stress_Monitor.size() > 0)
 	{
 		strConsole += "\tStrain_y: " + Script(d3Strain.y,4);
 		strConsole += "\tStress_y: " + Script(d3Stress.y,4);
 	}
-	strConsole += "\tForce_y: " + Script(d3Force.y,4);
 	strConsole += "\tKinetic Energy: " + Script(dKineticEnergy,4);
 	strConsole += "\tStrain Energy: " + Script(dEnergy_Strain,4);
 	strConsole += "\tPlastic Energy: " + Script(dEnergy_Plastic,4);
