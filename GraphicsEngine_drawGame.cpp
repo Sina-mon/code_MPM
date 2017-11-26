@@ -146,6 +146,7 @@ void GraphicsEngine::drawGame(void)
 				gl_Particle_Mesh->Draw();
 			}
 		}
+
 		// grid points --------------------------------------------------------
 		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
 
@@ -156,8 +157,18 @@ void GraphicsEngine::drawGame(void)
 			if(thisGP->b3_Fixed == glm::bvec3{false, false, false})	continue;
 
 			// particle position
-			float fSize = 0.00005;
-			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+			glm::vec3 f3Size = glm::vec3(0.0002,0.0002,0.0002);
+			if(thisGP->b3_Fixed.y == true)
+			{
+				f3Size.x = 0.0005;
+				f3Size.z = 0.0005;
+			}
+			else if(thisGP->b3_Fixed.x == true)
+			{
+				f3Size.y = 0.0005;
+				f3Size.z = 0.0005;
+			}
+			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), f3Size);
 			// particle color
 			glm::vec4 f4objectColor = _GRAY;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
@@ -554,7 +565,7 @@ void GraphicsEngine::drawGame(void)
 		}
 		if(vMaterialPoint_CPDI.size() != 0)
 		{
-			d6Stress_Maximum[0] = vMaterialPoint_CPDI[0]->d_YieldStress;
+			d6Stress_Maximum[0] = 1.2*vMaterialPoint_CPDI[0]->d_YieldStress;
 		}
 		CR.calculateState_J2(d6Stress_Maximum);
 		float fJ2_Maximum = CR.d_J2;

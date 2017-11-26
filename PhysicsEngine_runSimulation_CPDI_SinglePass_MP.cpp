@@ -188,6 +188,26 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
+			// displacement controlled material points ------------------------ displacement control
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_CPDI_Displacement_Control.size(); index_MP++)
+			{
+				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
+
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				{
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+
+					thisAGP->d3_Velocity = thisMP->d3_Velocity;
+					thisAGP->d3_Momentum = thisAGP->d_Mass * thisMP->d3_Velocity;
+					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
+					thisAGP->d3_Force = glm::dvec3(0.0, -0.01, 0.0);
+				}
+			}
+			a_Runtime[5] += omp_get_wtime() - dRuntime_Block;
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
 			// update grid momentum and apply boundary conditions ------------- update GP momentum and damping
 			#pragma omp for
 			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
@@ -226,26 +246,6 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total)
 				}
 			}
 			a_Runtime[4] += omp_get_wtime() - dRuntime_Block;
-
-			#pragma omp barrier
-			dRuntime_Block = omp_get_wtime();
-			// displacement controlled material points ------------------------ displacement control
-			#pragma omp for
-			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_CPDI_Displacement_Control.size(); index_MP++)
-			{
-				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
-
-				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
-				{
-					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
-
-					thisAGP->d3_Velocity = thisMP->d3_Velocity;
-					thisAGP->d3_Momentum = thisAGP->d_Mass * thisMP->d3_Velocity;
-					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
-					thisAGP->d3_Force = glm::dvec3(0.0, -0.0, 0.0);
-				}
-			}
-			a_Runtime[5] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();

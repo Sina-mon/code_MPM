@@ -38,6 +38,8 @@ class PhysicsEngine
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress_Runtime(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_FullLength(void);
+		void 	initializeWorld_CPDI_HalfRing_Fan(void);
+		void	initializeWorld_CPDI_HalfRing_Gupta_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xu_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed(void);
 		void	initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);

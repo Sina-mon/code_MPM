@@ -9,8 +9,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	// grid points ------------------------------------------------------------
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.004/1.0);
 //	glm::ivec3 i3_Cells = glm::ivec3(1.0*20, 1.0*30, 2);
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.080, 0.004/4.0);
-	glm::ivec3 i3_Cells = glm::ivec3(4.0*20, 4.0*40, 2);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.004/4.0);
+	glm::ivec3 i3_Cells = glm::ivec3(4.0*20, 4.0*30, 2);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -98,7 +98,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	double dDiameter_Average = 0.5*(dDiameter_Inner + dDiameter_Outer);
 
 	int iDivision_Angular = 180;
-	int iDivision_Radial = 4;
+	int iDivision_Radial = 16;
 	int iDivision_Longitudinal = 1;
 
 	double dAngle_Start	= -0.5*_PI;
@@ -112,7 +112,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 	glm::dvec3 d3Dimension_LoadCell			= glm::dvec3(0.0,0.0,0.0);//glm::dvec3(0.6*d3_Length_World.x,1.0*d3_Length_Cell.y,d3_Length_Grid.z);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
-	glm::dvec3 d3Center_Ring			= glm::dvec3(d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+2.6*d3_Length_Cell.y,0.5*dLength_Ring);
+	glm::dvec3 d3Center_Ring			= glm::dvec3(1.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+2.6*d3_Length_Cell.y,0.5*dLength_Ring);
 	glm::dvec3 d3Center_LoadCell		= 0.5*d3Dimension_LoadCell + glm::dvec3(0.0, d3Center_Ring.y+0.5*dDiameter_Outer+2.0*d3_Length_Cell.y,0.0);
 //	glm::dvec3 d3Center_Platen_Top		= 0.5*d3Dimension_Platen_Top + glm::dvec3(0.0, d3Center_LoadCell.y+0.5*d3Dimension_LoadCell.y+2.0*d3_Length_Cell.y,0.0);
 	glm::dvec3 d3Center_Platen_Top		= 0.5*d3Dimension_Platen_Top + glm::dvec3(0.0, d3Center_Ring.y+0.5*dDiameter_Outer+2.6*d3_Length_Cell.y,0.0);
@@ -310,8 +310,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void)
 
 	double dPlatenSpeed = +1.0;
 
-	d_TimeIncrement_Maximum = 2.0e-8;
-	d_TimeEnd = 1.0*1.0*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 0.0*2.0e-8;
+	d_TimeEnd = .0*1.0*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------
