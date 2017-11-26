@@ -10,6 +10,7 @@ class GridPoint
 		virtual ~GridPoint() {;}
 
 		bool b_Active = false;
+		bool b_Contact = false;
 
 		glm::ivec3 i3_Index = glm::vec3(0,0,0);
 

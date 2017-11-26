@@ -35,6 +35,7 @@ class MaterialPoint_BC
 		bool b_Surface = false;
 
 		unsigned int i_ID = 0;
+		unsigned int i_Body = 0;
 		unsigned int i_MaterialType = _ELASTIC;
 
 		double d_Mass = 0.0;

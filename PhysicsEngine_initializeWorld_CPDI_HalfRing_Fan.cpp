@@ -7,12 +7,11 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.004/1.0);
-//	glm::ivec3 i3_Cells = glm::ivec3(1.0*20, 1.0*30, 2);
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.080, 0.004/2.0);
 	glm::ivec3 i3_Cells = glm::ivec3(2.0*20, 2.0*40, 2);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
+
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
 	{// initialize GP mediator
 
@@ -22,24 +21,16 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 		mpm_GP_Mediator_Thread[indexThread].d3_Length_Cell = d3_Length_Cell;
 		mpm_GP_Mediator_Thread[indexThread].i3_Cells = i3_Cells;
 		mpm_GP_Mediator_Thread[indexThread].i3_Node_Count = i3_Nodes;
+
+		//allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
 	allGridPoint = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 
-	for(int iThread = 0; iThread < _MAX_N_THREADS; iThread++)
+	// multi-body implementation
+	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
 	{
-		allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
+		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
-
-	// contact kernel grid ---------------------------------------------------- contact grid
-	{// initialize GP kernel mediator
-		d3_Length_Grid_Kernel = d3_Length_Grid;
-		i3_Cells_Kernel = 1*i3_Cells;
-
-		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
-
-		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
-	}
-	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
@@ -97,8 +88,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 	double dDiameter_Average = 0.5*(dDiameter_Outer+dDiameter_Inner);
 
-	int iDivision_Angular = 90;
-	int iDivision_Radial = 8;
+	int iDivision_Angular = 180;
+	int iDivision_Radial = 16;
 	int iDivision_Longitudinal = 1;
 
 	double dAngle_Start	= -0.5*_PI;
@@ -109,7 +100,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	double dLength_Ring = glm::min(dThickness_Ring/iDivision_Radial, _PI*dDiameter_Average/iDivision_Angular);
 
 	glm::dvec3 d3Dimension_Platen_Bottom	= glm::dvec3(0.8*d3_Length_World.x,.0*d3_Length_Cell.y,d3_Length_Grid.z);
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,d3_Length_Grid.z);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.9*d3_Length_World.x,4.0*d3_Length_Cell.y,d3_Length_Grid.z);
 	glm::dvec3 d3Dimension_LoadCell			= glm::dvec3(0.0,0.0,0.0);//glm::dvec3(0.6*d3_Length_World.x,1.0*d3_Length_Cell.y,d3_Length_Grid.z);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
@@ -135,6 +126,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 			thisMP->i_MaterialType = _VONMISESHARDENING;
 //			thisMP->i_MaterialType = _PLASTIC;
 			thisMP->i_ID = 1;
+			thisMP->i_Body = 0;
 
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
@@ -153,6 +145,12 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 
 			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
+
+			// identify surface MPs
+			if(glm::length(thisMP->d3_Position-d3Center_Ring) < (dRadius_Inner+dThickness_Ring/iDivision_Radial))
+				thisMP->b_Surface = true;
+			if(glm::length(thisMP->d3_Position-d3Center_Ring) > (dRadius_Outer-dThickness_Ring/iDivision_Radial))
+				thisMP->b_Surface = true;
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
@@ -227,6 +225,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
+			thisMP->i_Body = 1;
 
 			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
@@ -249,7 +248,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 			allMaterialPoint_CPDI.push_back(thisMP);
 			// displacement control
 //			if(false)
-			//if(thisMP->d3_Position.y > d3Center_Platen_Top.y + 0.25*d3Dimension_Platen_Top.y)
+			if(thisMP->d3_Position.y > d3Center_Platen_Top.y + 0.25*d3Dimension_Platen_Top.y)
 			{
 				thisMP->b_DisplacementControl = true;
 				thisMP->f_DisplacementControl_Multiplier = -1.0;
@@ -312,7 +311,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	double dPlatenSpeed = +10.0;
 
 	d_TimeIncrement_Maximum = 5.0e-8;
-	d_TimeEnd = 0.5*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 1.0*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------

@@ -26,12 +26,13 @@ void GraphicsEngine::gameLoop(void)
 			std::cout << "GraphicsEngine: Screenshot saved at: " << Script(f_Time, 4) << std::endl;
 		}
 
-		double dTimeIncrement_Request = 0.5e3*mpm_PhysicsEngine->getTime_Increment();
+		double dTimeIncrement_Request = 500*mpm_PhysicsEngine->getTime_Increment();
 //		double dTimeIncrement_Request = mpm_PhysicsEngine->getTime_End();
 		if(iSimulationStatus == 0)
 		{
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP(dTimeIncrement_Request);
-			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP_Locks(dTimeIncrement_Request);
+//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass_MP_Locks(dTimeIncrement_Request);
+			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_MultiBody_SinglePass_MPLocks(dTimeIncrement_Request);
 
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_DoublePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MP(dTimeIncrement_Request);

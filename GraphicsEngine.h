@@ -74,6 +74,7 @@ class GraphicsEngine
 		enum class enum_Canvas : int {
 			MAIN = 0,
 			SOLID,
+			MASSGRADIENT,
 			J2_PLASTICSTRAIN,
 			J2_STRESS,
 			COUNT,

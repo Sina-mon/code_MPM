@@ -18,6 +18,14 @@ PhysicsEngine::~PhysicsEngine()
 		}
 	}
 
+	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+	{
+		for(unsigned int index = 0; index < allGridPoint_Body[index_Body].size(); index++)
+		{
+			delete allGridPoint_Body[index_Body][index];
+		}
+	}
+
 	// destroy GridPoint locks
 	for(int index = 0; index < v_GridPoint_Lock.size(); index++)
 	{

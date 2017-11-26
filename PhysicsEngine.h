@@ -21,12 +21,13 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS 4
+#define _MAX_N_THREADS	1
+#define _MAX_N_BODIES	2
 
 class PhysicsEngine
 {
 	public:
-		PhysicsEngine() {};
+		PhysicsEngine() {;}
 		virtual ~PhysicsEngine();
 
 		void	initializeWorld_Bar(void);
@@ -56,20 +57,14 @@ class PhysicsEngine
 		glm::dvec3 d3_Length_World = glm::dvec3(0.0, 0.0, 0.0);
 		// MPM ----------------------------------------------------------------
 		GridPoint_Mediator mpm_GP_Mediator_Thread[_MAX_N_THREADS];
-		int		runSimulation_Classic_DoublePass_MP(double dTimeIncrement_Total);
-		int		runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
-		int		runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
-		int		runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
-		int		runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
-		int		runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
-		int		runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
-
-//		double d_Offset = 0.0;
-
-		glm::dvec3 d3_Length_Grid_Kernel = glm::dvec3(0.0, 0.0, 0.0);
-		glm::dvec3 d3_Length_Cell_Kernel = glm::dvec3(0.0, 0.0, 0.0);
-		glm::ivec3 i3_Cells_Kernel = glm::ivec3(0.0, 0.0, 0.0);
-		glm::ivec3 i3_Nodes_Kernel = glm::ivec3(0.0, 0.0, 0.0);
+		int	runSimulation_Classic_DoublePass_MP(double dTimeIncrement_Total);
+		int	runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
+		int	runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeIncrement_Total);
 
 		// function to communicate with outside -------------------------------
 		double getTime_Runtime(void) {return(d_Runtime_Total);}
@@ -81,10 +76,9 @@ class PhysicsEngine
 		unsigned int	getCount_MaterialPoint(void) {return(allMaterialPoint.size());}
 		unsigned int	getCount_MaterialPoint_CPDI(void) {return(allMaterialPoint_CPDI.size());}
 		unsigned int 	getCount_GridPoint(void) {return(allGridPoint.size());}
-		std::vector<MaterialPoint_BC *>	getMaterialPoints(void) {return(allMaterialPoint);}
+		std::vector<MaterialPoint_BC *>			getMaterialPoints(void) {return(allMaterialPoint);}
 		std::vector<MaterialPoint_CPDI_CC *>	getMaterialPoints_CPDI(void) {return(allMaterialPoint_CPDI);}
-		std::vector<GridPoint *>		getGridPoints(void) {return(allGridPoint);}
-		std::vector<GridPoint *>		getGridPoints_Kernel(void) {return(v_GridPoint_Kernel);}
+		std::vector<GridPoint *>				getGridPoints(void) {return(allGridPoint);}
 	protected:
 		TimeLine m_TimeLine;
 		double d_Mass_Minimum = 0.0;
@@ -94,7 +88,6 @@ class PhysicsEngine
 		std::array<double, 8> a_Runtime;
 
 		std::vector<GridPoint *> allGridPoint;
-		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
 		std::vector<GridPoint *> v_GridPoint_Kernel;
 		std::vector<MaterialPoint_BC *> allMaterialPoint;
 		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Displacement_Monitor;
@@ -108,8 +101,14 @@ class PhysicsEngine
 		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Control;
 		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Monitor;
 
+		// multi-body related parameters
+		std::vector<GridPoint *> allGridPoint_Body[_MAX_N_BODIES];
+
+		// parallelization related members
+		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
 		std::vector<omp_lock_t *> v_GridPoint_Lock;
 
+		// timing
 		double d_Time = 0.0; // current simulation time
 		double d_TimeIncrement_Maximum = 1.0e-3;
 		double d_TimeEnd = 10.0;//5.0e-4;

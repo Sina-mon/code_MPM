@@ -290,7 +290,6 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		sDescription += "Mass: " + Script(dMass_Domain,6) + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")\n";
-		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
 		sDescription += "Material Point offset: " + Script(dOffset,3) + "\n";
 //        if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
 //            sDescription += "Platen Speed: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Velocity.y, 3) + " m/s" + "\n";
