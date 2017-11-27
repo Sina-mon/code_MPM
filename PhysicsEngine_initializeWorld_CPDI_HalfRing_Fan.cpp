@@ -44,7 +44,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 		//fixed grid points
 		thisGridPoint->b3_Fixed = glm::bvec3(false, false, false);
 
-		if(fabs(dx - 0.0) < 0.5*d3_Length_Cell.x)
+		if(fabs(dx - 0.0) < .5*d3_Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
 		}
@@ -88,8 +88,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 	double dDiameter_Average = 0.5*(dDiameter_Outer+dDiameter_Inner);
 
-	int iDivision_Angular = 180;
-	int iDivision_Radial = 16;
+	int iDivision_Angular = 90;
+	int iDivision_Radial = 8;
 	int iDivision_Longitudinal = 1;
 
 	double dAngle_Start	= -0.5*_PI;
@@ -132,7 +132,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 2760.0 * thisMP->d_Volume;
-			d_Mass_Minimum = 0.0 * dMass;
+			d_Mass_Minimum = 0.001 * dMass;
 			thisMP->d_Mass = dMass;
 
 			thisMP->d_ElasticModulus = 70.0e9;
@@ -308,7 +308,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 		}
 	}
 
-	double dPlatenSpeed = +10.0;
+	double dPlatenSpeed = +1.0;
 
 	d_TimeIncrement_Maximum = 5.0e-8;
 	d_TimeEnd = 1.0*dDiameter_Outer / glm::abs(dPlatenSpeed);

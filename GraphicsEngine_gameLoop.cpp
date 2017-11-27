@@ -26,7 +26,8 @@ void GraphicsEngine::gameLoop(void)
 			std::cout << "GraphicsEngine: Screenshot saved at: " << Script(f_Time, 4) << std::endl;
 		}
 
-		double dTimeIncrement_Request = 500*mpm_PhysicsEngine->getTime_Increment();
+//		double dTimeIncrement_Request = 500*mpm_PhysicsEngine->getTime_Increment();
+		double dTimeIncrement_Request = 0.5*mpm_PhysicsEngine->getTime_ConsoleInterval();
 //		double dTimeIncrement_Request = mpm_PhysicsEngine->getTime_End();
 		if(iSimulationStatus == 0)
 		{
