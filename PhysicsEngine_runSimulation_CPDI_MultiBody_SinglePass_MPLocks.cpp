@@ -122,7 +122,6 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 						thisAGP->d3_MassGradient += d3ShapeGradient * thisMP->d_Mass;
 					}
 					if(iThread_Count > 1)	omp_unset_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
-					//thisAGP_Thread->d_Mass += dShapeValue * thisMP->d_Mass;
 				}
 			}
 			a_Runtime[2] += omp_get_wtime() - dRuntime_Block;
@@ -204,35 +203,15 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 					{
 						GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
 
-						thisGP->d3_Velocity	+= thisGP_Body->d3_Velocity;
+//						if(thisGP_Body->d_Mass > d_Mass_Minimum)
+							thisGP->d3_Velocity	+= (thisGP_Body->d3_Velocity * thisGP_Body->d_Mass) / thisGP->d_Mass;
+//						thisGP->d3_Velocity	+= thisGP_Body->d3_Velocity;
 						//thisGP->d3_Momentum	+= thisGP_Body->d3_Momentum;
 						thisGP->d3_Force	+= thisGP_Body->d3_Force;
 					}
 				}
 			}
 			a_Runtime[3] += omp_get_wtime() - dRuntime_Block;
-
-			#pragma omp barrier
-			dRuntime_Block = omp_get_wtime();
-			// displacement controlled material points ------------------------ displacement control
-			#pragma omp for
-			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_CPDI_Displacement_Control.size(); index_MP++)
-			{
-				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
-
-				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
-				{
-					GridPoint *thisAGP;
-						thisAGP = allGridPoint_Body[thisMP->i_Body][thisMP->v_AGP[index_AGP].index];
-
-//					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
-
-					thisAGP->d3_Velocity = thisMP->d3_Velocity;
-					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
-					thisAGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
-				}
-			}
-			a_Runtime[5] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -255,7 +234,8 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 				{
 					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
 
-					combinedGP.d3_Velocity	+= thisGP_Body->d3_Velocity;
+//					if(thisGP->d_Mass > d_Mass_Minimum)
+						combinedGP.d3_Velocity	+= (thisGP_Body->d_Mass * thisGP_Body->d3_Velocity)/thisGP->d_Mass;
 					combinedGP.d3_Force	+= thisGP_Body->d3_Force;
 				}
 				// check for contact
@@ -267,13 +247,13 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 //					if(glm::length(thisGP_Body->d3_MassGradient) > d_Mass_Minimum)
 					glm::dvec3 d3Normal = glm::normalize(thisGP_Body->d3_MassGradient);
 					double dContact = glm::dot(thisGP_Body->d3_Velocity - combinedGP.d3_Velocity, d3Normal);
-					if(dContact > 0.0)
+					if(dContact > 1.0e-12)
 					{// if there is contact, adjust the normal velocity component
 						thisGP->b_Contact = true;
 
-						//thisGP_Body->d3_Velocity = thisGP_Body->d3_Velocity - dContact*d3Normal;
+						thisGP_Body->d3_Velocity = thisGP_Body->d3_Velocity - dContact*d3Normal;
 
-						thisGP_Body->d3_Force += (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
+						thisGP_Body->d3_Force = (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
 					}
 				}
 				// update body momenta and apply boundary conditions
@@ -292,7 +272,7 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 					if(thisGP->b3_Fixed.y == true)
 					{
 						thisGP_Body->d3_Velocity.y = 0.0;
-						thisGP_Body->d3_Force_Temp.y += thisGP_Body->d3_Force.y;
+						thisGP->d3_Force_Temp.y += thisGP_Body->d3_Force.y;
 						thisGP_Body->d3_Force.y = 0.0;
 					}
 					if(thisGP->b3_Fixed.z == true)
@@ -301,6 +281,7 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 						thisGP_Body->d3_Force.z = 0.0;
 					}
 				}
+
 
 //				if(thisGP->d_Mass > d_Mass_Minimum)
 //					thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;
@@ -324,6 +305,28 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 
 			}
 			a_Runtime[4] += omp_get_wtime() - dRuntime_Block;
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// displacement controlled material points ------------------------ displacement control
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < v_MarkedMaterialPoints_CPDI_Displacement_Control.size(); index_MP++)
+			{
+				MaterialPoint_CPDI_CC *thisMP = v_MarkedMaterialPoints_CPDI_Displacement_Control[index_MP];
+
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				{
+					GridPoint *thisAGP;
+						thisAGP = allGridPoint_Body[thisMP->i_Body][thisMP->v_AGP[index_AGP].index];
+
+//					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+
+					thisAGP->d3_Velocity = thisMP->d3_Velocity;
+					//thisAGP->d3_Force_Temp += thisAGP->d3_Force;
+					thisAGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
+				}
+			}
+			a_Runtime[5] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();

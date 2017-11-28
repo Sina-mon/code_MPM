@@ -28,17 +28,6 @@ void PhysicsEngine::initializeWorld_Classic_HalfRing_Xiang_PlainStress(void)
 		allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
 
-	// contact kernel grid ---------------------------------------------------- contact grid
-	{// initialize GP kernel mediator
-		d3_Length_Grid_Kernel = d3_Length_Grid;
-		i3_Cells_Kernel = 1*i3_Cells;
-
-		d3_Length_Cell_Kernel = d3_Length_Grid_Kernel / glm::dvec3(i3_Cells_Kernel);
-
-		i3_Nodes_Kernel = i3_Cells_Kernel + glm::ivec3(1, 1, 1);
-	}
-	v_GridPoint_Kernel = GP_Factory.createGrid(d3_Length_Grid_Kernel, i3_Cells_Kernel);
-
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
 		GridPoint *thisGridPoint = allGridPoint[index_GP];
