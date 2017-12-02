@@ -41,14 +41,14 @@ class GraphicsEngine
 		void saveScreenshot(int x, int y, int w, int h, const char * filename);
 	protected:
 		//snapshot save
-		float f_TimeSnapshot_Interval = 1.0e-3;//100.0*5.0e-8;//0.1;
+		float f_TimeSnapshot_Interval = 1.0; // set inside the setPhysicsEngineReference method
 		float f_TimeSnapshot_LastSave = -1.0e12; // before creation
 		int i_TimeSnapshotCycle = 0;
 
 		SDL_Window *p_Window = NULL;
 
-		float i_ScreenWidth = 600;
-		float i_ScreenHeight = 600;
+		float i_ScreenWidth = 4*400;
+		float i_ScreenHeight = 2*400;
 
 		glm::vec3 f3_World_Center = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 f3_World_Dimensions = glm::vec3(0.0, 0.0, 0.0);
@@ -78,6 +78,9 @@ class GraphicsEngine
 			MAIN = 0,
 			J2_STRESS,
 			J2_PLASTICSTRAIN,
+			ENERGY_STRAIN,
+			ENERGY_PLASTIC,
+			SOLID,
 			COUNT,
 		};
 

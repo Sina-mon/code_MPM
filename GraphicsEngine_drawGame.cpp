@@ -80,7 +80,7 @@ void GraphicsEngine::drawGame(void)
 				fSize *= 1.0;
 			}
 			if(thisMP->b_DisplacementControl)
-				f4objectColor = _WHITE;
+				f4objectColor = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -110,7 +110,7 @@ void GraphicsEngine::drawGame(void)
 			if(thisMP->b_Surface)
 				f4objectColor = _BLUE;
 			if(thisMP->b_DisplacementControl)
-				f4objectColor = _WHITE;
+				f4objectColor = _GREEN;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -284,7 +284,7 @@ void GraphicsEngine::drawGame(void)
 		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-		float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
+		float fJ2_Maximum = 1.0*1.0/3.0*glm::pow(vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus, 2);
 //		float fJ2_Maximum = 1.0e-12;
 //		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 //		{
@@ -325,383 +325,9 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(false)
-	{// kernel
-		gl_Canvas_Texture_Grid_Kernel->bindRenderTarget();
-		gl_BasicProgram.use();
-
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// diffuse
-		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
-		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
-		gl_Diffuse_Texture->bindTextureUnit(0);
-		// shadow
-		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
-		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
-		gl_Shadow_Texture->bindTextureUnit(1);
-
-		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
-		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
-		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
-		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
-		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
-		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
-
-		glm::vec3 f3LightDirection = gl_Light->getDirection();
-		glm::vec4 f4LightColor = gl_Light->f4_Color;
-		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
-		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
-
-//		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
-		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints_Kernel();
-
-		float fKernel_Maximum = 0.0;
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-//			if(thisGP->d_Kernel > fKernel_Maximum)
-//				fKernel_Maximum = thisGP->d_Kernel;
-		}
-
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			// particle position
-			float fSize = 0.002;//*thisGP->d_Kernel / fKernel_Maximum * mpm_PhysicsEngine->d3_Length_Cell.x;
-			// particle color
-			glm::vec4 f4objectColor = _WHITE;
-//			if(thisGP->b_Contact_Positive == true && thisGP->b_Contact_Negative == true)
-//			if(thisGP->b_Contact_Negative == true)
-			{
-				f4objectColor = _RED;
-				fSize *= 5.0;
-			}
-
-			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-			// shadow
-			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
-			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			// camera and model transformation matices
-			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
-			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
-			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-			gl_Particle_Mesh->Draw();
-		}
-
-		gl_BasicProgram.unuse();
-	}
-
-	if(false)
-	{// kernel gradient
-		gl_Canvas_Texture_Grid_KernelGradient->bindRenderTarget();
-		gl_BasicProgram.use();
-
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// diffuse
-		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
-		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
-		gl_Diffuse_Texture->bindTextureUnit(0);
-		// shadow
-		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
-		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
-		gl_Shadow_Texture->bindTextureUnit(1);
-
-		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
-		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
-		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
-		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
-		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
-		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
-
-		glm::vec3 f3LightDirection = gl_Light->getDirection();
-		glm::vec4 f4LightColor = gl_Light->f4_Color;
-		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
-		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
-
-		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
-//		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints_Kernel();
-
-		float fKernelGradient_Maximum = 0.0;
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-//			if(glm::length(thisGP->d3_Kernel_Gradient) > fKernelGradient_Maximum)
-//				fKernelGradient_Maximum = glm::length(thisGP->d3_Kernel_Gradient);
-		}
-
-//		std::cout << "Max kernel gradient: " << fKernelGradient_Maximum << std::endl;
-
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			// particle position
-			float fSize = 0.0002;// for problems with dimensions of 1m
-			Transformation glTransformation(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0));
-			// color
-			glm::vec4 f4objectColor = _GREEN;
-//			if(thisGP->b_Contact_Positive && thisGP->b_Contact_Negative)
-//				f4objectColor = _RED;
-//			else
-//				continue;
-			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-			// shadow
-			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
-			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			// camera and model transformation matices
-			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
-			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-//			gl_Particle_Mesh->Draw();
-
-//			if(glm::length(thisGP->d3_Kernel_Gradient) > 0.0)
-//			{
-//				glBegin(GL_LINES);
-//					glm::vec3 f3Start = thisGP->d3_Position;
-//					glm::vec3 f3End = glm::vec3(thisGP->d3_Position) + fSize/fKernelGradient_Maximum * glm::vec3(thisGP->d3_Kernel_Gradient);
-//					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-//					glVertex3f(f3End.x, f3End.y, f3End.z);
-//				glEnd();
-//			}
-		}
-
-		gl_BasicProgram.unuse();
-	}
-
-	if(false)
-	{// kernel gradient
-		gl_Canvas_Texture_Grid_Kernel->bindRenderTarget();
-		gl_BasicProgram.use();
-
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// diffuse
-		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
-		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
-		gl_Diffuse_Texture->bindTextureUnit(0);
-		// shadow
-		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
-		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
-		gl_Shadow_Texture->bindTextureUnit(1);
-
-		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
-		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
-		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
-		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
-		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
-		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
-
-		glm::vec3 f3LightDirection = gl_Light->getDirection();
-		glm::vec4 f4LightColor = gl_Light->f4_Color;
-		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
-		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
-
-		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
-//		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints_Kernel();
-
-		float fKernelGradient_Maximum = 0.0;
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-//			if(glm::length(thisGP->d3_Kernel_Gradient) > fKernelGradient_Maximum)
-//				fKernelGradient_Maximum = glm::length(thisGP->d3_Kernel_Gradient);
-		}
-
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			// particle position
-			float fSize = 0.0002;// for problems with dimensions of 1m
-			Transformation glTransformation(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0));
-			// color
-			glm::vec4 f4objectColor = _GREEN;
-//			if(thisGP->b_Contact_Positive && thisGP->b_Contact_Negative)
-//				f4objectColor = _RED;
-//			else
-//				continue;
-			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-			// shadow
-			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
-			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			// camera and model transformation matices
-			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
-			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-//			gl_Particle_Mesh->Draw();
-
-//			if(glm::length(thisGP->d3_Kernel_Gradient) > 0.0)
-//			{
-//				glBegin(GL_LINES);
-//					glm::vec3 f3Start = thisGP->d3_Position;
-//					glm::vec3 f3End = glm::vec3(thisGP->d3_Position) + fSize/fKernelGradient_Maximum * glm::vec3(thisGP->d3_Kernel_Gradient);
-//					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-//					glVertex3f(f3End.x, f3End.y, f3End.z);
-//				glEnd();
-//			}
-		}
-
-		gl_BasicProgram.unuse();
-	}
-
-	if(false)
-	{// grid mass canvas
-		gl_Canvas_Texture_Grid_Mass->bindRenderTarget();
-		gl_BasicProgram.use();
-
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// diffuse
-		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
-		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
-		gl_Diffuse_Texture->bindTextureUnit(0);
-		// shadow
-		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
-		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
-		gl_Shadow_Texture->bindTextureUnit(1);
-
-		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
-		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
-		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
-		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
-		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
-		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
-
-		glm::vec3 f3LightDirection = gl_Light->getDirection();
-		glm::vec4 f4LightColor = gl_Light->f4_Color;
-		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
-		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
-
-		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
-
-		float fMass_Maximum = 0.0;
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			if(thisGP->d_Mass > fMass_Maximum)	fMass_Maximum = thisGP->d_Mass;
-		}
-
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			// particle position
-			float fSize = thisGP->d_Mass / fMass_Maximum * 0.0001;
-			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.5*fSize));
-			// particle color
-			glm::vec4 f4objectColor = _GRAY;
-			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-			// shadow
-			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
-			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			// camera and model transformation matices
-			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
-			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-			gl_Particle_Mesh->Draw();
-		}
-
-		gl_BasicProgram.unuse();
-	}
-
-	if(false)
-	{// grid mass gradient
-		gl_Canvas_Texture_Grid_Mass->bindRenderTarget();
-		gl_BasicProgram.use();
-
-		glClearDepth(1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// diffuse
-		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
-		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
-		gl_Diffuse_Texture->bindTextureUnit(0);
-		// shadow
-		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
-		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
-		gl_Shadow_Texture->bindTextureUnit(1);
-
-		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
-		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
-		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
-		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
-		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
-		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
-
-		glm::vec3 f3LightDirection = gl_Light->getDirection();
-		glm::vec4 f4LightColor = gl_Light->f4_Color;
-		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
-		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
-
-		std::vector<GridPoint *> vGridPoint = mpm_PhysicsEngine->getGridPoints();
-
-
-		float fMassGradient_Maximum = 0.0;
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			if(glm::length(thisGP->d3_MassGradient) > fMassGradient_Maximum)
-				fMassGradient_Maximum = glm::length(thisGP->d3_MassGradient);
-		}
-
-		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
-		{
-			GridPoint *thisGP = vGridPoint[index_GP];
-
-			// particle position
-			float fSize = 0.0002;// for problems with dimensions of 1m
-			Transformation glTransformation(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0));
-			// color
-			glm::vec4 f4objectColor = _GREEN;
-//			if(thisGP->b_Contact_Positive && thisGP->b_Contact_Negative)
-//				f4objectColor = _RED;
-//			else
-//				continue;
-			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-			// shadow
-			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
-			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			// camera and model transformation matices
-			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
-			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-//			gl_Particle_Mesh->Draw();
-
-			if(glm::length(thisGP->d3_MassGradient) > 0.0)
-			{
-				glBegin(GL_LINES);
-					glm::vec3 f3Start = thisGP->d3_Position;
-					glm::vec3 f3End = glm::vec3(thisGP->d3_Position) + fSize/fMassGradient_Maximum * glm::vec3(thisGP->d3_MassGradient);
-					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-					glVertex3f(f3End.x, f3End.y, f3End.z);
-				glEnd();
-			}
-		}
-
-		gl_BasicProgram.unuse();
-	}
-
-	if(false)
-	{// MP kernel gradient
-		gl_Canvas_Texture_MP_KernelGradient->bindRenderTarget();
+	if(true)
+	{// MP parameteric value, strain energy
+		v_Canvas_Texture[(int)enum_Canvas::ENERGY_STRAIN]->bindRenderTarget();
 		gl_BasicProgram.use();
 
 		glClearDepth(1.0);
@@ -728,44 +354,220 @@ void GraphicsEngine::drawGame(void)
 		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
 
 		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
 
-		float fKernelGradient_Maximum = 0.0;
-		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
-		{
-			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
-
-//			if(glm::length(thisMP->d3_Kernel_Gradient) > fKernelGradient_Maximum)
-//				fKernelGradient_Maximum = glm::length(thisMP->d3_Kernel_Gradient);
-		}
+		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
+		// material points ----------------------------------------------------
+		ConstitutiveRelation CR;
+		float fValue_Maximum = 0.5*(vMaterialPoint[0]->d_YieldStress * vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus * vMaterialPoint[0]->d_Volume_Initial);
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
 			// particle position
-			float fSize = 0.0001;// for problems with dimensions of 1m
-			Transformation glTransformation(glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0));
+			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
-			glm::vec4 f4objectColor = _GREEN;
+			float fValue = thisMP->d_Energy_Strain;
+			glm::vec4 f4objectColor = (1.0f-fValue/fValue_Maximum) * _BLUE + fValue/fValue_Maximum * _RED;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
 			// shadow
 			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
 			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
 			// camera and model transformation matices
+			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
 			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
 			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
 			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
 			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
 
-//			if(glm::length(thisMP->d3_Kernel_Gradient) > 0.0)
+			gl_Particle_Mesh->Draw();
+		}
+
+		gl_BasicProgram.unuse();
+	}
+
+	if(true)
+	{// MP parameteric value, plastic energy
+		v_Canvas_Texture[(int)enum_Canvas::ENERGY_PLASTIC]->bindRenderTarget();
+		gl_BasicProgram.use();
+
+		glClearDepth(1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// diffuse
+		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
+		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
+		gl_Diffuse_Texture->bindTextureUnit(0);
+		// shadow
+		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
+		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
+		gl_Shadow_Texture->bindTextureUnit(1);
+
+		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
+		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
+		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
+		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
+		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
+		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
+
+		glm::vec3 f3LightDirection = gl_Light->getDirection();
+		glm::vec4 f4LightColor = gl_Light->f4_Color;
+		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
+		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
+
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
+
+		vMaterialPoint.insert(vMaterialPoint.end(), vMaterialPoint_CPDI.begin(), vMaterialPoint_CPDI.end());
+		// material points ----------------------------------------------------
+		ConstitutiveRelation CR;
+		float fValue_Maximum = 0.5*(vMaterialPoint[0]->d_YieldStress * vMaterialPoint[0]->d_YieldStress / vMaterialPoint[0]->d_ElasticModulus * vMaterialPoint[0]->d_Volume_Initial);
+
+		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
+		{
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
+
+			// particle position
+			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+			// particle color
+			float fValue = thisMP->d_Energy_Plastic;
+			glm::vec4 f4objectColor = (1.0f-fValue/fValue_Maximum) * _BLUE + fValue/fValue_Maximum * _RED;
+			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+			// shadow
+			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			// camera and model transformation matices
+			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+			gl_Particle_Mesh->Draw();
+		}
+
+		gl_BasicProgram.unuse();
+	}
+
+	if(true)
+	{// Solid, only containing the material points
+		v_Canvas_Texture[(int)enum_Canvas::SOLID]->bindRenderTarget();
+		gl_BasicProgram.use();
+
+		glClearDepth(1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// diffuse
+		GLuint gl_UniformLocation_Diffuse = gl_BasicProgram.getUniformLocation("diffuseTexture");
+		glUniform1i(gl_UniformLocation_Diffuse, 0); // save unit 0 for this texture
+		gl_Diffuse_Texture->bindTextureUnit(0);
+		// shadow
+		GLuint gl_UniformLocation_Shadow = gl_BasicProgram.getUniformLocation("shadowTexture");
+		glUniform1i(gl_UniformLocation_Shadow, 1); // save unit 0 for this texture
+		gl_Shadow_Texture->bindTextureUnit(1);
+
+		GLuint objectColorLocation = gl_BasicProgram.getUniformLocation("objectColor");
+		GLuint transformationModelLocation = gl_BasicProgram.getUniformLocation("transformationModelMatrix");
+		GLuint transformationCameraLocation = gl_BasicProgram.getUniformLocation("transformationCameraMatrix");
+		GLuint transformationShadowLocation = gl_BasicProgram.getUniformLocation("transformationShadowMatrix");
+		GLuint lightDirectionLocation = gl_BasicProgram.getUniformLocation("lightDirection");
+		GLuint lightColorLocation = gl_BasicProgram.getUniformLocation("lightColor");
+
+		glm::vec3 f3LightDirection = gl_Light->getDirection();
+		glm::vec4 f4LightColor = gl_Light->f4_Color;
+		glUniform3fv(lightDirectionLocation, 1, &f3LightDirection[0]);
+		glUniform4fv(lightColorLocation, 1, &f4LightColor[0]);
+
+		std::vector<MaterialPoint_BC *> vMaterialPoint = mpm_PhysicsEngine->getMaterialPoints();
+		std::vector<MaterialPoint_CPDI_CC *> vMaterialPoint_CPDI = mpm_PhysicsEngine->getMaterialPoints_CPDI();
+
+		// material points, classic -------------------------------------------
+		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
+		{
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
+
+			// particle position
+			float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+			// particle color
+			glm::vec4 f4objectColor = _RED;
+			if(thisMP->b_Mark_Stress)
+				f4objectColor = _GREEN;
 			if(thisMP->b_Surface)
 			{
-				glBegin(GL_LINES);
-					glm::vec3 f3Start = thisMP->d3_Position;
-					glm::vec3 f3End = thisMP->d3_Position;// + fSize/fKernelGradient_Maximum * glm::vec3(thisMP->d3_Kernel_Gradient);
-					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-					glVertex3f(f3End.x, f3End.y, f3End.z);
-				glEnd();
+				f4objectColor = _BLUE;
+				fSize *= 1.0;
+			}
+			if(thisMP->b_DisplacementControl)
+				f4objectColor = _WHITE;
+			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+			// shadow
+			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			// camera and model transformation matices
+			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+			gl_Particle_Mesh->Draw();
+		}
+		// material points, CPDI ----------------------------------------------
+		for(int index_MP = 0; index_MP < vMaterialPoint_CPDI.size(); index_MP++)
+		{
+			MaterialPoint_CPDI_CC *thisMP = vMaterialPoint_CPDI[index_MP];
+
+			// particle position
+			float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+			// particle color
+			glm::vec4 f4objectColor = _RED;
+			if(thisMP->b_Mark_Stress)
+				f4objectColor = _GREEN;
+			if(thisMP->b_Surface)
+				f4objectColor = _BLUE;
+			if(thisMP->b_DisplacementControl)
+				f4objectColor = _WHITE;
+			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+			// shadow
+			glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+			glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			// camera and model transformation matices
+			Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+			glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+			glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+			glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+			glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+			gl_Particle_Mesh->Draw();
+
+			for(int index_Corner = 0; index_Corner < 4; index_Corner++)
+			{
+				// particle position
+				float fSize = 1.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
+				// particle color
+				glm::vec4 f4objectColor = _RED;
+				if(thisMP->b_Mark_Stress)
+					f4objectColor = _GREEN;
+				if(thisMP->b_Surface)
+					f4objectColor = _BLUE;
+				if(thisMP->b_DisplacementControl)
+					f4objectColor = _WHITE;
+				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+
+				// shadow
+				glm::mat4 m4LightTransformation = gl_Light->getViewProjection();
+				glUniformMatrix4fv(transformationShadowLocation, 1, GL_FALSE, &m4LightTransformation[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+				// camera and model transformation matices
+				Transformation glTransformation(thisMP->a_Corner[index_Corner].d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize));
+				glm::mat4 m4TransformationMatrix_Camera = gl_Camera->getViewProjection();
+				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+				glUniformMatrix4fv(transformationCameraLocation, 1, GL_FALSE, &m4TransformationMatrix_Camera[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+
+				gl_Particle_Mesh->Draw();
 			}
 		}
 
@@ -784,90 +586,75 @@ void GraphicsEngine::drawGame(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		float fScreenRatio = 1.0 / (int)enum_Canvas::COUNT;
+		glm::vec2 f2ScreenRatio = glm::vec2(0.25,0.5);
 
 		if(true)
-		{// top-left quadrant of screen
+		{
 			// bind texture
 			v_Canvas_Texture[(int)enum_Canvas::MAIN]->bindTextureUnit(0);
 			// set viewport
-			float x_Location = (float)enum_Canvas::MAIN / (int)enum_Canvas::COUNT;
-			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+//			float x_Location = (float)enum_Canvas::MAIN / (int)enum_Canvas::COUNT;
+//			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+			glm::vec2 f2PositionRatio = glm::vec2(0.0,0.5);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
 			gl_Canvas_Mesh->Draw();
 		}
+		if((int)enum_Canvas::SOLID < (int)enum_Canvas::COUNT)
+		{
+			// bind texture
+			v_Canvas_Texture[(int)enum_Canvas::SOLID]->bindTextureUnit(0);
+			// set viewport
+			glm::vec2 f2PositionRatio = glm::vec2(0.25,0.5);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
+			//draw
+			v_Canvas_Mesh[(int)enum_Canvas::SOLID]->Draw();
+		}
 		if((int)enum_Canvas::J2_STRESS < (int)enum_Canvas::COUNT)
-		{// top-left quadrant of screen
+		{
 			// bind texture
 			v_Canvas_Texture[(int)enum_Canvas::J2_STRESS]->bindTextureUnit(0);
 			// set viewport
-			float x_Location = (float)enum_Canvas::J2_STRESS / (int)enum_Canvas::COUNT;
-			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+//			float x_Location = (float)enum_Canvas::J2_STRESS / (int)enum_Canvas::COUNT;
+//			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+			glm::vec2 f2PositionRatio = glm::vec2(0.0,0.0);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
 			v_Canvas_Mesh[(int)enum_Canvas::J2_STRESS]->Draw();
 		}
 		if((int)enum_Canvas::J2_PLASTICSTRAIN < (int)enum_Canvas::COUNT)
-		{// top-left quadrant of screen
+		{
 			// bind texture
 			v_Canvas_Texture[(int)enum_Canvas::J2_PLASTICSTRAIN]->bindTextureUnit(0);
 			// set viewport
-			float x_Location = (float)enum_Canvas::J2_PLASTICSTRAIN / (int)enum_Canvas::COUNT;
-			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+//			float x_Location = (float)enum_Canvas::J2_PLASTICSTRAIN / (int)enum_Canvas::COUNT;
+//			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+			glm::vec2 f2PositionRatio = glm::vec2(0.25,0.0);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
 			v_Canvas_Mesh[(int)enum_Canvas::J2_PLASTICSTRAIN]->Draw();
 		}
-		if(false)
-		{// top-right quadrant of screen
+		if((int)enum_Canvas::ENERGY_STRAIN < (int)enum_Canvas::COUNT)
+		{
 			// bind texture
-			gl_Canvas_Texture_Grid_Kernel->bindTextureUnit(0);
+			v_Canvas_Texture[(int)enum_Canvas::ENERGY_STRAIN]->bindTextureUnit(0);
 			// set viewport
-			glViewport(0.25*i_ScreenWidth, 0.0*i_ScreenHeight, 0.25*i_ScreenWidth, 1.0*i_ScreenHeight);
+//			float x_Location = (float)enum_Canvas::ENERGY_STRAIN / (int)enum_Canvas::COUNT;
+//			glViewport(x_Location*i_ScreenWidth, 0.0*i_ScreenHeight, fScreenRatio*i_ScreenWidth, 1.0*i_ScreenHeight);
+			glm::vec2 f2PositionRatio = glm::vec2(0.50,0.0);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
-			gl_Canvas_Mesh->Draw();
+			v_Canvas_Mesh[(int)enum_Canvas::ENERGY_STRAIN]->Draw();
 		}
-		if(false)
-		{// top-right quadrant of screen
+		if((int)enum_Canvas::ENERGY_PLASTIC < (int)enum_Canvas::COUNT)
+		{
 			// bind texture
-			gl_Canvas_Texture_Grid_Kernel->bindTextureUnit(0);
+			v_Canvas_Texture[(int)enum_Canvas::ENERGY_PLASTIC]->bindTextureUnit(0);
 			// set viewport
-			glViewport(0.5*i_ScreenWidth, 0.5*i_ScreenHeight, 0.5*i_ScreenWidth, 0.5*i_ScreenHeight);
+			glm::vec2 f2PositionRatio = glm::vec2(0.75,0.0);
+			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
-			gl_Canvas_Mesh->Draw();
-		}
-		if(false)
-		{// top-right quadrant of screen
-			// bind texture
-			gl_Canvas_Texture_MP_KernelGradient->bindTextureUnit(0);
-			// set viewport
-			glViewport(0.5*i_ScreenWidth, 0.5*i_ScreenHeight, 0.5*i_ScreenWidth, 0.5*i_ScreenHeight);
-			//draw
-			gl_Canvas_Mesh->Draw();
-		}
-		if(false)
-		{// bottom-left quadrant of screen
-			// bind texture
-			gl_Canvas_Texture_MP_KernelGradient->bindTextureUnit(0);
-			// set viewport
-			glViewport(0.50*i_ScreenWidth, 0.0*i_ScreenHeight, 0.25*i_ScreenWidth, 1.0*i_ScreenHeight);
-			//draw
-			gl_Canvas_Mesh->Draw();
-		}
-		if(false)
-		{// bottom-right quadrant of screen
-			// bind texture
-			gl_Canvas_Texture_Grid_Mass->bindTextureUnit(0);
-			// set viewport
-			glViewport(0.50*i_ScreenWidth, 0.0*i_ScreenHeight, 0.25*i_ScreenWidth, 1.0*i_ScreenHeight);
-			//draw
-			gl_Canvas_Mesh->Draw();
-		}
-		if(false)
-		{// bottom-left quadrant of screen
-			// bind texture
-			gl_Canvas_Texture_Grid_KernelGradient->bindTextureUnit(0);
-			// set viewport
-			glViewport(0.75*i_ScreenWidth, 0.0*i_ScreenHeight, 0.25*i_ScreenWidth, 1.0*i_ScreenHeight);
-			//draw
-			gl_Canvas_Mesh->Draw();
+			v_Canvas_Mesh[(int)enum_Canvas::ENERGY_PLASTIC]->Draw();
 		}
 
 		// undind texture

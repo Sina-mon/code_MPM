@@ -21,7 +21,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS 8
+#define _MAX_N_THREADS 1
 
 class PhysicsEngine
 {
@@ -32,6 +32,7 @@ class PhysicsEngine
 		void	initializeWorld_Bar(void);
 		void	initializeWorld_Bar_CPDI(void);
 		void	initializeWorld_Ring(void);
+		void	initializeWorld_CPDI_FullRing_Xiang_PlainStrain(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStrain(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xiang_FullLength(void);
@@ -63,6 +64,7 @@ class PhysicsEngine
 		double getTime_Current(void) {return(d_Time);}
 		double getTime_End(void) {return(d_TimeEnd);}
 		double getTime_Increment(void) {return(d_TimeIncrement_Maximum);}
+		double getTime_ConsoleInterval(void) {return(d_TimeConsole_Interval);}
 		// graphics interface -------------------------------------------------
 		unsigned int	getCount_MaterialPoint(void) {return(allMaterialPoint.size());}
 		unsigned int	getCount_MaterialPoint_CPDI(void) {return(allMaterialPoint_CPDI.size());}
