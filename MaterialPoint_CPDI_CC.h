@@ -19,7 +19,7 @@ class MaterialPoint_CPDI_CC : public MaterialPoint_BC
 
 		std::array<Corner_ST, 4> a_Corner;
 
-		std::vector<AGPstruct> v_AGP;
+//		std::vector<AGPstruct> v_AGP;
 
 //		std::array<std::array<int, 8>, 4> a_Corner_AGP_Index = {{ {{0,0,0,0,0,0,0,0}}, {{0,0,0,0,0,0,0,0}}, {{0,0,0,0,0,0,0,0}}, {{0,0,0,0,0,0,0,0}} }};
 //		std::array<std::array<int, 8>, 4> a_Corner_AGP_ShapeValue = {{ {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}}, {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}}, {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}}, {{0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}} }};

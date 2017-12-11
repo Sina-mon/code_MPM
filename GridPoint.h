@@ -10,6 +10,7 @@ class GridPoint
 		virtual ~GridPoint() {;}
 
 		bool b_Active = false;
+		bool b_Contact = false;
 
 		glm::ivec3 i3_Index = glm::vec3(0,0,0);
 
@@ -23,6 +24,7 @@ class GridPoint
 
 		glm::dvec3 d3_MassGradient	= glm::dvec3(0.0,0.0,0.0);
 		glm::dvec3 d3_Velocity		= glm::dvec3(0.0,0.0,0.0);
+		glm::dvec3 d3_Momentum		= glm::dvec3(0.0,0.0,0.0);
 		glm::dvec3 d3_Force			= glm::dvec3(0.0,0.0,0.0);
 
 		glm::dvec3 d3_Force_Temp	= glm::dvec3(0.0,0.0,0.0);

@@ -35,6 +35,7 @@ class MaterialPoint_BC
 		bool b_Surface = false;
 
 		unsigned int i_ID = 0;
+		unsigned int i_Body = 0;
 		unsigned int i_MaterialType = _ELASTIC;
 
 		double d_Mass = 0.0;
@@ -62,6 +63,8 @@ class MaterialPoint_BC
 		double d_BackStress_Isotropic = 0.0;
 		double d_Hardening_Isotropic_C0 = 0.0;
 		double d_Hardening_Isotropic_C1 = 0.0;
+
+		std::vector<AGPstruct> v_AGP;
 	protected:
 	private:
 };

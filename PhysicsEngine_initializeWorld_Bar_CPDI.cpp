@@ -86,23 +86,23 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		omp_init_lock(v_GridPoint_Lock[index]);
 	}
 
-	d_Offset = 1.0*d3_Length_Cell.x;
+	double dOffset = 1.0*d3_Length_Cell.x;
 
 	glm::dvec3 d3Bar_Dimension = glm::dvec3(0.01, 0.04, 0.001);
 	glm::dvec3 d3Bar_Center = 0.5*d3_Length_Grid;
-	d3Bar_Center.y = 0.5*d3Bar_Dimension.y + 2.0*d3_Length_Cell.y;
+	d3Bar_Center.y = 0.5*d3Bar_Dimension.y + 4.0*d3_Length_Cell.y;
 
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = -0.0;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Bar_Center, d3Bar_Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Bar_Center, d3Bar_Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-//			thisMP->i_MaterialType = _VONMISESHARDENING;
-			thisMP->i_MaterialType = _PLASTIC;
+			thisMP->i_MaterialType = _VONMISESHARDENING;
+//			thisMP->i_MaterialType = _PLASTIC;
 //			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
@@ -132,16 +132,20 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 			// moment log
 //			v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 			// mark for stress monitor
-//			v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+			if(glm::abs(thisMP->d3_Position.y - d3Bar_Center.y) < 2.0*d3_Length_Cell.y)
+			{
+				thisMP->b_Mark_Stress = true;
+				v_MarkedMaterialPoints_Stress_Monitor.push_back(thisMP);
+			}
 		}
 	}
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
 		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
 		glm::dvec3 d3Center = d3Bar_Center;
-		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3_Length_Cell.y;
+		d3Center.y = d3Bar_Center.y + 0.5*d3Bar_Dimension.y + 0.5*d3Dimension.y + 0.0*d3_Length_Cell.y;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -180,11 +184,11 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	}
 	if(true)
 	{// bottom platen material points ----------------------------------------- platen MP
-		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,2.0*d3_Length_Cell.y,d3Bar_Dimension.z);
+		glm::dvec3 d3Dimension = glm::dvec3(1.5*d3Bar_Dimension.x,4.0*d3_Length_Cell.y,d3Bar_Dimension.z);
 		glm::dvec3 d3Center = d3Bar_Center;
 		d3Center.y = 0.5*d3Dimension.y;
 
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, d_Offset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, d3Dimension, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -231,7 +235,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	    double dTime_Line = 0.0;
 
    		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
-   		m_TimeLine.addTimePoint(0.1, glm::dvec3(0.0, dPlatenSpeed, 0.0));
+   		m_TimeLine.addTimePoint(10., glm::dvec3(0.0, dPlatenSpeed, 0.0));
 
 //   		m_TimeLine.addTimePoint(0.0, glm::dvec3(0.0, dPlatenSpeed, 0.0));
 //   		m_TimeLine.addTimePoint(0.0025, glm::dvec3(0.0, dPlatenSpeed, 0.0));
@@ -261,7 +265,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 	d_DampingCoefficient = 0.00;
 
 	d_TimeIncrement_Maximum = 1.0e-8;
-	d_TimeEnd = 0.5*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
+	d_TimeEnd = 1.0*d3Bar_Dimension.y / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5;
 
 	std::string sDescription = "";
@@ -286,8 +290,7 @@ void PhysicsEngine::initializeWorld_Bar_CPDI(void)
 		sDescription += "Mass: " + Script(dMass_Domain,6) + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")\n";
-		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
-		sDescription += "Material Point offset: " + Script(d_Offset,3) + "\n";
+		sDescription += "Material Point offset: " + Script(dOffset,3) + "\n";
 //        if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
 //            sDescription += "Platen Speed: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Velocity.y, 3) + " m/s" + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
