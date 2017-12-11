@@ -221,8 +221,45 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 			{
 				GridPoint *thisGP = allGridPoint[index_GP];
 
-//				if(thisGP->b_Active == false)
-//					continue;
+				if(thisGP->b_Active == false)
+					continue;
+
+				// helper combined variable
+				GridPoint combinedGP;
+				//glm::dvec3 d3Normal = glm::dvec3(0.0,0.0,0.0);
+				{
+					combinedGP.d3_Velocity	= glm::dvec3(0.0,0.0,0.0);
+					combinedGP.d3_Force		= glm::dvec3(0.0,0.0,0.0);
+				}
+				for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+				{
+					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
+
+					combinedGP.d3_Velocity	+= (thisGP_Body->d_Mass * thisGP_Body->d3_Velocity)/thisGP->d_Mass;
+				}
+				for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+				{
+					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
+
+					glm::dvec3 d3Normal = glm::dvec3(0.0,0.0,0.0);
+//					if(thisGP_Body->d_Mass > d_Mass_Minimum)
+						d3Normal = glm::normalize(thisGP_Body->d3_MassGradient);
+					//glm::dvec3 d3Normal = glm::normalize(thisGP_Body->d3_MassGradient);
+					double dContact = glm::dot(thisGP_Body->d3_Velocity - combinedGP.d3_Velocity, d3Normal);
+
+					if(dContact > 1.0e-12)
+					{// if there is contact, adjust the normal velocity component
+						thisGP->b_Contact = true;
+
+						glm::dvec3 d3Force_Contact = (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
+
+						thisGP_Body->d3_Force += -glm::dot(thisGP_Body->d3_Force, d3Normal) * d3Normal;
+						thisGP_Body->d3_Force += d3Force_Contact;
+//
+//						thisGP_Body->d3_Force += (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
+//						thisGP_Body->d3_Velocity = thisGP_Body->d3_Velocity - dContact*d3Normal;
+					}
+				}
 
 //				// helper combined variable
 //				GridPoint combinedGP;
@@ -259,6 +296,7 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 				{
 					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
 
+//					if(thisGP_Body->d_Mass > d_Mass_Minimum && thisGP->b_Contact != true)
 					if(thisGP_Body->d_Mass > d_Mass_Minimum)
 						thisGP_Body->d3_Velocity += thisGP_Body->d3_Force / thisGP_Body->d_Mass * dTimeIncrement;
 
@@ -280,41 +318,6 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 					}
 				}
 
-				// helper combined variable
-				GridPoint combinedGP;
-				{
-					combinedGP.d3_Velocity	= glm::dvec3(0.0,0.0,0.0);
-					combinedGP.d3_Force		= glm::dvec3(0.0,0.0,0.0);
-				}
-				for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-				{
-					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
-
-					combinedGP.d3_Velocity	+= (thisGP_Body->d_Mass * thisGP_Body->d3_Velocity)/thisGP->d_Mass;
-				}
-
-
-				for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-				{
-					GridPoint *thisGP_Body = allGridPoint_Body[index_Body][index_GP];
-
-					glm::dvec3 d3Normal = glm::normalize(thisGP_Body->d3_MassGradient);
-					double dContact = glm::dot(thisGP_Body->d3_Velocity - combinedGP.d3_Velocity, d3Normal);
-
-					if(dContact > 1.0e-12 && thisGP->d_Mass > d_Mass_Minimum)
-					{// if there is contact, adjust the normal velocity component
-						thisGP->b_Contact = true;
-
-						glm::dvec3 d3Force_Contact = (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
-
-						thisGP_Body->d3_Force += d3Force_Contact;
-
-						thisGP_Body->d3_Velocity += d3Force_Contact / thisGP_Body->d_Mass * dTimeIncrement;
-//						thisGP_Body->d3_Force += (-thisGP_Body->d_Mass * dContact / dTimeIncrement) * d3Normal;
-//						thisGP_Body->d3_Velocity = thisGP_Body->d3_Velocity - dContact*d3Normal;
-
-					}
-				}
 
 //				if(thisGP->d_Mass > d_Mass_Minimum)
 //					thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;

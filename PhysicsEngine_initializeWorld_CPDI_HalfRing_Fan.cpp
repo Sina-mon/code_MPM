@@ -83,15 +83,15 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	}
 
 
-	double dPlatenSpeed = +10.0;
+	double dPlatenSpeed = +1.0;
 
 	double dThickness_Ring = 0.00296;
 	double dDiameter_Outer = 0.04987;
 	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 	double dDiameter_Average = 0.5*(dDiameter_Outer+dDiameter_Inner);
 
-	int iDivision_Angular = 90;
-	int iDivision_Radial = 8;
+	int iDivision_Angular = 180;
+	int iDivision_Radial = 16;
 	int iDivision_Longitudinal = 1;
 
 	double dAngle_Start	= -0.5*_PI;
@@ -101,12 +101,12 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	double dLength_Ring = glm::min(dThickness_Ring/iDivision_Radial, _PI*dDiameter_Average/iDivision_Angular);
 
 	glm::dvec3 d3Dimension_Platen_Bottom	= glm::dvec3(0.8*d3_Length_World.x,.0*d3_Length_Cell.y,d3_Length_Grid.z);
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.9*d3_Length_World.x,1.0*d3_Length_Cell.y,d3_Length_Grid.z);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.9*d3_Length_World.x,2.0*d3_Length_Cell.y,d3_Length_Grid.z);
 	glm::dvec3 d3Dimension_LoadCell			= glm::dvec3(0.0,0.0,0.0);//glm::dvec3(0.6*d3_Length_World.x,1.0*d3_Length_Cell.y,d3_Length_Grid.z);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
 	glm::dvec3 d3Center_Ring			= glm::dvec3(.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+1.0*d3_Length_Cell.y,0.5*dLength_Ring);
-	glm::dvec3 d3Center_Platen_Top		= 0.5*d3Dimension_Platen_Top + glm::dvec3(0.0, d3Center_Ring.y+0.5*dDiameter_Outer+2.0*d3_Length_Cell.y,0.0);
+	glm::dvec3 d3Center_Platen_Top		= 0.5*d3Dimension_Platen_Top + glm::dvec3(0.0, d3Center_Ring.y+0.5*dDiameter_Outer+2.1*d3_Length_Cell.y,0.0);
 
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
@@ -127,7 +127,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 2760.0 * thisMP->d_Volume;
-			d_Mass_Minimum = 0.001 * dMass;
+			d_Mass_Minimum = 0.0 * dMass;
 			thisMP->d_Mass = dMass;
 
 			thisMP->d_ElasticModulus = 70.0e9;
