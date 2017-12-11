@@ -83,7 +83,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	}
 
 
-	double dPlatenSpeed = +1.0;
+	double dPlatenSpeed = +0.2;
 
 	double dThickness_Ring = 0.00296;
 	double dDiameter_Outer = 0.04987;
@@ -105,7 +105,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	glm::dvec3 d3Dimension_LoadCell			= glm::dvec3(0.0,0.0,0.0);//glm::dvec3(0.6*d3_Length_World.x,1.0*d3_Length_Cell.y,d3_Length_Grid.z);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
-	glm::dvec3 d3Center_Ring			= glm::dvec3(.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+1.0*d3_Length_Cell.y,0.5*dLength_Ring);
+	glm::dvec3 d3Center_Ring			= glm::dvec3(.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+2.1*d3_Length_Cell.y,0.5*dLength_Ring);
 	glm::dvec3 d3Center_Platen_Top		= 0.5*d3Dimension_Platen_Top + glm::dvec3(0.0, d3Center_Ring.y+0.5*dDiameter_Outer+2.1*d3_Length_Cell.y,0.0);
 
 	if(true)
@@ -252,8 +252,8 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 5.0e-8;
-	d_TimeEnd = 0.9*dDiameter_Outer / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 2.0e-8;
+	d_TimeEnd = 0.7*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------

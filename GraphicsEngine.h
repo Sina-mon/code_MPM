@@ -44,8 +44,8 @@ class GraphicsEngine
 
 		SDL_Window *p_Window = NULL;
 
-		float i_ScreenWidth = 0.75*4*800;
-		float i_ScreenHeight = 0.75*1*800;
+		float i_ScreenWidth = 0.6*4*800;
+		float i_ScreenHeight = 0.6*1*800;
 
 		glm::vec3 f3_World_Center = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 f3_World_Dimensions = glm::vec3(0.0, 0.0, 0.0);

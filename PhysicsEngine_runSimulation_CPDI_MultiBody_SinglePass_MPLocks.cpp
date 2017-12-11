@@ -448,6 +448,11 @@ int PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeI
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain_Plastic[index] += d6PlasticStrainIncrement[index];
 
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Strain += thisMP->d6_Stress[index]*d6StrainIncrement[index] * thisMP->d_Volume;
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Plastic += thisMP->d6_Stress[index]*d6PlasticStrainIncrement[index] * thisMP->d_Volume;
+
 				thisMP->d_BackStress_Isotropic += vonMises_Thread.dBackstress_IsotropicIncrement;
 			}
 			a_Runtime[6] += omp_get_wtime() - dRuntime_Block;
