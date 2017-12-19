@@ -1,6 +1,7 @@
 #include "ConstitutiveRelation.h"
 
 // from, https://en.wikipedia.org/wiki/Cauchy_stress_tensor#Principal_stresses_and_stress_invariants
+// https://en.wikiversity.org/wiki/Principal_stresses
 // from, http://www.continuummechanics.org/principalstrain.html
 // ----------------------------------------------------------------------------
 void ConstitutiveRelation::calculateState_I1(double d6State[6])
@@ -178,22 +179,23 @@ glm::dvec3 ConstitutiveRelation::getPrincipal(double d6State[6])
 	double dI3 = this->getState_I3(d6State);
 
 	double dQ = (3.0*dI2 - dI1*dI1)/9.0;
-	double dR = (2.0*dI1*dI1 - 9.0*dI1*dI2 + 27.0*dI3)/54.0;
+	double dR = (2.0*dI1*dI1*dI1 - 9.0*dI1*dI2 + 27.0*dI3)/54.0;
 
 	if(dQ > 0)
 	{
-		std::cout << "Arithmatic error, in ConstitutiveRelation::getPrincipal_max" << std::endl;
+		std::cout << "Arithmatic error 1, in ConstitutiveRelation::getPrincipal_max" << std::endl;
 		return(d3Result);
 	}
 
 	double dT = dR / glm::sqrt(-dQ*dQ*dQ);
-	double dTheta = glm::acos(dTheta);
+//	if(dT < -1.0 || 1.0 < dT)
+//	{
+//		std::cout << "Arithmatic error 2, in ConstitutiveRelation::getPrincipal_max. dT = " << dT << std::endl;
+//		return(d3Result);
+//	}
+	dT = glm::clamp(dT, -1.0, 1.0);
+	double dTheta = glm::acos(dT);
 
-	if(dTheta < 0.0 || 1.0 < dTheta)
-	{
-		std::cout << "Arithmatic error, in ConstitutiveRelation::getPrincipal_max" << std::endl;
-		return(d3Result);
-	}
 
 	d3Result[0] = 2.0*glm::sqrt(-dQ) * glm::cos((dTheta+0.0*_PI)/3.0) + 1.0/3.0*dI1;
 	d3Result[1] = 2.0*glm::sqrt(-dQ) * glm::cos((dTheta+2.0*_PI)/3.0) + 1.0/3.0*dI1;

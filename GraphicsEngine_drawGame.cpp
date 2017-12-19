@@ -479,18 +479,18 @@ void GraphicsEngine::drawGame(void)
 		double d6Strain_Maximum[6] = {0, 0, 0, 0, 0, 0};
 		if(vMaterialPoint.size() != 0)
 		{
-			d6Strain_Minimum[0] = vMaterialPoint[0]->d_YieldStress/vMaterialPoint[0]->d_ElasticModulus;
-			d6Strain_Maximum[0] = 100.0*vMaterialPoint[0]->d_YieldStress/vMaterialPoint[0]->d_ElasticModulus;
+			d6Strain_Minimum[0] = 0.0;//vMaterialPoint[0]->d_YieldStress/vMaterialPoint[0]->d_ElasticModulus;
+			d6Strain_Maximum[0] = 0.1;//100.0*vMaterialPoint[0]->d_YieldStress/vMaterialPoint[0]->d_ElasticModulus;
 		}
 		if(vMaterialPoint_CPDI.size() != 0)
 		{
-			d6Strain_Minimum[0] = vMaterialPoint_CPDI[0]->d_YieldStress/vMaterialPoint_CPDI[0]->d_ElasticModulus;
-			d6Strain_Maximum[0] = 50.0*vMaterialPoint_CPDI[0]->d_YieldStress/vMaterialPoint_CPDI[0]->d_ElasticModulus;
+			d6Strain_Minimum[0] = 0.0;//vMaterialPoint_CPDI[0]->d_YieldStress/vMaterialPoint_CPDI[0]->d_ElasticModulus;
+			d6Strain_Maximum[0] = 0.1;//50.0*vMaterialPoint_CPDI[0]->d_YieldStress/vMaterialPoint_CPDI[0]->d_ElasticModulus;
 		}
 		CR.calculateState_J2(d6Strain_Minimum);
-		float fJ2_Minimum = CR.d_J2;
+		float fJ2_Minimum = 0.0;//CR.d_J2;
 		CR.calculateState_J2(d6Strain_Maximum);
-		float fJ2_Maximum = CR.d_J2;
+		float fJ2_Maximum = 0.12;//CR.d_J2;
 
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
@@ -531,10 +531,11 @@ void GraphicsEngine::drawGame(void)
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
 			CR.calculateState_J2(thisMP->d6_Strain_Plastic);
-			float fJ2 = CR.d_J2;
+			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Strain));
+			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);//CR.d_J2;
 			glm::vec4 f4objectColor = _BLUE;
 			if(fJ2 > fJ2_Minimum)
-				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _GREEN;
 			if(fJ2 > fJ2_Maximum)
 				f4objectColor  = _RED;
 
@@ -658,11 +659,11 @@ void GraphicsEngine::drawGame(void)
 		double d6Stress_Maximum[6] = {0.0, 0, 0, 0, 0, 0};
 		if(vMaterialPoint.size() != 0)
 		{
-			d6Stress_Maximum[0] = 1.0*vMaterialPoint[0]->d_YieldStress + 0.0*vMaterialPoint[0]->d_Hardening_Isotropic_C1;
+			d6Stress_Maximum[0] = vMaterialPoint[0]->p_Material->d_YieldStress + 0.0*vMaterialPoint[0]->d_Hardening_Isotropic_C1;
 		}
 		if(vMaterialPoint_CPDI.size() != 0)
 		{
-			d6Stress_Maximum[0] = 1.2*vMaterialPoint_CPDI[0]->d_YieldStress;
+			d6Stress_Maximum[0] = 1.2*vMaterialPoint_CPDI[0]->p_Material->d_YieldStress;
 		}
 		CR.calculateState_J2(d6Stress_Maximum);
 		float fJ2_Maximum = CR.d_J2;
