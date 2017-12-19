@@ -64,6 +64,7 @@ class PhysicsEngine
 		int	runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass_MP_Locks_Temp(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeIncrement_Total);
 
 		// function to communicate with outside -------------------------------
