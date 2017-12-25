@@ -312,16 +312,16 @@ void GraphicsEngine::drawGame(void)
 
 			// particle position
 			float fSize = 0.002;
-			glm::vec3 f3Size = glm::vec3(0.0002,0.0002,0.0002);
+			glm::vec3 f3Size = glm::vec3(0.0001,0.0001,0.0001);
 			if(thisGP->b3_Fixed.y == true)
 			{
-				f3Size.x = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.x = 0.0002;
+				f3Size.z = 0.0002;
 			}
 			else if(thisGP->b3_Fixed.x == true)
 			{
-				f3Size.y = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.y = 0.0002;
+				f3Size.z = 0.0002;
 			}
 //				0.002f*glm::vec3(thisGP->b3_Fixed) + glm::vec3(0.00001);
 //			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize,0.01*fSize,fSize));

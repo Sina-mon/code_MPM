@@ -86,6 +86,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 	{
 		pInconel->i_ID = 0;
 		pInconel->i_MaterialType = __VONMISESHARDENING;
+//		pInconel->i_MaterialType = __PLASTIC;
 
 		pInconel->d_Density = 8250.0;
 
@@ -93,8 +94,8 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		pInconel->d_PoissonRatio = 0.29;
 
 		pInconel->d_YieldStress = 280.0e6;
-		pInconel->d_Hardening_Isotropic_C0 = 15.0;
-		pInconel->d_Hardening_Isotropic_C1 = 420.0e6;
+		pInconel->d_Hardening_Isotropic_C0 = 0.5*15.0;
+		pInconel->d_Hardening_Isotropic_C1 = 200.0+420.0e6;
 	}
 	Material_BC *pSteel = new Material_BC;
 	v_allMaterial.push_back(pSteel);
@@ -108,19 +109,17 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		pSteel->d_PoissonRatio = 0.3;
 	}
 
-	double dPlatenSpeed = +5.0;
-//	ET03
-	double dDiameter_Average = 0.0045;
+	double dPlatenSpeed = +10.0;
+
 	double dThickness_Ring = 0.0005;
-//	ET04
-//	double dDiameter_Average = 0.04987;
-//	double dThickness_Ring = 0.00296;
+	double dDiameter_Outer = 0.005;
 
-	double dDiameter_Outer = dDiameter_Average + dThickness_Ring;
-	double dDiameter_Inner = dDiameter_Average - dThickness_Ring;
+	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 
-	glm::ivec2 i2Array_Count = glm::ivec2(1,1);
-	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer, dDiameter_Outer);
+	double dDiameter_Average = 0.5*(dDiameter_Outer + dDiameter_Inner);
+
+	glm::ivec2 i2Array_Count = glm::ivec2(2,2);
+	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+.0*d3_Length_Cell.x, dDiameter_Outer+.0*d3_Length_Cell.y);
 
 	int iDivision_Angular = 360;
 	int iDivision_Radial = 16;
@@ -130,16 +129,16 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 	double dAngle_End	= +2.0*_PI;
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
-	double dLength_Ring = glm::min(dThickness_Ring/iDivision_Radial, 2.0*_PI*dDiameter_Average/iDivision_Angular);
+	double dLength_Ring = glm::min(dThickness_Ring/iDivision_Radial, _PI*dDiameter_Average/iDivision_Angular);
 	if(dLength_Ring > d3_Length_Cell.z)
 		dLength_Ring = d3_Length_Cell.z;
 
 	glm::dvec3 d3Dimension_Platen_Bottom	= glm::dvec3(0.8*d3_Length_World.x,.0*d3_Length_Cell.y,d3_Length_Grid.z);
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(i2Array_Count.x*dDiameter_Outer,2.0*d3_Length_Cell.y,dLength_Ring);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(i2Array_Count.x*dDiameter_Outer,2.0*d3_Length_Cell.y,_PI*dDiameter_Average/iDivision_Angular);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
-	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer + 1.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
-	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+0.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
+	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer + 2.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+2.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
+	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(2.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
 
 	for(int ix = 0; ix < i2Array_Count.x; ix++)
 	{
@@ -191,7 +190,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Platen_Top, d3Dimension_Platen_Top, 2.0*dLength_Ring);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Platen_Top, d3Dimension_Platen_Top, _PI*dDiameter_Average/iDivision_Angular);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -277,7 +276,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 	d_TimeIncrement_Maximum = 1.0/20.0*5.0e-8;
 	d_TimeEnd = (d3Center_Platen_Top.y - 0.2*dDiameter_Outer) / glm::abs(dPlatenSpeed);
 //	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 0.5e-4 / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 0.2e-4 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
@@ -317,7 +316,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")" + "(" + Script(d3_Length_Cell.x,3) + ")\n";
 //		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
-		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(0.5*_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
+		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
 		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
 		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
 		sDescription += "Tube average_diameter: " + Script(dDiameter_Average,3) + "\n";

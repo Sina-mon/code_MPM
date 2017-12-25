@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
+int PhysicsEngine::runSimulation_CPDI_DoublePass_MPLocks(double dTimeIncrement_Total)
 {
 	omp_set_num_threads(_MAX_N_THREADS);
 
@@ -46,18 +46,6 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 				thisGP->d3_Momentum = glm::dvec3(0.0, 0.0, 0.0);
 				thisGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
 				thisGP->d3_Force_Temp = glm::dvec3(0.0, 0.0, 0.0);
-
-				for(int index_Thread = 0; index_Thread < iThread_Count; index_Thread++)
-				{
-					GridPoint *thisGP_Thread = allGridPoint_Thread[index_Thread][index_GP];
-
-					thisGP_Thread->b_Active = false;
-					thisGP_Thread->d_Mass = 0.0;
-					thisGP_Thread->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-					thisGP_Thread->d3_Momentum = glm::dvec3(0.0, 0.0, 0.0);
-					thisGP_Thread->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
-					thisGP_Thread->d3_Force_Temp = glm::dvec3(0.0, 0.0, 0.0);
-				}
 			}
 			a_Runtime[0] += omp_get_wtime() - dRuntime_Block;
 
@@ -87,7 +75,7 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 			}
 			a_Runtime[1] += omp_get_wtime() - dRuntime_Block;
 
-			#pragma omp barrier
+/*			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
 			// material point to grid, mass only
 			#pragma omp for
@@ -100,34 +88,21 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
-					GridPoint *thisAGP_Thread = allGridPoint_Thread[iThread_This][thisMP->v_AGP[index_AGP].index];
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
 					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
 					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					// mass
-					thisAGP_Thread->d_Mass += dShapeValue * thisMP->d_Mass;
-				}
-			}
-			#pragma omp barrier
-			// accumulate GP-layered values ----------------------------------- GP-layered
-			#pragma omp for
-			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
-			{
-				GridPoint *thisGP = allGridPoint[index_GP];
-				if(thisGP->b_Active == true)
-				{
-					for(int index_Thread = 0; index_Thread < iThread_Count; index_Thread++)
+					if(iThread_Count > 1)	omp_set_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 					{
-						GridPoint *thisGP_Thread = allGridPoint_Thread[index_Thread][index_GP];
-
-						thisGP->d_Mass += thisGP_Thread->d_Mass;
+						thisAGP->d_Mass += dShapeValue * thisMP->d_Mass;
 					}
+					if(iThread_Count > 1)	omp_unset_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 				}
 			}
-			a_Runtime[2] += omp_get_wtime() - dRuntime_Block;
-
+*/
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
 			// material point to grid, velocity and force
@@ -142,48 +117,34 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
-					GridPoint *thisAGP_Thread = allGridPoint_Thread[iThread_This][thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
 					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
 					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
-					// velocity
-					if(thisAGP->d_Mass > d_Mass_Minimum)
+					if(iThread_Count > 1)	omp_set_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 					{
-//						thisAGP_Thread->d3_Velocity += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity) / thisAGP->d_Mass;
-						thisAGP_Thread->d3_Momentum += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity);
+						// mass
+						thisAGP->d_Mass += dShapeValue * thisMP->d_Mass;
+
+						// momentum
+							thisAGP->d3_Momentum += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity);
+						// velocity
+//						if(thisAGP->d_Mass > d_Mass_Minimum)
+//							thisAGP->d3_Velocity += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity) / thisAGP->d_Mass;
+
+						// internal forces
+						double dVolume = thisMP->d_Volume;
+						thisAGP->d3_Force.x += -dVolume * (d3ShapeGradient.x*thisMP->d6_Stress[0] + d3ShapeGradient.y*thisMP->d6_Stress[3] + d3ShapeGradient.z*thisMP->d6_Stress[5]);
+						thisAGP->d3_Force.y += -dVolume * (d3ShapeGradient.y*thisMP->d6_Stress[1] + d3ShapeGradient.x*thisMP->d6_Stress[3] + d3ShapeGradient.z*thisMP->d6_Stress[4]);
+						thisAGP->d3_Force.z += -dVolume * (d3ShapeGradient.z*thisMP->d6_Stress[2] + d3ShapeGradient.x*thisMP->d6_Stress[5] + d3ShapeGradient.y*thisMP->d6_Stress[4]);
+
+						// external forces
+						thisAGP->d3_Force += dShapeValue*thisMP->d3_Force_External;
 					}
-
-					// internal forces
-					double dVolume = thisMP->d_Volume;
-					thisAGP_Thread->d3_Force.x += -dVolume * (d3ShapeGradient.x*thisMP->d6_Stress[0] + d3ShapeGradient.y*thisMP->d6_Stress[3] + d3ShapeGradient.z*thisMP->d6_Stress[5]);
-					thisAGP_Thread->d3_Force.y += -dVolume * (d3ShapeGradient.y*thisMP->d6_Stress[1] + d3ShapeGradient.x*thisMP->d6_Stress[3] + d3ShapeGradient.z*thisMP->d6_Stress[4]);
-					thisAGP_Thread->d3_Force.z += -dVolume * (d3ShapeGradient.z*thisMP->d6_Stress[2] + d3ShapeGradient.x*thisMP->d6_Stress[5] + d3ShapeGradient.y*thisMP->d6_Stress[4]);
-
-					// external forces
-					thisAGP_Thread->d3_Force += dShapeValue*thisMP->d3_Force_External;
+					if(iThread_Count > 1)	omp_unset_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 				}
 			}
-			#pragma omp barrier
-			// accumulate GP-layered values ----------------------------------- GP-layered
-			#pragma omp for
-			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
-			{
-				GridPoint *thisGP = allGridPoint[index_GP];
-				if(thisGP->b_Active == true)
-				{
-					for(int index_Thread = 0; index_Thread < iThread_Count; index_Thread++)
-					{
-						GridPoint *thisGP_Thread = allGridPoint_Thread[index_Thread][index_GP];
-
-						//thisGP->d3_Velocity	+= thisGP_Thread->d3_Velocity;
-						thisGP->d3_Momentum	+= thisGP_Thread->d3_Momentum;
-						thisGP->d3_Force	+= thisGP_Thread->d3_Force;
-					}
-				}
-			}
-			a_Runtime[3] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -290,37 +251,21 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
-					GridPoint *thisAGP_Thread = allGridPoint_Thread[iThread_This][thisMP->v_AGP[index_AGP].index];
 
 					// shape value and shape gradient value
 					double dShapeValue = thisMP->v_AGP[index_AGP].dShapeValue;
 					glm::dvec3 d3ShapeGradient = thisMP->v_AGP[index_AGP].d3ShapeGradient;
 
 					// velocity
-					if(thisAGP->d_Mass > d_Mass_Minimum)
+					if(iThread_Count > 1)	omp_set_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 					{
-						thisAGP_Thread->d3_Velocity += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity) / thisAGP->d_Mass;
-//						thisAGP_Thread->d3_Momentum += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity);
+						// velocity
+						if(thisAGP->d_Mass > d_Mass_Minimum)
+							thisAGP->d3_Velocity += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity) / thisAGP->d_Mass;
 					}
+					if(iThread_Count > 1)	omp_unset_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
 				}
 			}
-			#pragma omp barrier
-			// accumulate GP-layered values ----------------------------------- GP-layered
-			#pragma omp for
-			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
-			{
-				GridPoint *thisGP = allGridPoint[index_GP];
-				if(thisGP->b_Active == true)
-				{
-					for(int index_Thread = 0; index_Thread < iThread_Count; index_Thread++)
-					{
-						GridPoint *thisGP_Thread = allGridPoint_Thread[index_Thread][index_GP];
-
-						thisGP->d3_Velocity	+= thisGP_Thread->d3_Velocity;
-					}
-				}
-			}
-			a_Runtime[3] += omp_get_wtime() - dRuntime_Block;
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();
@@ -425,42 +370,45 @@ int PhysicsEngine::runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total)
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain[index] += d6StrainIncrement[index];
 
-				// elastic
-				double dE = thisMP->d_ElasticModulus;
-				// plastic
-				double dNu = thisMP->d_PoissonRatio;
-				double dYield = thisMP->d_YieldStress;
-
 				double d6StressIncrement[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 				double d6PlasticStrainIncrement[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-				ConstitutiveRelation vonMises_Thread;
+				ConstitutiveRelation CR_Thread;
 
-				if(thisMP->i_MaterialType == _ELASTIC)
-					vonMises_Thread.calculateIncrement_Elastic(dE, dNu, d6StrainIncrement);
-				else if(thisMP->i_MaterialType == _PLASTIC)
-					vonMises_Thread.calculateIncrement_PerfectlyPlastic_6D(dE, dNu, dYield, thisMP->d6_Stress, d6StrainIncrement);
-				else if(thisMP->i_MaterialType == _VONMISESHARDENING)
-					vonMises_Thread.calculateIncrement_VonMisesHardening_6D(dE, dNu, dYield, thisMP->d_BackStress_Isotropic, thisMP->d_Hardening_Isotropic_C0, thisMP->d_Hardening_Isotropic_C1, thisMP->d6_Stress, d6StrainIncrement);
+				if(thisMP->p_Material == NULL)
+				{
+					std::cout << "Error in PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks, material not specified" << std::endl;
+					continue;
+				}
+
+				if(thisMP->p_Material->i_MaterialType == __ELASTIC)
+					CR_Thread.calculateIncrement_Elastic(thisMP->p_Material, d6StrainIncrement);
+					//CR_Thread.calculateIncrement_Elastic(dE, dNu, d6StrainIncrement);
+				else if(thisMP->p_Material->i_MaterialType == __PLASTIC)
+					CR_Thread.calculateIncrement_Plastic(thisMP->p_Material, thisMP->d6_Stress, d6StrainIncrement);
+				else if(thisMP->p_Material->i_MaterialType == __VONMISESHARDENING)
+					CR_Thread.calculateIncrement_VonMisesHardening(thisMP->p_Material, thisMP->d_BackStress_Isotropic, thisMP->d6_Stress, d6StrainIncrement);
 				else
-					vonMises_Thread.calculateIncrement_PerfectlyPlastic_6D(dE, dNu, dYield, thisMP->d6_Stress, d6StrainIncrement);
+					CR_Thread.calculateIncrement_Plastic(thisMP->p_Material, thisMP->d6_Stress, d6StrainIncrement);
 
 				// update MP variables
 				for(int index = 0; index < 6; index++)
-					d6StressIncrement[index] = vonMises_Thread.d6StressIncrement[index];
+					thisMP->d6_Strain_Rate[index] = d6StrainIncrement[index] / dTimeIncrement;
 				for(int index = 0; index < 6; index++)
-					d6PlasticStrainIncrement[index] = vonMises_Thread.d6PlasticStrainIncrement[index];
+					d6StressIncrement[index] = CR_Thread.d6StressIncrement[index];
+				for(int index = 0; index < 6; index++)
+					d6PlasticStrainIncrement[index] = CR_Thread.d6PlasticStrainIncrement[index];
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Stress[index] += d6StressIncrement[index];
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain_Plastic[index] += d6PlasticStrainIncrement[index];
-
+				// energies
 				for(int index = 0; index < 6; index++)
 					thisMP->d_Energy_Strain += thisMP->d6_Stress[index]*d6StrainIncrement[index] * thisMP->d_Volume;
 				for(int index = 0; index < 6; index++)
 					thisMP->d_Energy_Plastic += thisMP->d6_Stress[index]*d6PlasticStrainIncrement[index] * thisMP->d_Volume;
 
-				thisMP->d_BackStress_Isotropic += vonMises_Thread.dBackstress_IsotropicIncrement;
+				thisMP->d_BackStress_Isotropic += CR_Thread.dBackstress_IsotropicIncrement;
 			}
 			a_Runtime[6] += omp_get_wtime() - dRuntime_Block;
 

@@ -13,13 +13,13 @@ PhysicsEngine::~PhysicsEngine()
 	for(unsigned int index = 0; index < v_allMaterial.size(); index++)
         delete v_allMaterial[index];
 
-	for(int iThread = 0; iThread < _MAX_N_THREADS; iThread++)
-	{
-		for(unsigned int index = 0; index < allGridPoint_Thread[iThread].size(); index++)
-		{
-			delete allGridPoint_Thread[iThread][index];
-		}
-	}
+//	for(int iThread = 0; iThread < _MAX_N_THREADS; iThread++)
+//	{
+//		for(unsigned int index = 0; index < allGridPoint_Thread[iThread].size(); index++)
+//		{
+//			delete allGridPoint_Thread[iThread][index];
+//		}
+//	}
 
 	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
 	{

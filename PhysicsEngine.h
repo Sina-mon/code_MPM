@@ -22,7 +22,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	1
+#define _MAX_N_THREADS	8
 #define _MAX_N_BODIES	2
 
 class PhysicsEngine
@@ -66,7 +66,8 @@ class PhysicsEngine
 		int	runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
-		int	runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_DoublePass_MPLocks(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass_MPLocks(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeIncrement_Total);
 
 		// function to communicate with outside -------------------------------
@@ -110,7 +111,7 @@ class PhysicsEngine
 		std::vector<GridPoint *> allGridPoint_Body[_MAX_N_BODIES];
 
 		// parallelization related members
-		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
+//		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
 		std::vector<omp_lock_t *> v_GridPoint_Lock;
 
 		// timing
