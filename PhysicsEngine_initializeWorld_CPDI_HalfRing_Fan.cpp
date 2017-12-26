@@ -83,7 +83,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Fan(void)
 	}
 
 
-	double dPlatenSpeed = +0.5;
+	double dPlatenSpeed = +10.0;
 //	ET03
 //	double dThickness_Ring = 0.00200;
 //	double dDiameter_Outer = 0.07964;
