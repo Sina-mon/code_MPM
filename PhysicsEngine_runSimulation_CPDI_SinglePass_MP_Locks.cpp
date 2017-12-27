@@ -271,39 +271,45 @@ int PhysicsEngine::runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain[index] += d6StrainIncrement[index];
 
-				// elastic
-				double dE = thisMP->d_ElasticModulus;
-				// plastic
-				double dNu = thisMP->d_PoissonRatio;
-				double dYield = thisMP->d_YieldStress;
-
 				double d6StressIncrement[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 				double d6PlasticStrainIncrement[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-				ConstitutiveRelation vonMises_Thread;
+				ConstitutiveRelation CR_Thread;
 
-				if(thisMP->i_MaterialType == _ELASTIC)
-					vonMises_Thread.calculateIncrement_Elastic(dE, dNu, d6StrainIncrement);
-				else if(thisMP->i_MaterialType == _PLASTIC)
-					vonMises_Thread.calculateIncrement_PerfectlyPlastic_6D(dE, dNu, dYield, thisMP->d6_Stress, d6StrainIncrement);
-				else if(thisMP->i_MaterialType == _VONMISESHARDENING)
-					vonMises_Thread.calculateIncrement_VonMisesHardening_6D(dE, dNu, dYield, thisMP->d_BackStress_Isotropic, thisMP->d_Hardening_Isotropic_C0, thisMP->d_Hardening_Isotropic_C1, thisMP->d6_Stress, d6StrainIncrement);
+				if(thisMP->p_Material == NULL)
+				{
+					std::cout << "Error in PhysicsEngine::runSimulation_CPDI_MultiBody_SinglePass_MPLocks, material not specified" << std::endl;
+					continue;
+				}
+
+				if(thisMP->p_Material->i_MaterialType == __ELASTIC)
+					CR_Thread.calculateIncrement_Elastic(thisMP->p_Material, d6StrainIncrement);
+					//CR_Thread.calculateIncrement_Elastic(dE, dNu, d6StrainIncrement);
+				else if(thisMP->p_Material->i_MaterialType == __PLASTIC)
+					CR_Thread.calculateIncrement_Plastic(thisMP->p_Material, thisMP->d6_Stress, d6StrainIncrement);
+				else if(thisMP->p_Material->i_MaterialType == __VONMISESHARDENING)
+					CR_Thread.calculateIncrement_VonMisesHardening(thisMP->p_Material, thisMP->d_BackStress_Isotropic, thisMP->d6_Stress, d6StrainIncrement);
 				else
-					vonMises_Thread.calculateIncrement_PerfectlyPlastic_6D(dE, dNu, dYield, thisMP->d6_Stress, d6StrainIncrement);
+					CR_Thread.calculateIncrement_Plastic(thisMP->p_Material, thisMP->d6_Stress, d6StrainIncrement);
 
+				// update MP variables
 				for(int index = 0; index < 6; index++)
-					d6StressIncrement[index] = vonMises_Thread.d6StressIncrement[index];
-
+					thisMP->d6_Strain_Rate[index] = d6StrainIncrement[index] / dTimeIncrement;
 				for(int index = 0; index < 6; index++)
-					d6PlasticStrainIncrement[index] = vonMises_Thread.d6PlasticStrainIncrement[index];
-
+					d6StressIncrement[index] = CR_Thread.d6StressIncrement[index];
+				for(int index = 0; index < 6; index++)
+					d6PlasticStrainIncrement[index] = CR_Thread.d6PlasticStrainIncrement[index];
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Stress[index] += d6StressIncrement[index];
-
 				for(int index = 0; index < 6; index++)
 					thisMP->d6_Strain_Plastic[index] += d6PlasticStrainIncrement[index];
+				// energies
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Strain += thisMP->d6_Stress[index]*d6StrainIncrement[index] * thisMP->d_Volume;
+				for(int index = 0; index < 6; index++)
+					thisMP->d_Energy_Plastic += thisMP->d6_Stress[index]*d6PlasticStrainIncrement[index] * thisMP->d_Volume;
 
-				thisMP->d_BackStress_Isotropic += vonMises_Thread.dBackstress_IsotropicIncrement;
+				thisMP->d_BackStress_Isotropic += CR_Thread.dBackstress_IsotropicIncrement;
 			}
 			a_Runtime[6] += omp_get_wtime() - dRuntime_Block;
 
