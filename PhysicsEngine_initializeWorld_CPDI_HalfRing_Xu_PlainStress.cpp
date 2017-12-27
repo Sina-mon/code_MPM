@@ -239,7 +239,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xu_PlainStress(void)
 				thisMP->f_DisplacementControl_Multiplier = -1.0;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 				v_MarkedMaterialPoints_CPDI_Displacement_Control.push_back(thisMP);
-				v_MarkedMaterialPoints_CPDI_Displacement_Monitor.push_back(thisMP);
+				v_MarkedMaterialPoints_Displacement_Monitor.push_back(thisMP);
 			}
 		}
 	}
@@ -289,7 +289,7 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xu_PlainStress(void)
 				thisMP->f_DisplacementControl_Multiplier = +.0;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 				v_MarkedMaterialPoints_CPDI_Displacement_Control.push_back(thisMP);
-				v_MarkedMaterialPoints_CPDI_Displacement_Monitor.push_back(thisMP);
+				v_MarkedMaterialPoints_Displacement_Monitor.push_back(thisMP);
 			}
 		}
 	}

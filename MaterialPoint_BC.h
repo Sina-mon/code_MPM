@@ -3,6 +3,8 @@
 
 #include "Definitions.h"
 
+#include "Material_BC.h"
+
 enum MaterialType
 {
 	_ELASTIC,
@@ -25,6 +27,8 @@ class MaterialPoint_BC
 	public:
 		MaterialPoint_BC() {;}
 		virtual ~MaterialPoint_BC() {;}
+
+		Material_BC *p_Material = NULL;
 
 		bool b_DisplacementControl = false;
 		float f_DisplacementControl_Multiplier = 1.0;
@@ -56,6 +60,7 @@ class MaterialPoint_BC
 		double d6_Strain[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Stress[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Strain_Plastic[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		double d6_Strain_Rate[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 		double d_Energy_Strain = 0.0;
 		double d_Energy_Plastic = 0.0;

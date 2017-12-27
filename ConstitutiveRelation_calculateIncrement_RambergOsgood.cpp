@@ -1,13 +1,11 @@
 #include "ConstitutiveRelation.h"
 
 // ----------------------------------------------------------------------------
-void ConstitutiveRelation::calculateIncrement_VonMisesHardening(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6])
+void ConstitutiveRelation::calculateIncrement_RambergOsgood(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6])
 {
 	double dE = pMaterial->d_ElasticModulus;
 	double dNu = pMaterial->d_PoissonRatio;
 	double dYield = pMaterial->d_YieldStress;
-	double dHardening_Isotropic_C0 = pMaterial->d_Hardening_Isotropic_C0;
-	double dHardening_Isotropic_C1 = pMaterial->d_Hardening_Isotropic_C1;
 
 	double d6StressIncrement_Trial[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	double d6Stress_Trial[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -43,21 +41,18 @@ void ConstitutiveRelation::calculateIncrement_VonMisesHardening(Material_BC *pMa
 	dJ2 += d6Stress_Trial[5]*d6Stress_Trial[5];
 
 	double dK0 = dYield / sqrt(3.0);
-	double dR = dBackstress_Isotropic / sqrt(2.0);
 
-	if(dJ2 <= (dK0+dR)*(dK0+dR))
+	if(dJ2 <= dK0*dK0)
 	{
 		for(int index = 0; index < 6; index++)
 			d6StressIncrement[index] = d6StressIncrement_Trial[index];
 		for(int index = 0; index < 6; index++)
 			d6PlasticStrainIncrement[index] = 0.0;
-
-		dBackstress_IsotropicIncrement = 0.0;
 	}
 	else
 	{
 		for(int index = 0; index < 6; index++)
-			d6Stress_Deviatoric_Trial[index] *= (dK0+dR) / sqrt(dJ2);
+			d6Stress_Deviatoric_Trial[index] *= dK0 / sqrt(dJ2);
 
 		for(int index = 0; index < 6; index++)
 			d6StressIncrement[index] = d6Stress_Deviatoric_Trial[index] - d6StressCurrent[index];
@@ -77,21 +72,10 @@ void ConstitutiveRelation::calculateIncrement_VonMisesHardening(Material_BC *pMa
 
 		for(int index = 0; index < 6; index++)
 			d6PlasticStrainIncrement[index] = d6StrainIncrement[index] - d6StrainIncrement_Elastic[index];
-
-		double dEffectivePlasticStrainIncrement = 0.0;
-		for(int index = 0; index < 6; index++)
-			dEffectivePlasticStrainIncrement += d6PlasticStrainIncrement[index] * d6PlasticStrainIncrement[index];
-		dEffectivePlasticStrainIncrement *= 2.0/3.0;
-		dEffectivePlasticStrainIncrement = glm::sqrt(dEffectivePlasticStrainIncrement);
-
-		if((sqrt(2.0/3.0) * dHardening_Isotropic_C1 - dBackstress_Isotropic) > 0.0)
-			dBackstress_IsotropicIncrement = dHardening_Isotropic_C0 * (sqrt(2.0/3.0) * dHardening_Isotropic_C1 - dBackstress_Isotropic) * dEffectivePlasticStrainIncrement;
-		else
-			dBackstress_IsotropicIncrement  = 0.0;
 	}
 }
 // ----------------------------------------------------------------------------
-void ConstitutiveRelation::calculateIncrement_VonMisesHardening_6D(double dE, double dNu, double dYield, double dBackstress_Isotropic, double dHardening_Isotropic_C0, double dHardening_Isotropic_C1, double d6StressCurrent[6], double d6StrainIncrement[6])
+void ConstitutiveRelation::calculateIncrement_PerfectlyPlastic_6D(double dE, double dNu, double dYield, double d6StressCurrent[6], double d6StrainIncrement[6])
 {
 	double d6StressIncrement_Trial[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	double d6Stress_Trial[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -127,21 +111,18 @@ void ConstitutiveRelation::calculateIncrement_VonMisesHardening_6D(double dE, do
 	dJ2 += d6Stress_Trial[5]*d6Stress_Trial[5];
 
 	double dK0 = dYield / sqrt(3.0);
-	double dR = dBackstress_Isotropic / sqrt(2.0);
 
-	if(dJ2 <= (dK0+dR)*(dK0+dR))
+	if(dJ2 <= dK0*dK0)
 	{
 		for(int index = 0; index < 6; index++)
 			d6StressIncrement[index] = d6StressIncrement_Trial[index];
 		for(int index = 0; index < 6; index++)
 			d6PlasticStrainIncrement[index] = 0.0;
-
-		dBackstress_IsotropicIncrement = 0.0;
 	}
 	else
 	{
 		for(int index = 0; index < 6; index++)
-			d6Stress_Deviatoric_Trial[index] *= (dK0+dR) / sqrt(dJ2);
+			d6Stress_Deviatoric_Trial[index] *= dK0 / sqrt(dJ2);
 
 		for(int index = 0; index < 6; index++)
 			d6StressIncrement[index] = d6Stress_Deviatoric_Trial[index] - d6StressCurrent[index];
@@ -161,17 +142,6 @@ void ConstitutiveRelation::calculateIncrement_VonMisesHardening_6D(double dE, do
 
 		for(int index = 0; index < 6; index++)
 			d6PlasticStrainIncrement[index] = d6StrainIncrement[index] - d6StrainIncrement_Elastic[index];
-
-		double dEffectivePlasticStrainIncrement = 0.0;
-		for(int index = 0; index < 6; index++)
-			dEffectivePlasticStrainIncrement += d6PlasticStrainIncrement[index] * d6PlasticStrainIncrement[index];
-		dEffectivePlasticStrainIncrement *= 2.0/3.0;
-		dEffectivePlasticStrainIncrement = glm::sqrt(dEffectivePlasticStrainIncrement);
-
-		if((sqrt(2.0/3.0) * dHardening_Isotropic_C1 - dBackstress_Isotropic) > 0.0)
-			dBackstress_IsotropicIncrement = dHardening_Isotropic_C0 * (sqrt(2.0/3.0) * dHardening_Isotropic_C1 - dBackstress_Isotropic) * dEffectivePlasticStrainIncrement;
-		else
-			dBackstress_IsotropicIncrement  = 0.0;
 	}
 }
 // ----------------------------------------------------------------------------

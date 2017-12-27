@@ -11,6 +11,8 @@ make a convenience function to set all outpur variables (stressincrement, plasti
 ////#include ".\include\glm\glm.hpp" // windows
 //#include "./include/glm/glm.hpp" // linux
 
+#include "Material_BC.h"
+
 class ConstitutiveRelation
 {
 	public:
@@ -25,6 +27,11 @@ class ConstitutiveRelation
 		double d_I3 = 0.0;
 		double d_J2 = 0.0;
 		double d_J3 = 0.0;
+
+		void calculateIncrement_Elastic(Material_BC *pMaterial, double d6StrainIncrement[6]);
+		void calculateIncrement_Plastic(Material_BC *pMaterial, double d6StressCurrent[6], double d6StrainIncrement[6]);
+		void calculateIncrement_RambergOsgood(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6]);
+		void calculateIncrement_VonMisesHardening(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6]);
 
 		void calculateIncrement_Elastic(double dE, double dNu, double d6StrainIncrement[6]);
 		void calculateIncrement_NeoHookean_6D(double dE, double dNu, double d6Stress_Current[6], glm::dmat3 d33DeformationGradient);

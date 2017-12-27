@@ -21,6 +21,7 @@ int main (int argc, char ** argv)
 //	thePhysicsEngine.initializeWorld_Classic_Foam_Ring();
 //	thePhysicsEngine.initializeWorld_Classic_Foam_HoneyComb();
 //	thePhysicsEngine.initializeWorld_Classic_HalfRing_Xiang_PlainStress();
+	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand();
 
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed();
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xu_PlainStress();
@@ -30,7 +31,8 @@ int main (int argc, char ** argv)
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_PlainStrain();
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Xiang_FullLength();
 
-	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Fan();
+//	thePhysicsEngine.initializeWorld_CPDI_Cellular_Langrand();
+//	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Fan();
 //	thePhysicsEngine.initializeWorld_CPDI_HalfRing_Gupta_PlainStress();
 
 //	thePhysicsEngine.initializeWorld_CPDI_FullRing_Xiang_PlainStrain();
