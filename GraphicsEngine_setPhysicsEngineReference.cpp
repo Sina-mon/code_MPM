@@ -13,7 +13,7 @@ void GraphicsEngine::setPhysicsEngineReference(PhysicsEngine *mpmPhysicsEngine)
 	f3_Camera_Position_Original = 0.5f*f3Bounds;
 //	f3_Camera_Position_Original.x = 1.5*f3Bounds.x;
 //	f3_Camera_Position_Original.z = .55*(f3Bounds.x + f3Bounds.y + f3Bounds.z);
-	f3_Camera_Position_Original.z = 1.3*(f3Bounds.x + f3Bounds.y + f3Bounds.z);
+	f3_Camera_Position_Original.z = 1.7*(f3Bounds.x + f3Bounds.y + f3Bounds.z);
 	f3_Camera_Target_Original = 0.5f*f3Bounds;
 
 	gl_Camera->f3_Position = f3_Camera_Position_Original;

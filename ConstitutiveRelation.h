@@ -30,6 +30,7 @@ class ConstitutiveRelation
 
 		void calculateIncrement_Elastic(Material_BC *pMaterial, double d6StrainIncrement[6]);
 		void calculateIncrement_Plastic(Material_BC *pMaterial, double d6StressCurrent[6], double d6StrainIncrement[6]);
+		void calculateIncrement_RambergOsgood(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6]);
 		void calculateIncrement_VonMisesHardening(Material_BC *pMaterial, double dBackstress_Isotropic, double d6StressCurrent[6], double d6StrainIncrement[6]);
 
 		void calculateIncrement_Elastic(double dE, double dNu, double d6StrainIncrement[6]);

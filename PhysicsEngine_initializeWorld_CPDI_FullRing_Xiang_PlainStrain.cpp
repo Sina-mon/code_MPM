@@ -83,7 +83,7 @@ void PhysicsEngine::initializeWorld_CPDI_FullRing_Xiang_PlainStrain(void)
 	double dRadius_Outer = 0.5*dDiameter_Outer;
 	double dLength_Ring = 0.001;//1.0*d_Offset;
 
-	int iDivision_Angular = 90;
+	int iDivision_Angular = 180;
 	int iDivision_Radial = 6;
 	int iDivision_Longitudinal = 1;
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.5,0.0,0.5)*d3_Length_Grid;
@@ -167,7 +167,7 @@ void PhysicsEngine::initializeWorld_CPDI_FullRing_Xiang_PlainStrain(void)
 			// all MPs
 			allMaterialPoint_CPDI.push_back(thisMP);
 			// displacement control
-			if(thisMP->d3_Position.y > d3Center.y)
+			if(thisMP->d3_Position.y > d3Center.y + 0.25*d3Dimension.y)
 			{
 				thisMP->b_DisplacementControl = true;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
@@ -215,7 +215,7 @@ void PhysicsEngine::initializeWorld_CPDI_FullRing_Xiang_PlainStrain(void)
 		}
 	}
 
-	double dPlatenSpeed = -10.0;
+	double dPlatenSpeed = -1.0;
 	double dTime_On  = 0.2e-3;
 	double dTime_Off = 0.8e-3;
 	if(true)
@@ -252,7 +252,7 @@ void PhysicsEngine::initializeWorld_CPDI_FullRing_Xiang_PlainStrain(void)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.00;
 
-	d_TimeIncrement_Maximum = 2.0e-8;
+	d_TimeIncrement_Maximum = 5.0e-8;
 	d_TimeEnd = 1.0*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-4 / glm::abs(dPlatenSpeed);
 

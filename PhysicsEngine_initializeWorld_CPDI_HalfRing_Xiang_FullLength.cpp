@@ -7,8 +7,13 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_FullLength(void)
 	GridPoint_Factory				GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
+<<<<<<< HEAD:PhysicsEngine_initializeWorld_QuarterRing_CPDI_Xiang.cpp
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.002);
+	glm::ivec3 i3_Cells = 2*glm::ivec3(40, 60, 2);
+=======
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.060, 0.060);
 	glm::ivec3 i3_Cells = 2*glm::ivec3(40, 60, 60);
+>>>>>>> a41187e35852aaf870226f9689a165a3f57b5bef:PhysicsEngine_initializeWorld_CPDI_HalfRing_Xiang_FullLength.cpp
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
@@ -58,6 +63,10 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_FullLength(void)
 		{
 //			thisGridPoint->b3_Fixed.z = true;
 		}
+		if(fabs(dz - 0.0) < 1.5*d3_Length_Cell.z)
+		{
+			//thisGridPoint->b3_Fixed.z = true;
+		}
 		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
 		{
 			//thisGridPoint->b3_Fixed.z = true;
@@ -93,7 +102,11 @@ void PhysicsEngine::initializeWorld_CPDI_HalfRing_Xiang_FullLength(void)
 	glm::dvec3 d3Center_Ring = glm::dvec3(0.0,0.0,0.5)*d3_Length_Grid;
 	d3Center_Ring.x += 0.5*d3_Length_Cell.x;
 	d3Center_Ring.y = 0.5*dDiameter_Outer + 3.5*d3_Length_Cell.y;
+<<<<<<< HEAD:PhysicsEngine_initializeWorld_QuarterRing_CPDI_Xiang.cpp
+	d3Center_Ring.z = d3_Length_Cell.z + 0.5*dLength_Ring;
+=======
 //	d3Center_Ring.z = d3_Length_Cell.z + 0.5*dLength_Ring;
+>>>>>>> a41187e35852aaf870226f9689a165a3f57b5bef:PhysicsEngine_initializeWorld_CPDI_HalfRing_Xiang_FullLength.cpp
 	if(true)
 	{// ring material points -------------------------------------------------- tube MP
 		double dGravity = 0.0;

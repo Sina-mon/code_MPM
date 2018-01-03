@@ -226,15 +226,16 @@ void GraphicsEngine::drawGame(void)
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
-			glm::vec4 f4objectColor = _RED;
+			glm::vec4 f4objectColor = _BLUE;
 			if(thisMP->b_Mark_Stress)
-				f4objectColor = _GREEN;
+				f4objectColor = _BLUE;
 			if(thisMP->b_Surface)
-				f4objectColor = _BLACK;
+				f4objectColor = _GREEN;
+			if(thisMP->b_DisplacementControl)
+				f4objectColor = _BLUE;
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
-			if(thisMP->b_Mark_Stress)
-				f4objectColor = _GRAY;
+
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -264,7 +265,6 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = _GREEN;
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _BLUE;
-
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
 
@@ -312,16 +312,16 @@ void GraphicsEngine::drawGame(void)
 
 			// particle position
 			float fSize = 0.002;
-			glm::vec3 f3Size = glm::vec3(0.0002,0.0002,0.0002);
+			glm::vec3 f3Size = glm::vec3(0.0001,0.0001,0.0001);
 			if(thisGP->b3_Fixed.y == true)
 			{
-				f3Size.x = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.x = 0.0002;
+				f3Size.z = 0.0002;
 			}
 			else if(thisGP->b3_Fixed.x == true)
 			{
-				f3Size.y = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.y = 0.0002;
+				f3Size.z = 0.0002;
 			}
 //				0.002f*glm::vec3(thisGP->b3_Fixed) + glm::vec3(0.00001);
 //			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize,0.01*fSize,fSize));
@@ -500,14 +500,16 @@ void GraphicsEngine::drawGame(void)
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
 			CR.calculateState_J2(thisMP->d6_Strain_Plastic);
-			float fJ2 = CR.d_J2;
-			glm::vec4 f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Strain));
+			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);//CR.d_J2;
+			glm::vec4 f4objectColor = _BLUE;
+			if(fJ2 > fJ2_Minimum)
+				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _GREEN;
+			if(fJ2 > fJ2_Maximum)
+				f4objectColor  = _RED;
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
-			if(thisMP->b_Surface)
-				f4objectColor = _BLACK;
-			if(thisMP->b_Mark_Stress)
-				f4objectColor = _GRAY;
+
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -538,7 +540,6 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _GREEN;
 			if(fJ2 > fJ2_Maximum)
 				f4objectColor  = _RED;
-
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
 
@@ -659,11 +660,11 @@ void GraphicsEngine::drawGame(void)
 		double d6Stress_Maximum[6] = {0.0, 0, 0, 0, 0, 0};
 		if(vMaterialPoint.size() != 0)
 		{
-			d6Stress_Maximum[0] = vMaterialPoint[0]->p_Material->d_YieldStress + 0.0*vMaterialPoint[0]->d_Hardening_Isotropic_C1;
+			d6Stress_Maximum[0] = 1.0*vMaterialPoint[0]->p_Material->d_YieldStress + 1.0*vMaterialPoint[0]->p_Material->d_Hardening_Isotropic_C1;
 		}
 		if(vMaterialPoint_CPDI.size() != 0)
 		{
-			d6Stress_Maximum[0] = 1.2*vMaterialPoint_CPDI[0]->p_Material->d_YieldStress;
+			d6Stress_Maximum[0] = 1.0*vMaterialPoint_CPDI[0]->p_Material->d_YieldStress + 1.0*vMaterialPoint_CPDI[0]->p_Material->d_Hardening_Isotropic_C1;
 		}
 		CR.calculateState_J2(d6Stress_Maximum);
 		float fJ2_Maximum = CR.d_J2;
@@ -696,6 +697,7 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = _BLACK;
 			if(thisMP->b_Mark_Stress)
 				f4objectColor = _GRAY;
+
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
 			// shadow
@@ -851,7 +853,7 @@ void GraphicsEngine::drawGame(void)
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
-			float fValue = thisMP->d_Energy_Strain;
+			float fValue = thisMP->d_Energy_Plastic;
 			glm::vec4 f4objectColor = (1.0f-fValue/fValue_Maximum) * _BLUE + fValue/fValue_Maximum * _RED;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 

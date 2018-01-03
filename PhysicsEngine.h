@@ -3,7 +3,7 @@
 
 #include <math.h>
 #include <vector>
-#include<algorithm>
+#include <algorithm>
 #include <time.h>
 
 #include <omp.h>
@@ -12,6 +12,7 @@
 ////#include ".\include\glm\glm.hpp" // windows
 //#include "./include/glm/glm.hpp"//sina, glm is a column major implementation
 
+#include "Canvas_CC.h"
 #include "GridPoint.h"
 #include "GridPoint_Factory.h"
 #include "GridPoint_Mediator.h"
@@ -22,7 +23,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	1
+#define _MAX_N_THREADS 1
 #define _MAX_N_BODIES	2
 
 class PhysicsEngine
@@ -46,6 +47,7 @@ class PhysicsEngine
 		void	initializeWorld_CPDI_HalfRing_Gupta_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xu_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed(void);
+		void	initializeWorld_Classic_Cellular_Langrand(void);
 		void	initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_Classic_Foam(void);
 		void	initializeWorld_Classic_Foam_Bullet(void);
@@ -61,13 +63,14 @@ class PhysicsEngine
 		// MPM ----------------------------------------------------------------
 		GridPoint_Mediator mpm_GP_Mediator_Thread[_MAX_N_THREADS];
 		int	runSimulation_Classic_DoublePass_MP(double dTimeIncrement_Total);
+		int	runSimulation_Classic_DoublePass_MPLocks(double dTimeIncrement_Total);
 		int	runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_SinglePass(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_SinglePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_DoublePass_MP(double dTimeIncrement_Total);
-		int	runSimulation_CPDI_SinglePass_MP_Locks(double dTimeIncrement_Total);
-		int	runSimulation_CPDI_SinglePass_MP_Locks_Temp(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_DoublePass_MPLocks(double dTimeIncrement_Total);
+		int	runSimulation_CPDI_SinglePass_MPLocks(double dTimeIncrement_Total);
 		int	runSimulation_CPDI_MultiBody_SinglePass_MPLocks(double dTimeIncrement_Total);
 
 		// function to communicate with outside -------------------------------
@@ -92,7 +95,6 @@ class PhysicsEngine
 		std::array<double, 8> a_Runtime;
 
 		std::vector<GridPoint *> allGridPoint;
-//		std::vector<GridPoint *> v_GridPoint_Kernel;
 		std::vector<Material_BC *> v_allMaterial;
 		std::vector<MaterialPoint_BC *> allMaterialPoint;
 		std::vector<MaterialPoint_BC *> v_MarkedMaterialPoints_Displacement_Monitor;
@@ -111,7 +113,7 @@ class PhysicsEngine
 		std::vector<GridPoint *> allGridPoint_Body[_MAX_N_BODIES];
 
 		// parallelization related members
-		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
+//		std::vector<GridPoint *> allGridPoint_Thread[_MAX_N_THREADS];
 		std::vector<omp_lock_t *> v_GridPoint_Lock;
 
 		// timing
