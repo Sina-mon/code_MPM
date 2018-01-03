@@ -12,6 +12,7 @@
 ////#include ".\include\glm\glm.hpp" // windows
 //#include "./include/glm/glm.hpp"//sina, glm is a column major implementation
 
+#include "Canvas_CC.h"
 #include "GridPoint.h"
 #include "GridPoint_Factory.h"
 #include "GridPoint_Mediator.h"
@@ -46,11 +47,15 @@ class PhysicsEngine
 		void	initializeWorld_CPDI_HalfRing_Gupta_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Xu_PlainStress(void);
 		void	initializeWorld_CPDI_HalfRing_Shim_PlainStress_WaveSpeed(void);
+
+		void 	initializeWorld_Classic_Ring_Fan(void);
+		void	initializeWorld_Classic_Cellular_Langrand(void);
 		void	initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);
 		void	initializeWorld_Classic_Foam(void);
 		void	initializeWorld_Classic_Foam_Bullet(void);
 		void	initializeWorld_Classic_Foam_Ring(void);
 		void	initializeWorld_Classic_Foam_HoneyComb(void);
+
 		void	initializeWorld_QuarterRing_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI_Xiang(void);
 		void	initializeWorld_Ring_CPDI(void);
@@ -60,6 +65,7 @@ class PhysicsEngine
 		glm::dvec3 d3_Length_World = glm::dvec3(0.0, 0.0, 0.0);
 		// MPM ----------------------------------------------------------------
 		GridPoint_Mediator mpm_GP_Mediator_Thread[_MAX_N_THREADS];
+		int	runSimulation_Classic_DoublePass_MPLocks(double dTimeIncrement_Total);
 		int	runSimulation_Classic_DoublePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_Classic_SinglePass_MP(double dTimeIncrement_Total);
 		int	runSimulation_Classic_SinglePass_MP_Contact(double dTimeIncrement_Total);
@@ -83,6 +89,8 @@ class PhysicsEngine
 		std::vector<MaterialPoint_BC *>			getMaterialPoints(void) {return(allMaterialPoint);}
 		std::vector<MaterialPoint_CPDI_CC *>	getMaterialPoints_CPDI(void) {return(allMaterialPoint_CPDI);}
 		std::vector<GridPoint *>				getGridPoints(void) {return(allGridPoint);}
+
+		std::string str_Snapshot_FileName = _STR_SNAPFILE;
 	protected:
 		TimeLine m_TimeLine;
 		double d_Mass_Minimum = 0.0;
@@ -123,6 +131,7 @@ class PhysicsEngine
 		double d_TimeConsole_Interval = 500.0*d_TimeIncrement_Maximum;
 		double d_TimeConsole_Last = -1.0e12; // before creation
 
+		std::string str_Log_FileName = _STR_LOGFILE;
 		void reportConsole(std::string sDescription = "");
 	private:
 };

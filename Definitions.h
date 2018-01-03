@@ -1,7 +1,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#include <sstream>
+#include<sstream>
 #include<iomanip>
 
 //#include ".\include\glm\glm.hpp" // windows
@@ -22,7 +22,7 @@
 #define _GRAY	glm::vec4(0.5, 0.5, 0.5, 1.0)
 #define _BLACK	glm::vec4(0.0, 0.0, 0.0, 1.0)
 //-----------------------------------------------
-#define _STR_LOGFILE	 "./bmp/log.txt"
+#define _STR_LOGFILE	 "./bmp/log_"
 #define _STR_SNAPFILE	 "./bmp/Snapshot_"
 //-----------------------------------------------
 //-----------------------------------------------

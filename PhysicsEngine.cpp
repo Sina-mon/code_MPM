@@ -166,7 +166,7 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 
 	std::cout << strConsole;
 
-	std::string strFileName = _STR_LOGFILE;
+	std::string strFileName = str_Log_FileName;//;_STR_LOGFILE;
 	std::ofstream OutputFile(strFileName.c_str(), std::ios_base::app);
 
 	OutputFile << strConsole;

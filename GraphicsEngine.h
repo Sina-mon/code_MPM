@@ -44,8 +44,8 @@ class GraphicsEngine
 
 		SDL_Window *p_Window = NULL;
 
-		float i_ScreenWidth = 0.5*4*800;
-		float i_ScreenHeight = 0.5*1*800;
+		float i_ScreenWidth = 0.45*4*1000;
+		float i_ScreenHeight = 0.45*1*1000;
 
 		glm::vec3 f3_World_Center = glm::vec3(0.0, 0.0, 0.0);
 		glm::vec3 f3_World_Dimensions = glm::vec3(0.0, 0.0, 0.0);
@@ -74,10 +74,10 @@ class GraphicsEngine
 		enum class enum_Canvas : int {
 			MAIN = 0,
 			SOLID,
-			MASSGRADIENT,
 			J2_PLASTICSTRAIN,
 			J2_STRESS,
 			COUNT,
+			MASSGRADIENT,
 			ENERGY_STRAIN,
 			ENERGY_PLASTIC,
 		};

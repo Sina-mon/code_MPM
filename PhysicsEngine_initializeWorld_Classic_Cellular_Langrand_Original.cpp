@@ -1,14 +1,16 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
+void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 {
-	MaterialPoint_Factory_CPDI_CC	MP_Factory;
-	GridPoint_Factory				GP_Factory;
+	MaterialPoint_Factory_Classic_CC	MP_Factory;
+	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
 	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.030, 0.001/10.0);
 	glm::ivec3 i3_Cells = glm::ivec3(10.0*40, 10.0*30, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.010, 0.010, 0.001/10.0);
+//	glm::ivec3 i3_Cells = glm::ivec3(10.0*10, 10.0*10, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 
@@ -93,25 +95,20 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		pInconel->d_ElasticModulus = 197.6e9;
 		pInconel->d_PoissonRatio = 0.29;
 
-		pInconel->d_YieldStress = 350.0e6;
-		pInconel->d_Hardening_Isotropic_C0 = 15.0;
-		pInconel->d_Hardening_Isotropic_C1 = 350.0e6;
+		pInconel->d_YieldStress = 280.0e6;
+		pInconel->d_Hardening_Isotropic_C0 = 0.5*15.0;
+		pInconel->d_Hardening_Isotropic_C1 = 200.0+420.0e6;
 	}
-	Material_BC *pBraze = new Material_BC;
-	v_allMaterial.push_back(pBraze);
+	Material_BC *pSteel = new Material_BC;
+	v_allMaterial.push_back(pSteel);
 	{
-		pBraze->i_ID = 0;
-		pBraze->i_MaterialType = __VONMISESHARDENING;
-//		pBraze->i_MaterialType = __PLASTIC;
+		pSteel->i_ID = 0;
+		pSteel->i_MaterialType = __ELASTIC;
 
-		pBraze->d_Density = 2.0*8250.0;
+		pSteel->d_Density = 10.0*7800.0;
 
-		pBraze->d_ElasticModulus = 2.0*197.6e9;
-		pBraze->d_PoissonRatio = 0.29;
-
-		pBraze->d_YieldStress = 2.0*250.0e6;
-		pBraze->d_Hardening_Isotropic_C0 = 0.5*15.0;
-		pBraze->d_Hardening_Isotropic_C1 = 200.0+450.0e6;
+		pSteel->d_ElasticModulus = 10.0*210.0e9;
+		pSteel->d_PoissonRatio = 0.3;
 	}
 
 	double dPlatenSpeed = +5.0;
@@ -126,74 +123,37 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 	glm::ivec2 i2Array_Count = glm::ivec2(1,1);
 	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+.0*d3_Length_Cell.x, dDiameter_Outer+.0*d3_Length_Cell.y);
 
-	int iDivision_Angular = 360;
-	int iDivision_Radial = 32;
-	int iDivision_Longitudinal = 1;
+	double dOffset = dThickness_Ring/16.0;
 
-	double dAngle_Start	= -0.0*_PI;
-	double dAngle_End	= +2.0*_PI;
+//	int iDivision_Angular = 360;
+//	int iDivision_Radial = 16;
+//	int iDivision_Longitudinal = 1;
+//
+//	double dAngle_Start	= -0.0*_PI;
+//	double dAngle_End	= +2.0*_PI;
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
-	double dLength_Ring = glm::min(dThickness_Ring/iDivision_Radial, _PI*dDiameter_Average/iDivision_Angular);
+	double dLength_Ring = dOffset;
 	if(dLength_Ring > d3_Length_Cell.z)
 		dLength_Ring = d3_Length_Cell.z;
 
 	glm::dvec3 d3Dimension_Platen_Bottom	= glm::dvec3(0.8*d3_Length_World.x,.0*d3_Length_Cell.y,d3_Length_Grid.z);
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(i2Array_Count.x*dDiameter_Outer,2.0*d3_Length_Cell.y,_PI*dDiameter_Average/iDivision_Angular);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(i2Array_Count.x*dDiameter_Outer,2.0*d3_Length_Cell.y,dOffset);
 
 	glm::dvec3 d3Center_Platen_Bottom	= 0.5*d3Dimension_Platen_Bottom + glm::dvec3(0.0,0.2*d3_Length_Cell.y,0.0);
 	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer + 2.0*d3_Length_Cell.x, 0.5*dDiameter_Outer+d3Dimension_Platen_Bottom.y+2.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
 	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(2.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
 
 	for(int ix = 0; ix < i2Array_Count.x; ix++)
-	{// cellular material points --------------------------------------------------
+	{
 		for(int iy = 0; iy < i2Array_Count.y; iy++)
 		{
-			glm::dvec3 d3Center_Ring = d3Center_Array + glm::dvec3(ix*d2Array_Offset.x,iy*d2Array_Offset.y,0.0);
-
-			if(false)
-			{// braze
-				double dThickness_Braze = 0.0002;
-				double dDistance = dRadius_Outer - 0.5*dThickness_Braze;
-
-				std::vector<MaterialPoint_BC *> thisMaterialDomain_Braze;
-				for(float fAngle = 0.0; fAngle < 2.0*_PI; fAngle += _PI)
-				{
-					glm::dvec3 d3Center = d3Center_Ring + glm::dvec3(dDistance*glm::cos(fAngle), dDistance*glm::sin(fAngle), 0.0);
-					std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, glm::dvec3(dThickness_Braze,0.0015,dLength_Ring), _PI*dDiameter_Average/iDivision_Angular);
-					thisMaterialDomain_Braze.insert(thisMaterialDomain_Braze.end(), thisMaterialDomain.begin(), thisMaterialDomain.end());
-				}
-				for(float fAngle = 0.5*_PI; fAngle < 2.0*_PI; fAngle += _PI)
-				{
-					glm::dvec3 d3Center = d3Center_Ring + glm::dvec3(dDistance*glm::cos(fAngle), dDistance*glm::sin(fAngle), 0.0);
-					std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center, glm::dvec3(0.0015,dThickness_Braze,dLength_Ring), _PI*dDiameter_Average/iDivision_Angular);
-					thisMaterialDomain_Braze.insert(thisMaterialDomain_Braze.end(), thisMaterialDomain.begin(), thisMaterialDomain.end());
-				}
-				for(int index_MP = 0; index_MP < thisMaterialDomain_Braze.size(); index_MP++)
-				{
-					MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain_Braze[index_MP];
-
-					thisMP->p_Material = pInconel;
-
-					thisMP->i_Body = 0;
-
-					thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
-					thisMP->d_Volume = thisMP->d_Volume_Initial;
-
-					thisMP->d_Mass = thisMP->p_Material->d_Density * thisMP->d_Volume;
-					d_Mass_Minimum = 0.0 * thisMP->d_Mass;
-
-					thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-					thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
-
-					allMaterialPoint_CPDI.push_back(thisMP);
-				}
-			}
 			if(true)
 			{// ring material points -------------------------------------------------- tube MP
-//				glm::dvec3 d3Center_Ring = d3Center_Array + glm::dvec3(ix*d2Array_Offset.x,iy*d2Array_Offset.y,0.0);
+				glm::dvec3 d3Center_Ring = d3Center_Array + glm::dvec3(ix*d2Array_Offset.x,iy*d2Array_Offset.y,0.0);
 
-				std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Arc(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dAngle_Start, dAngle_End, dRadius_Outer, dRadius_Inner, dLength_Ring, iDivision_Angular, iDivision_Radial, iDivision_Longitudinal);
+//				std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Arc(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dAngle_Start, dAngle_End, dRadius_Outer, dRadius_Inner, dLength_Ring, iDivision_Angular, iDivision_Radial, iDivision_Longitudinal);
+				std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Tube(d3Center_Ring, glm::dvec3(0.0,0.0,0.0), dRadius_Outer, dRadius_Inner, dLength_Ring, dOffset);
 				for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 				{// assign material point initial values
 					MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -202,7 +162,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 
 					thisMP->i_Body = 0;
 
-					thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
+					thisMP->d_Volume_Initial = dOffset*dOffset*dOffset;
 					thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 					thisMP->d_Mass = thisMP->p_Material->d_Density * thisMP->d_Volume;
@@ -211,25 +171,17 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 					thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 					thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 
-//					// identify surface MPs
-//					if(glm::length(thisMP->d3_Position-d3Center_Ring) > (dRadius_Outer-1.5*dThickness_Ring))
-//					{
-//						if(glm::abs((thisMP->d3_Position.x-d3Center_Ring.x)) < 0.5*0.0015)
-//							thisMP->b_Surface = true;
-////						if(glm::abs((thisMP->d3_Position.y-d3Center_Ring.y)) < 0.001 && thisMP->d3_Position.x < (i2Array_Count.x)*dDiameter_Inner)
-//						if(glm::abs((thisMP->d3_Position.y-d3Center_Ring.y)) < 0.5*0.0015)
-//							thisMP->b_Surface = true;
-//					}
-//					if(thisMP->b_Surface == true)
-//					{
-//						thisMP->p_Material = pBraze;
-//					}
+					// identify surface MPs
+//					if(glm::length(thisMP->d3_Position-d3Center_Ring) < (dRadius_Inner+dThickness_Ring/iDivision_Radial))
+//						thisMP->b_Surface = true;
+//					if(glm::length(thisMP->d3_Position-d3Center_Ring) > (dRadius_Outer-dThickness_Ring/iDivision_Radial))
+//						thisMP->b_Surface = true;
 				}
 				for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 				{// send to MP vectors
-					MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain[index_MP];
+					MaterialPoint_Classic_CC *thisMP = (MaterialPoint_Classic_CC *)thisMaterialDomain[index_MP];
 					// all MPs
-					allMaterialPoint_CPDI.push_back(thisMP);
+					allMaterialPoint.push_back(thisMP);
 					// moment log
 					v_MarkedMaterialPoints_Momentum.push_back(thisMP);
 					// mark for principal stress/strain monitor
@@ -243,7 +195,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Platen_Top, d3Dimension_Platen_Top, _PI*dDiameter_Average/iDivision_Angular);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Platen_Top, d3Dimension_Platen_Top, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -252,7 +204,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 
 			thisMP->i_Body = 1;
 
-			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
+			thisMP->d_Volume_Initial = dOffset*dOffset*dOffset;
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			thisMP->d_Mass = thisMP->p_Material->d_Density * thisMP->d_Volume;
@@ -262,16 +214,16 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		}
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// send to MP vectors
-			MaterialPoint_CPDI_CC *thisMP = (MaterialPoint_CPDI_CC *)thisMaterialDomain[index_MP];
+			MaterialPoint_Classic_CC *thisMP = (MaterialPoint_Classic_CC *)thisMaterialDomain[index_MP];
 			// all MPs
-			allMaterialPoint_CPDI.push_back(thisMP);
+			allMaterialPoint.push_back(thisMP);
 			// displacement control
 //			if(thisMP->d3_Position.y > d3Center_Platen_Top.y + 0.375*d3Dimension_Platen_Top.y)
 			{
 				thisMP->b_DisplacementControl = true;
 				thisMP->f_DisplacementControl_Multiplier = -1.0;
 				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-				v_MarkedMaterialPoints_CPDI_Displacement_Control.push_back(thisMP);
+				v_MarkedMaterialPoints_Displacement_Control.push_back(thisMP);
 				v_MarkedMaterialPoints_Displacement_Monitor.push_back(thisMP);
 			}
 		}
@@ -292,7 +244,7 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 			thisMP->i_MaterialType = _ELASTIC;
 			thisMP->i_ID = 1;
 
-			thisMP->d_Volume_Initial = MP_Factory.getVolume((MaterialPoint_CPDI_CC *)thisMP);
+			thisMP->d_Volume_Initial = dOffset*dOffset*dOffset;
 			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
 			double dMass = 7800.0 * thisMP->d_Volume;
@@ -338,9 +290,9 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 	m_TimeLine.addTimePoint(10.,					glm::dvec3(0.0, -dPlatenSpeed, 0.0));
 
 	double dMass_Domain = 0.0;
-	for(unsigned int index_MP = 0; index_MP < allMaterialPoint_CPDI.size(); index_MP++)
+	for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
 	{// calculate debug values
-		dMass_Domain += allMaterialPoint_CPDI[index_MP]->d_Mass;
+		dMass_Domain += allMaterialPoint[index_MP]->d_Mass;
 	}
 
 	a_Runtime.fill(0.0);
@@ -364,14 +316,14 @@ void PhysicsEngine::initializeWorld_CPDI_Cellular_Langrand(void)
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
 		sDescription += "Time increment: " + Script(d_TimeIncrement_Maximum, 6) + "\n";
-		sDescription += "Material Point count: " + Script(allMaterialPoint_CPDI.size()) + "\n";
+		sDescription += "Material Point count: " + Script(allMaterialPoint.size()) + "\n";
 		sDescription += "Mass: " + Script(dMass_Domain,6) + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")" + "(" + Script(d3_Length_Cell.x,3) + ")\n";
-//		sDescription += "Kernel Resolution: (" + Script(i3_Cells_Kernel.x) + "," + Script(i3_Cells_Kernel.y) + "," + Script(i3_Cells_Kernel.z) + ")\n";
-		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
-		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
-		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
+		sDescription += "dOffset: " + Script(dOffset,4) + "\n";
+//		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
+//		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
+//		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
 		sDescription += "Tube average_diameter: " + Script(dDiameter_Average,3) + "\n";
 		sDescription += "Tube thickness: " + Script(dThickness_Ring,3) + "\n";
 		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
