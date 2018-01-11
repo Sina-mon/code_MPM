@@ -4,6 +4,7 @@
 // --------------------------------------------------------
 Canvas_CC::Canvas_CC(glm::dvec3 d3Size, double dOffset)
 {
+	d_Offset = dOffset;
 	d3_Size = d3Size;
 	i3_Size = glm::ivec3(glm::floor(d3_Size / dOffset));
 
@@ -40,6 +41,22 @@ Canvas_CC::~Canvas_CC()
 	//dtor
 }
 // --------------------------------------------------------
+void Canvas_CC::drawCircle(glm::dvec3 d3Center, double dRadius)
+{
+	d3Center.z = 0.0;
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		glm::dvec3 d3Position = v_Voxels[index_Voxel].d3_Position;
+
+		double dDistance = glm::length(d3Position - d3Center);
+
+		if(dDistance <= dRadius)
+		{
+			v_Voxels[index_Voxel].b_Active = true;
+		}
+	}
+}
+// --------------------------------------------------------
 void Canvas_CC::drawRing(glm::dvec3 d3Center, double dRadius_Outer, double dRadius_Inner)
 {
 	d3Center.z = 0.0;
@@ -49,10 +66,25 @@ void Canvas_CC::drawRing(glm::dvec3 d3Center, double dRadius_Outer, double dRadi
 
 		double dDistance = glm::length(d3Position - d3Center);
 
-		if(dRadius_Inner <= dDistance &&  dDistance <= dRadius_Outer)
+		if(dDistance < dRadius_Inner || dRadius_Outer < dDistance)
+			continue;
+
+		bool bSurface_Local = false;
+		if(glm::abs(dDistance - dRadius_Outer) < d_Offset)
+			bSurface_Local = true;
+		if(glm::abs(dDistance - dRadius_Inner) < d_Offset)
+			bSurface_Local = true;
+
+		if(bSurface_Local == true)
 		{
-			v_Voxels[index_Voxel].b_Active = true;
+			if(v_Voxels[index_Voxel].b_Active == true && v_Voxels[index_Voxel].b_Surface == true)
+				bSurface_Local = true;
+			if(v_Voxels[index_Voxel].b_Active == true && v_Voxels[index_Voxel].b_Surface == false)
+				bSurface_Local = false;
 		}
+
+		v_Voxels[index_Voxel].b_Surface = bSurface_Local;
+		v_Voxels[index_Voxel].b_Active = true;
 	}
 }
 // --------------------------------------------------------
@@ -77,10 +109,77 @@ void Canvas_CC::drawRectangle(glm::dvec3 d3Center, glm::dvec3 d3Size, glm::dvec3
 			continue;
 		if(d3Position_Local.y < -0.5*d3Size.y || +0.5*d3Size.y < d3Position_Local.y)
 			continue;
-		if(d3Position_Local.z < -0.5*d3Size.z || +0.5*d3Size.z < d3Position_Local.z)
-			continue;
+//		if(d3Position_Local.z < -0.5*d3Size.z || +0.5*d3Size.z < d3Position_Local.z)
+//			continue;
+
+		bool bSurface_Local = false;
+		if((glm::abs(glm::abs(d3Position_Local.x) - 0.5*d3Size.x) <= d_Offset))
+		{
+			bSurface_Local = true;
+		}
+		if((glm::abs(glm::abs(d3Position_Local.y) - 0.5*d3Size.y) <= d_Offset))
+		{
+			bSurface_Local = true;
+		}
+		if((glm::abs(glm::abs(d3Position_Local.z) - 0.5*d3Size.z) <= d_Offset))
+		{
+			bSurface_Local = true;
+		}
+
+		if(bSurface_Local == true)
+		{
+			if(v_Voxels[index_Voxel].b_Active == true && v_Voxels[index_Voxel].b_Surface == true)
+				bSurface_Local = true;
+			if(v_Voxels[index_Voxel].b_Active == true && v_Voxels[index_Voxel].b_Surface == false)
+				bSurface_Local = false;
+		}
 
 		v_Voxels[index_Voxel].b_Active = true;
+		v_Voxels[index_Voxel].b_Surface = bSurface_Local;
+	}
+}
+// --------------------------------------------------------
+void Canvas_CC::cutCircle(glm::dvec3 d3Center, double dRadius)
+{
+	d3Center.z = 0.0;
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		glm::dvec3 d3Position = v_Voxels[index_Voxel].d3_Position;
+
+		double dDistance = glm::length(d3Position - d3Center);
+
+		if(dDistance <= dRadius)
+		{
+			v_Voxels[index_Voxel].b_Active = false;
+		}
+	}
+}
+// --------------------------------------------------------
+void Canvas_CC::cutRectangle(glm::dvec3 d3Center, glm::dvec3 d3Size, glm::dvec3 d3Rotation)
+{
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		glm::dmat4 m4Transformation_Position = glm::translate(-d3Center);
+		glm::dmat4 m4Transformation_RotationX = glm::rotate(-d3Rotation.x, glm::dvec3(1.0, 0.0, 0.0));
+		glm::dmat4 m4Transformation_RotationY = glm::rotate(-d3Rotation.y, glm::dvec3(0.0, 1.0, 0.0));
+		glm::dmat4 m4Transformation_RotationZ = glm::rotate(-d3Rotation.z, glm::dvec3(0.0, 0.0, 1.0));
+
+		glm::dmat4 m4Transformation_Combined = glm::dmat4(1.0); // sina, apparently, glm::mat4() and glm::mat4(1.0) build identity matrices
+		m4Transformation_Combined *= m4Transformation_RotationZ;
+		m4Transformation_Combined *= m4Transformation_RotationY;
+		m4Transformation_Combined *= m4Transformation_RotationX;
+		m4Transformation_Combined *= m4Transformation_Position;
+
+		glm::dvec3 d3Position_Local = glm::dvec3(m4Transformation_Combined * glm::dvec4(v_Voxels[index_Voxel].d3_Position, 1.0));
+
+		if(d3Position_Local.x < -0.5*d3Size.x || +0.5*d3Size.x < d3Position_Local.x)
+			continue;
+		if(d3Position_Local.y < -0.5*d3Size.y || +0.5*d3Size.y < d3Position_Local.y)
+			continue;
+//		if(d3Position_Local.z < -0.5*d3Size.z || +0.5*d3Size.z < d3Position_Local.z)
+//			continue;
+
+		v_Voxels[index_Voxel].b_Active = false;
 	}
 }
 // --------------------------------------------------------

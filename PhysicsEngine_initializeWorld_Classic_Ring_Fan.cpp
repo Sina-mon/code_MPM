@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.120, 0.001/2.0);
-	glm::ivec3 i3_Cells = glm::ivec3(2.0*100, 2.0*120, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.100, 0.120, 0.001/1.0);
+	glm::ivec3 i3_Cells = glm::ivec3(1.0*100, 1.0*120, 1);
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 
@@ -42,8 +42,9 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 		{
 			thisGridPoint->b3_Fixed.x = true;
 		}
-		if(fabs(dx - d3_Length_Grid.x) < dTolerance)
+		if(fabs(dx - d3_Length_Grid.x) < 1.5*d3_Length_Cell.x)
 		{
+			//thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dy - 0.0) < 1.5*d3_Length_Cell.y)
 		{
@@ -110,8 +111,8 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 
 	double dPlatenSpeed = +1.0;
 //	Gupta
-	double dDiameter_Average = 0.04766;
-	double dThickness_Ring = 0.00344;
+//	double dDiameter_Average = 0.04766;
+//	double dThickness_Ring = 0.00344;
 //	ET01
 //	double dDiameter_Average = 0.09981;
 //	double dThickness_Ring = 0.00192;
@@ -119,13 +120,13 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 //	double dDiameter_Average = 0.07964;
 //	double dThickness_Ring = 0.00200;
 //	ET04
-//	double dDiameter_Average = 0.04987;
-//	double dThickness_Ring = 0.00296;
+	double dDiameter_Average = 0.04987;
+	double dThickness_Ring = 0.00296;
 
 	double dDiameter_Outer = dDiameter_Average + dThickness_Ring;
 	double dDiameter_Inner = dDiameter_Average - dThickness_Ring;
 
-	double dOffset = dThickness_Ring/32.0;
+	double dOffset = dThickness_Ring/16.0;
 
 	double dAngle_Start	= -0.5*_PI;
 	double dAngle_End	= +0.5*_PI;
@@ -139,7 +140,7 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 
 //	glm::dvec3 d3Center_Ring			= glm::dvec3(1.0*d3_Length_Cell.x+0.5*dDiameter_Outer, 1.0*d3_Length_Cell.y+0.5*dDiameter_Outer, 0.5*d3_Length_Grid.z);
 	glm::dvec3 d3Center_Ring			= glm::dvec3(0.0, 0.5*dDiameter_Outer, 0.0);
-	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(1.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, dDiameter_Outer+4.0*d3_Length_Cell.y+0.5*d3Dimension_Platen_Top.y, 0.5*d3_Length_Grid.z);
+	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(1.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, dDiameter_Outer+5.0*d3_Length_Cell.y+0.5*d3Dimension_Platen_Top.y, 0.5*d3_Length_Grid.z);
 
 	if(true)
 	{// sample
@@ -164,7 +165,8 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 
 			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-			newMP->d3_Position = vVoxels[index_Voxel].d3_Position + glm::dvec3(1.0*d3_Length_Cell.x+dOffset, 3.0*d3_Length_Cell.y, 0.5*d3_Length_Grid.z);
+//			newMP->d3_Position = vVoxels[index_Voxel].d3_Position + glm::dvec3(1.0*d3_Length_Cell.x+dOffset, 3.0*d3_Length_Cell.y, 0.5*d3_Length_Grid.z);
+			newMP->d3_Position = vVoxels[index_Voxel].d3_Position + glm::dvec3(2.0*d3_Length_Cell.x-dOffset, 3.0*d3_Length_Cell.y, 0.5*d3_Length_Grid.z);
 			newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 
@@ -211,7 +213,7 @@ void PhysicsEngine::initializeWorld_Classic_Ring_Fan(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/2.0*10.0e-8;
+	d_TimeIncrement_Maximum = 1.0/1.0*10.0e-8;
 	d_TimeEnd = 0.8*(d3Center_Platen_Top.y - 0.0*dDiameter_Outer) / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.2e-3 / glm::abs(dPlatenSpeed);
 

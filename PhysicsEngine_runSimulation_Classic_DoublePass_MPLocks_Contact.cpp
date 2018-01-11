@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks(double dTimeIncrement_Total)
+int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks_Contact(double dTimeIncrement_Total)
 {
 	omp_set_num_threads(_MAX_N_THREADS);
 
@@ -41,6 +41,9 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks(double dTimeIncremen
 					continue;
 
 				thisGP->b_Active = false;
+				thisGP->b_Contact = false;
+				thisGP->b_Contact_Negative = false;
+				thisGP->b_Contact_Positive = false;
 				thisGP->d_Mass = 0.0;
 				thisGP->d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
 				thisGP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
@@ -124,6 +127,8 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks(double dTimeIncremen
 					{
 						// mass
 						thisAGP->d_Mass += dShapeValue * thisMP->d_Mass;
+						// mass gradient
+						thisAGP->d3_MassGradient += d3ShapeGradient * thisMP->d_Mass;
 
 						// momentum
 							thisAGP->d3_Momentum += dShapeValue * (thisMP->d_Mass * thisMP->d3_Velocity);
@@ -141,6 +146,89 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks(double dTimeIncremen
 						thisAGP->d3_Force += dShapeValue*thisMP->d3_Force_External;
 					}
 					if(iThread_Count > 1)	omp_unset_lock(v_GridPoint_Lock[thisMP->v_AGP[index_AGP].index]);
+				}
+			}
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// material point from grid: mass gradient
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
+			{
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
+
+				if(thisMP->b_Surface != true)
+					continue;
+
+				thisMP->d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
+
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				{
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+
+					if(glm::length(thisAGP->d3_MassGradient) > glm::length(thisMP->d3_MassGradient))
+						thisMP->d3_MassGradient = thisAGP->d3_MassGradient;
+				}
+			}
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// reset mass gradient for grid points
+			#pragma omp for
+			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
+			{
+				GridPoint *thisGP = allGridPoint[index_GP];
+
+				if(thisGP->b_Active == false)
+					continue;
+
+				thisGP->d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
+			}
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// material point to grid: surface normal vectors (using MP mass gradients)
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
+			{
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
+
+				if(thisMP->b_Surface != true)
+					continue;
+
+				//thisMP->d3_MassGradient = glm::normalize(thisMP->d3_MassGradient);
+
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				{
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+
+					thisAGP->d3_MassGradient = thisMP->d3_MassGradient;
+				}
+			}
+
+			#pragma omp barrier
+			dRuntime_Block = omp_get_wtime();
+			// detect contact ------------------------------------------------- detect contacts
+			#pragma omp for
+			for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
+			{
+				MaterialPoint_BC *thisMP = allMaterialPoint[index_MP];
+
+				if(!(thisMP->b_Surface))
+					continue;
+
+				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
+				{
+					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+
+					if(glm::dot(thisAGP->d3_MassGradient, thisMP->d3_MassGradient) >= 0.0)
+					{
+						thisAGP->b_Contact_Positive = true;
+					}
+					else
+					{
+						thisAGP->b_Contact_Negative = true;
+					}
 				}
 			}
 

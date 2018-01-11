@@ -14,8 +14,8 @@ class GridPoint
 
 		glm::ivec3 i3_Index = glm::vec3(0,0,0);
 
-//		bool b_Contact_Positive = false;// sina, this variable is only for graphic debugging
-//		bool b_Contact_Negative = false;// sina, this variable is only for graphic debugging
+		bool b_Contact_Positive = false;// sina, this variable is only for graphic debugging
+		bool b_Contact_Negative = false;// sina, this variable is only for graphic debugging
 
 		glm::bvec3 b3_Fixed = glm::bvec3(false, false, false);
 		glm::dvec3 d3_Position = glm::dvec3(0.0, 0.0, 0.0);

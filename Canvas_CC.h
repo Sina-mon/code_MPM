@@ -9,6 +9,7 @@
 struct Voxel_ST
 {
 	bool b_Active = false;
+	bool b_Surface = false;
 
 	unsigned int i_ID = 0;
 
@@ -21,12 +22,17 @@ class Canvas_CC
 		Canvas_CC(glm::dvec3 d3Size, double dOffset);
 		virtual ~Canvas_CC();
 
+		double d_Offset;
 		glm::dvec3 d3_Size;
 		glm::dvec3 i3_Size;
 		std::vector<Voxel_ST> v_Voxels;
 
+		void drawCircle(glm::dvec3 d3Center, double dRadius);
 		void drawRing(glm::dvec3 d3Center, double dRadius_Outer, double dRadius_Inner);
 		void drawRectangle(glm::dvec3 d3Center, glm::dvec3 d3Size, glm::dvec3 d3Rotation);
+
+		void cutCircle(glm::dvec3 d3Center, double dRadius);
+		void cutRectangle(glm::dvec3 d3Center, glm::dvec3 d3Size, glm::dvec3 d3Rotation);
 
 		std::vector<Voxel_ST> getVoxels(bool bState);
 

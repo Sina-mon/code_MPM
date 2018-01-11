@@ -37,12 +37,14 @@ class MaterialPoint_BC
 		bool b_Mark_Energy_Strain = false;
 		bool b_Mark_Energy_Plastic = false;
 		bool b_Surface = false;
+		bool b_Failed = false;
 
 		unsigned int i_ID = 0;
 		unsigned int i_Body = 0;
 		unsigned int i_MaterialType = _ELASTIC;
 
 		double d_Mass = 0.0;
+		glm::dvec3 d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
 		double d_Volume = 0.0;
 		double d_Volume_Initial = 0.0;
 
