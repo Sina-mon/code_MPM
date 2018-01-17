@@ -1,30 +1,32 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
+void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 {
 	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3Length_Grid = glm::dvec3(0.010, 0.010, 0.002/10.0);
-	glm::ivec3 i3Cells = glm::ivec3(10.0*10, 10.0*10, 2);
-//	glm::dvec3 d3Length_Grid = glm::dvec3(0.030, 0.030, 0.001/10.0);
-//	glm::ivec3 i3Cells = glm::ivec3(10.0*30, 10.0*30, 1);
+	double dOffset = pCanvas->d_Offset;
+	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 4.0*pCanvas->d_Offset/1.0);
+
+	glm::ivec3 i3Cells = glm::ivec3(d3Length_Grid/(4.0*pCanvas->d_Offset));
 	glm::dvec3 d3Length_Cell = d3Length_Grid / glm::dvec3(i3Cells);
 	glm::ivec3 i3Nodes = i3Cells + glm::ivec3(1, 1, 1);
-	this->d3_Length_World = d3Length_Grid;
 
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
 	{// initialize GP mediator
+
+		d3_Length_World = d3Length_Grid;
+
 		mpm_GP_Mediator_Thread[indexThread].d3_Length_Grid = d3Length_Grid;
 		mpm_GP_Mediator_Thread[indexThread].d3_Length_Cell = d3Length_Cell;
 		mpm_GP_Mediator_Thread[indexThread].i3_Cells = i3Cells;
 		mpm_GP_Mediator_Thread[indexThread].i3_Node_Count = i3Nodes;
 
-		allGridPoint = GP_Factory.createGrid(d3Length_Grid, i3Cells);
+		//allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
-
+	allGridPoint = GP_Factory.createGrid(d3Length_Grid, i3Cells);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
@@ -33,6 +35,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 		double dx = thisGridPoint->d3_Position[0];
 		double dy = thisGridPoint->d3_Position[1];
 		double dz = thisGridPoint->d3_Position[2];
+		double dTolerance = 0.1*d3Length_Cell.x;
 
 		//fixed grid points
 		thisGridPoint->b3_Fixed = glm::bvec3(false, false, false);
@@ -40,6 +43,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 		if(fabs(dx - 0.0) < 1.5*d3Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.y = true;
+		}
+		if(fabs(dx - d3Length_Grid.x) < dTolerance)
+		{
 		}
 		if(fabs(dy - 0.0) < 1.5*d3Length_Cell.y)
 		{
@@ -47,9 +54,20 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 //			thisGridPoint->b3_Fixed.z = true;
 //			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
 		}
+		if(fabs(dy - d3Length_Grid.y) < dTolerance)
+		{
+		}
+		if(fabs(dz - 0.0) < 0.5*d3Length_Cell.z)
+		{
+			thisGridPoint->b3_Fixed.z = true;
+		}
 		if(fabs(dz - 0.0) < 2.0*d3Length_Grid.z)
 		{
 			thisGridPoint->b3_Fixed.z = true;
+		}
+		if(fabs(dz - d3Length_Grid.z) < dTolerance)
+		{
+//			thisGridPoint->b3_Fixed.z = true;
 		}
 	}
 
@@ -71,9 +89,9 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 	v_allMaterial.push_back(pInconel);
 	{
 		pInconel->i_ID = 0;
-		pInconel->i_MaterialType = __VONMISESHARDENING;
+//		pInconel->i_MaterialType = __VONMISESHARDENING;
 //		pInconel->i_MaterialType = __PLASTIC;
-//		pInconel->i_MaterialType = __ELASTIC;
+		pInconel->i_MaterialType = __ELASTIC;
 
 		pInconel->d_Density = 8250.0;
 
@@ -96,66 +114,9 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 		pSteel->d_PoissonRatio = 0.3;
 	}
 
-	double dThickness_Ring = 0.0005;
-	double dDiameter_Outer = 0.005;
-	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
-	double dDiameter_Average = 0.5*(dDiameter_Outer + dDiameter_Inner);
-
-	glm::ivec2 i2Array_Count = glm::ivec2(1,2);
-	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer, dDiameter_Outer*glm::sin(_PI/3.0));
-
-	double dPlatenSpeed = +10.0*i2Array_Count.y;
-//	double dOffset = glm::min(dThickness_Ring/16.0, d3Length_Cell.x/8.0);
-	double dOffset = d3Length_Cell.x/4.0;
-//	double dOffset = dThickness_Ring/16.0;
-
-	double dRadius_Inner = 0.5*dDiameter_Inner;
-	double dRadius_Outer = 0.5*dDiameter_Outer;
-	double dLength_Ring = glm::min(dOffset,d3Length_Cell.z);
-
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(i2Array_Count.x*dDiameter_Outer, 8.0*d3Length_Cell.y, dOffset);
-
-	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer, 0.0, 0.5*d3Length_Grid.z);
-	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-1.0)*d2Array_Offset.y+0.5*dDiameter_Outer+0.5*d3Dimension_Platen_Top.y + 1.5*d3Length_Cell.y, 0.5*d3Length_Grid.z);
-
 	if(true)
-	{// sample
-		Canvas2D_CC Canvas(glm::dvec2(d3Length_Grid.x, d3Length_Grid.y), dOffset);
-		for(int ix = 0; ix < i2Array_Count.x; ix++)
-		{// sample array
-			for(int iy = 0; iy < i2Array_Count.y; iy++)
-			{
-				glm::dvec2 d2Center_Ring = glm::dvec2(0.0,0.0);
-
-				if(iy % 2 == 0)
-					d2Center_Ring = glm::dvec2(d3Center_Array) + glm::dvec2(ix*d2Array_Offset.x, iy*d2Array_Offset.y);
-				else if(iy % 2 == 1)
-					d2Center_Ring = glm::dvec2(d3Center_Array) - glm::dvec2(0.5*dDiameter_Outer,0.0) + glm::dvec2(ix*d2Array_Offset.x, iy*d2Array_Offset.y);
-
-				if(0.5*ix + iy > 2)
-					d2Center_Ring += glm::dvec2(0.001,0.0);
-
-				std::vector<double> vAngle = {0.0, 1.0*_PI/3.0, 2.0*_PI/3.0, 3.0*_PI/3.0, 4.0*_PI/3.0, 5.0*_PI/3.0};
-				if(iy == i2Array_Count.y-1)
-				{
-					vAngle.clear();
-					vAngle = {0.0, 0.5*_PI, 1.0*_PI, 4.0*_PI/3.0, 5.0*_PI/3.0};
-				}
-				Canvas.drawRing(d2Center_Ring, dRadius_Outer, dRadius_Inner);
-				{// braze
-//					for(double dAngle = 0.0; dAngle < 2.0*_PI; dAngle += _PI/3.0)
-					for(int index_Angle = 0; index_Angle < vAngle.size(); index_Angle++)
-					{
-						double dAngle = vAngle[index_Angle];
-						glm::dvec2 d2Center_Braze = d2Center_Ring + glm::dvec2(0.5*dDiameter_Average*glm::cos(dAngle), 0.5*dDiameter_Average*glm::sin(dAngle));
-						//Canvas.drawRectangle(d3Center_Braze, glm::dvec3(0.0015,dThickness_Ring,d3Length_Cell.z), glm::dvec3(0.0,0.0,dAngle+0.5*_PI));
-					}
-				}
-			}
-		}
-		std::vector<Voxel_ST> vVoxels = Canvas.getVoxels(true);
-		std::cout << "Canvas voxels: " << Script(Canvas.v_Voxels.size()) << " (" << Script(Canvas.u2_Size.x) << "," << Script(Canvas.u2_Size.y) << ")" << std::endl;
-		std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
+	{// sample based on canvas
+		std::vector<Voxel_ST> vVoxels = pCanvas->getVoxels(true);
 
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points
@@ -163,74 +124,79 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0));
 
 			newMP->i_ID = vVoxels[index_Voxel].u_ID;
-			newMP->b_Surface = vVoxels[index_Voxel].b_Surface;
 			newMP->p_Material = pInconel;
 
-			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
+			newMP->d_Volume_Initial = dOffset*dOffset*dOffset * vVoxels[index_Voxel].d_ESO_Opacity;
 			newMP->d_Volume = newMP->d_Volume_Initial;
 
 			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
+			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(0.0,0.0,0.5*d3Length_Grid.z);
 			newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
-			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
+			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -00.0, 0.0);
 
 			allMaterialPoint.push_back(newMP);
+			// monitor
+			newMP->b_Monitor = false;
+			if(vVoxels[index_Voxel].b_ESO == true)
+			{
+				newMP->b_Mark_ESO = true;
+				newMP->b_Monitor = true;
+				//v_MarkedMaterialPoints_Stress_Monitor.push_back((MaterialPoint_Classic_CC *)newMP);
+			}
 			// moment log
 			v_MarkedMaterialPoints_Momentum.push_back((MaterialPoint_Classic_CC *)newMP);
 		}
 	}
 
+	double dPlatenSpeed = 0.1;
 	if(true)
-	{// platen
-		Canvas2D_CC Canvas(glm::dvec2(d3Length_Grid.x, d3Length_Grid.y), dOffset);
+	{// top platen material points -------------------------------------------- platen MP
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.8*d3Length_Grid.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(0.002,0.002,d3Length_Grid.z), 0.5*d3Length_Grid.z);
+		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
+		{// assign material point initial values
+			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
 
-		Canvas.drawRectangle(glm::dvec2(d3Center_Platen_Top), glm::dvec2(d3Dimension_Platen_Top), 0.0);
+			thisMP->p_Material = pInconel;
 
-		std::vector<Voxel_ST> vVoxels = Canvas.getVoxels(true);
+			thisMP->i_Body = 1;
 
-		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
-		{// get canvas voxels and create material points
-			MaterialPoint_BC *newMP;
-			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0));
+			thisMP->d_Volume_Initial = dOffset*dOffset*dOffset;
+			thisMP->d_Volume = thisMP->d_Volume_Initial;
 
-			newMP->i_ID = vVoxels[index_Voxel].u_ID;
-			newMP->b_Surface = vVoxels[index_Voxel].b_Surface;
-			newMP->p_Material = pInconel;
+			thisMP->d_Mass = thisMP->p_Material->d_Density * thisMP->d_Volume;
 
-			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
-			newMP->d_Volume = newMP->d_Volume_Initial;
-
-			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
-
-			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
-			newMP->d3_Velocity = glm::dvec3(0.0, -1.0, 0.0);
-			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
-
-			allMaterialPoint.push_back(newMP);
+			thisMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
+			thisMP->d3_Force_External = thisMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
+		}
+		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
+		{// send to MP vectors
+			MaterialPoint_Classic_CC *thisMP = (MaterialPoint_Classic_CC *)thisMaterialDomain[index_MP];
+			// all MPs
+			allMaterialPoint.push_back(thisMP);
 			// displacement control
-//			if(thisMP->d3_Position.y > d3Center_Platen_Top.y + 0.375*d3Dimension_Platen_Top.y)
+//			if(thisMP->d3_Position.x > 0.9*d3Length_Grid.x)
 			{
-				newMP->b_DisplacementControl = true;
-				newMP->f_DisplacementControl_Multiplier = -1.0;
-				newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-				v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
-				v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
+				thisMP->b_DisplacementControl = true;
+				thisMP->f_DisplacementControl_Multiplier = -1.0;
+				thisMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+				v_MarkedMaterialPoints_Displacement_Control.push_back(thisMP);
+				v_MarkedMaterialPoints_Displacement_Monitor.push_back(thisMP);
 			}
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/10.0*5.0e-8;
-	d_TimeEnd = 0.5*d3Center_Platen_Top.y / glm::abs(dPlatenSpeed);
-//	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 0.1e-4 / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 1.0/1.0*5.0e-8;
+	d_TimeEnd = 2.0e-4;
+	d_TimeConsole_Interval = 1e-5;
 
 	// timeline events -------------------------------------------------------
-	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
-	m_TimeLine.addTimePoint(5.0e-5,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(1.0*d_TimeEnd,			glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(1.0*d_TimeEnd + 1.0e-6,	glm::dvec3(0.0, -dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(10.,					glm::dvec3(0.0, -dPlatenSpeed, 0.0));
+//	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
+	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
+	m_TimeLine.addTimePoint(1.0e-4,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
+	m_TimeLine.addTimePoint(1.0e-4+1.0e-24,			glm::dvec3(0.0, 0.0, 0.0));
+	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, 0.0, 0.0));
+//	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 
 	double dMass_Domain = 0.0;
 	for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
@@ -239,7 +205,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.0;
+	d_DampingCoefficient = 0.1;
 
 	std::string sDescription = "";
 	{
@@ -254,7 +220,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 		std::string strTime(buffer);
 
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "Classic formulation, Cellular, Langrand (2017) --------------\n";
+		sDescription += "CPDI formulation, Cellular, Langrand (2017) ------\n";
 		sDescription += "Process started on: " + strTime + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
@@ -267,9 +233,9 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 //		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
 //		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
 //		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
-		sDescription += "Tube average_diameter: " + Script(dDiameter_Average,3) + "\n";
-		sDescription += "Tube thickness: " + Script(dThickness_Ring,3) + "\n";
-		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
+//		sDescription += "Tube average_diameter: " + Script(dDiameter_Average,3) + "\n";
+//		sDescription += "Tube thickness: " + Script(dThickness_Ring,3) + "\n";
+//		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
 		sDescription += "Yield: " + Script(pInconel->d_YieldStress, 3) + " N/m^2" + "\n";
 		sDescription += "Modulus: " + Script(pInconel->d_ElasticModulus, 3) + " N/m^2" + "\n";

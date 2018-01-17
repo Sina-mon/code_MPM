@@ -1,7 +1,7 @@
 #include "GraphicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void GraphicsEngine::gameLoop(void)
+void GraphicsEngine::gameLoop(bool bExit)
 {
 	int iSimulationStatus = 0;
 	while(e_GameState != GameState::EXIT)
@@ -37,14 +37,18 @@ void GraphicsEngine::gameLoop(void)
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_DoublePass_MPLocks(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_MultiBody_SinglePass_MPLocks(dTimeIncrement_Request);
 
-			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MPLocks_Contact(dTimeIncrement_Request);
-//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MPLocks(dTimeIncrement_Request);
+//			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MPLocks_Contact(dTimeIncrement_Request);
+			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MPLocks(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_DoublePass_MP(dTimeIncrement_Request);
 
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_CPDI_SinglePass(dTimeIncrement_Request);
 
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP(dTimeIncrement_Request);
 //			iSimulationStatus = mpm_PhysicsEngine->runSimulation_Classic_SinglePass_MP_Contact(dTimeIncrement_Request);
+		}
+		if(bExit == true && iSimulationStatus == 1)
+		{
+			e_GameState = GameState::EXIT;
 		}
 
 		processInput();

@@ -12,7 +12,7 @@
 ////#include ".\include\glm\glm.hpp" // windows
 //#include "./include/glm/glm.hpp"//sina, glm is a column major implementation
 
-#include "Canvas_CC.h"
+#include "Canvas2D_CC.h"
 #include "GridPoint.h"
 #include "GridPoint_Factory.h"
 #include "GridPoint_Mediator.h"
@@ -31,6 +31,8 @@ class PhysicsEngine
 	public:
 		PhysicsEngine() {;}
 		virtual ~PhysicsEngine();
+
+		void	initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas);
 
 		void 	initializeWorld_Classic_Ring_Fan(void);
 		void	initializeWorld_Classic_Cellular_Langrand(void);

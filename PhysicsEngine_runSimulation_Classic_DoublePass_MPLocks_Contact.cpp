@@ -202,7 +202,10 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks_Contact(double dTime
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
 
-					thisAGP->d3_MassGradient = thisMP->d3_MassGradient;
+					glm::dvec3 d3Distance = thisAGP->d3_Position - thisMP->d3_Position;
+
+					if(glm::dot(d3Distance, thisMP->d3_MassGradient) > 0.0)
+						thisAGP->d3_MassGradient = thisMP->d3_MassGradient;
 				}
 			}
 
@@ -220,12 +223,13 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks_Contact(double dTime
 				for(unsigned int index_AGP = 0; index_AGP < thisMP->v_AGP.size(); index_AGP++)
 				{
 					GridPoint *thisAGP = allGridPoint[thisMP->v_AGP[index_AGP].index];
+				double dTolerance = 0.001 * glm::length(thisAGP->d3_MassGradient) * glm::length(thisMP->d3_MassGradient);//glm::sin(0.001*_PI);
 
-					if(glm::dot(thisAGP->d3_MassGradient, thisMP->d3_MassGradient) >= 0.0)
+					if(glm::dot(thisAGP->d3_MassGradient, thisMP->d3_MassGradient) >= dTolerance)
 					{
 						thisAGP->b_Contact_Positive = true;
 					}
-					else
+					else if(glm::dot(thisAGP->d3_MassGradient, thisMP->d3_MassGradient) <= -dTolerance)
 					{
 						thisAGP->b_Contact_Negative = true;
 					}

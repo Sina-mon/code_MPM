@@ -41,5 +41,8 @@ GraphicsEngine::~GraphicsEngine()
 	if(gl_Canvas_Texture_MP_KernelGradient != NULL)	delete gl_Canvas_Texture_MP_KernelGradient;
 
 	if(gl_Particle_Mesh != NULL)	delete gl_Particle_Mesh;
+
+	SDL_DestroyWindow(p_Window);
+	SDL_Quit();
 }
 // ----------------------------------------------------------------------------

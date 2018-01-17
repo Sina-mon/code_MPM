@@ -5,8 +5,8 @@ void GraphicsEngine::setPhysicsEngineReference(PhysicsEngine *mpmPhysicsEngine)
 {
 	mpm_PhysicsEngine = mpmPhysicsEngine;
 
-//	f_TimeSnapshot_Interval = mpm_PhysicsEngine->getTime_End() / 100.0;
-	f_TimeSnapshot_Interval = 10.0*mpm_PhysicsEngine->getTime_ConsoleInterval();
+	f_TimeSnapshot_Interval = 0.9999*mpm_PhysicsEngine->getTime_End();
+//	f_TimeSnapshot_Interval = 10.0*mpm_PhysicsEngine->getTime_ConsoleInterval();
 
 	glm::vec3 f3Bounds = mpm_PhysicsEngine->d3_Length_World;
 

@@ -34,7 +34,7 @@ class GraphicsEngine
 		void initializeSystems(void);
 		void setPhysicsEngineReference(PhysicsEngine *mpmPhysicsEngine);
 		void drawGame(void);
-		void runVisualization(PhysicsEngine *pPhysicsEngine);
+		void runVisualization(PhysicsEngine *pPhysicsEngine, bool bExit);
 		void saveScreenshot(int x, int y, int w, int h, const char * filename);
 	protected:
 		//snapshot save
@@ -44,7 +44,7 @@ class GraphicsEngine
 
 		SDL_Window *p_Window = NULL;
 
-		float i_ScreenWidth = 0.5*6*1000;
+		float i_ScreenWidth = 0.5*4*1000;
 		float i_ScreenHeight = 0.5*1*1000;
 
 		glm::vec3 f3_World_Center = glm::vec3(0.0, 0.0, 0.0);
@@ -73,12 +73,12 @@ class GraphicsEngine
 
 		enum class enum_Canvas : int {
 			MAIN = 0,
-			MASSGRADIENT_GP,
-			MASSGRADIENT_MP,
 			SOLID,
 			J2_PLASTICSTRAIN,
 			J2_STRESS,
 			COUNT,
+			MASSGRADIENT_GP,
+			MASSGRADIENT_MP,
 			ENERGY_STRAIN,
 			ENERGY_PLASTIC,
 		};
@@ -109,7 +109,7 @@ class GraphicsEngine
 //		std::vector<DEM_Particle *> v_DEMParticles;
 
 		void initializeShaders(void);
-		void gameLoop(void);
+		void gameLoop(bool bExit);
 		void processInput(void);
 	private:
 };

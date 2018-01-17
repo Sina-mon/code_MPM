@@ -179,7 +179,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(true)
+	if((int)enum_Canvas::SOLID < (int)enum_Canvas::COUNT)
 	{// Solid, only containing the material points
 		v_Canvas_Texture[(int)enum_Canvas::SOLID]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -332,7 +332,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(true)
+	if((int)enum_Canvas::J2_PLASTICSTRAIN < (int)enum_Canvas::COUNT)
 	{// MP parameteric value, equivalent plastic strain
 		v_Canvas_Texture[(int)enum_Canvas::J2_PLASTICSTRAIN]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -396,10 +396,13 @@ void GraphicsEngine::drawGame(void)
 			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Strain));
 			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
 			glm::vec4 f4objectColor = _BLUE;
-			if(fJ2 > fJ2_Minimum)
-				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
-			if(fJ2 > fJ2_Maximum)
-				f4objectColor  = _GREEN;
+			if(thisMP->b_Monitor == true)
+			{
+				if(fJ2 > fJ2_Minimum)
+					f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+				if(fJ2 > fJ2_Maximum)
+					f4objectColor  = _GREEN;
+			}
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
 
@@ -512,7 +515,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(true)
+	if((int)enum_Canvas::J2_STRESS < (int)enum_Canvas::COUNT)
 	{// MP parameteric value, von-Mises stress
 		v_Canvas_Texture[(int)enum_Canvas::J2_STRESS]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -563,19 +566,22 @@ void GraphicsEngine::drawGame(void)
 //		float fJ2_Maximum = CR.d_J2;
 //		CR.calculateState_J2(d6Stress_Minimum);
 //		float fJ2_Minimum = CR.d_J2;
-//		float fJ2_Maximum = 1.0e-12;
-//		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
-//		{
-//			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
-//
-//			CR.calculateState_J2(thisMP->d6_Stress);
-//			float fJ2 = CR.d_J2;
-//
-//			if(fJ2 > fJ2_Maximum)
-//				fJ2_Maximum = fJ2;
-//		}
-		float fJ2_Minimum = 0.0;
-		float fJ2_Maximum = 240.0e6;
+		float fJ2_Maximum = 1.0e-12;
+		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
+		{
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
+
+			if(thisMP->b_Monitor == false)
+				continue;
+
+			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
+			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
+
+			if(fJ2 > fJ2_Maximum)
+				fJ2_Maximum = fJ2;
+		}
+		float fJ2_Minimum = 0.0*fJ2_Maximum;
+//		float fJ2_Maximum = 240.0e6;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
@@ -585,12 +591,15 @@ void GraphicsEngine::drawGame(void)
 			// particle color
 			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
 			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
-			glm::vec4 f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+			glm::vec4 f4objectColor = _BLUE;
+			if(thisMP->b_Monitor == true)
+			{
+				if(fJ2 > fJ2_Minimum)
+					f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+				if(fJ2 > fJ2_Maximum)
+					f4objectColor  = _GREEN;
+			}
 			if(thisMP->b_DisplacementControl)
-				f4objectColor = _GRAY;
-			if(thisMP->b_Surface)
-				f4objectColor = _BLACK;
-			if(thisMP->b_Mark_Stress)
 				f4objectColor = _GRAY;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
@@ -705,7 +714,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(true)
+	if((int)enum_Canvas::MASSGRADIENT_GP < (int)enum_Canvas::COUNT)
 	{// mass gradient, grid points
 		v_Canvas_Texture[(int)enum_Canvas::MASSGRADIENT_GP]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -806,7 +815,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(true)
+	if((int)enum_Canvas::MASSGRADIENT_MP < (int)enum_Canvas::COUNT)
 	{// mass gradient, particles
 		v_Canvas_Texture[(int)enum_Canvas::MASSGRADIENT_MP]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -909,7 +918,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(false)
+	if((int)enum_Canvas::ENERGY_STRAIN < (int)enum_Canvas::COUNT)
 	{// MP parameteric value, strain energy
 		v_Canvas_Texture[(int)enum_Canvas::ENERGY_STRAIN]->bindRenderTarget();
 		gl_BasicProgram.use();
@@ -1014,7 +1023,7 @@ void GraphicsEngine::drawGame(void)
 		gl_BasicProgram.unuse();
 	}
 
-	if(false)
+	if((int)enum_Canvas::ENERGY_PLASTIC < (int)enum_Canvas::COUNT)
 	{// MP parameteric value, plastic energy
 		v_Canvas_Texture[(int)enum_Canvas::ENERGY_PLASTIC]->bindRenderTarget();
 		gl_BasicProgram.use();
