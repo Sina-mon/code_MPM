@@ -7,7 +7,7 @@ Canvas2D_CC::Canvas2D_CC(glm::dvec2 d2Size, double dOffset)
 	std::cout << "max_size: " << v_Voxels.max_size() << "\n";
 	d_Offset = dOffset;
 	d2_Size = d2Size;
-	u2_Size = glm::uvec2(glm::floor(d2_Size / dOffset));
+	u2_Size = glm::floor(d2_Size / dOffset);
 
 	v_Voxels.clear();
 	v_Voxels.resize(u2_Size.x * u2_Size.y);
@@ -23,7 +23,7 @@ Canvas2D_CC::Canvas2D_CC(glm::dvec2 d2Size, double dOffset)
 
 			newVoxel->b_Active = false;
 			newVoxel->u_ID = uIndex;
-			newVoxel->d2_Position = glm::dvec2(u2Index) * dOffset;
+			newVoxel->d2_Position = glm::dvec2(u2Index) * dOffset + 0.5*glm::dvec2(dOffset,dOffset);
 
 			v_Voxels[uIndex] = newVoxel;
 		}
@@ -187,10 +187,36 @@ void Canvas2D_CC::setESORectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double
 
 		if(d2Position_Local.x < -0.5*d2Size.x || +0.5*d2Size.x < d2Position_Local.x)
 			continue;
-		if(d2Position_Local.y < -0.5*d2Size.y || +0.5*d2Size.y < d2Position_Local.y)
+//		if(d2Position_Local.y < -0.5*d2Size.y || +0.5*d2Size.y < d2Position_Local.y)
+		if(glm::abs(d2Position_Local.y) > 0.5*d2Size.y)
 			continue;
 
 		v_Voxels[index_Voxel]->b_ESO = bFlag;
+	}
+}
+// --------------------------------------------------------
+void Canvas2D_CC::setLoadRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag)
+{
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		glm::dmat4 m4Transformation_Position = glm::translate(glm::dvec3(-d2Center, 0.0));
+		glm::dmat4 m4Transformation_RotationZ = glm::rotate(-dRotation, glm::dvec3(0.0, 0.0, 1.0));
+
+		glm::dmat4 m4Transformation_Combined = glm::dmat4(1.0); // sina, apparently, glm::mat4() and glm::mat4(1.0) build identity matrices
+		m4Transformation_Combined *= m4Transformation_RotationZ;
+//		m4Transformation_Combined *= m4Transformation_RotationY;
+//		m4Transformation_Combined *= m4Transformation_RotationX;
+		m4Transformation_Combined *= m4Transformation_Position;
+
+		glm::dvec2 d2Position_Local = glm::dvec2(m4Transformation_Combined * glm::dvec4(v_Voxels[index_Voxel]->d2_Position, 0.0, 1.0));
+
+		if(d2Position_Local.x < -0.5*d2Size.x || +0.5*d2Size.x < d2Position_Local.x)
+			continue;
+//		if(d2Position_Local.y < -0.5*d2Size.y || +0.5*d2Size.y < d2Position_Local.y)
+		if(glm::abs(d2Position_Local.y) > 0.5*d2Size.y)
+			continue;
+
+		v_Voxels[index_Voxel]->b_Load = bFlag;
 	}
 }
 // --------------------------------------------------------
@@ -207,5 +233,44 @@ std::vector<Voxel_ST> Canvas2D_CC::getVoxels(bool bState = true)
 	}
 
 	return(vResult);
+}
+// --------------------------------------------------------
+unsigned long int Canvas2D_CC::getCount_Active(bool bState = true)
+{
+	unsigned long int iResult = 0;
+
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		if(v_Voxels[index_Voxel]->b_Active == bState)
+			iResult++;
+	}
+
+	return(iResult);
+}
+// --------------------------------------------------------
+unsigned long int Canvas2D_CC::getCount_ESO(bool bState = true)
+{
+	unsigned long int iResult = 0;
+
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		if(v_Voxels[index_Voxel]->b_ESO == bState)
+			iResult++;
+	}
+
+	return(iResult);
+}
+// --------------------------------------------------------
+unsigned long int Canvas2D_CC::getCount_Redundant(bool bState = true)
+{
+	unsigned long int iResult = 0;
+
+	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
+	{
+		if(v_Voxels[index_Voxel]->b_Redundant == bState)
+			iResult++;
+	}
+
+	return(iResult);
 }
 // --------------------------------------------------------

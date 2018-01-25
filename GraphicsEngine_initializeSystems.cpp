@@ -6,8 +6,10 @@ void GraphicsEngine::initializeSystems(void)
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 //	i_ScreenWidth = i_ScreenHeight * (int)enum_Canvas::COUNT;
-	p_Window = SDL_CreateWindow("MPM Suite", 10, 30, i_ScreenWidth, i_ScreenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_MINIMIZED);
+	p_Window = SDL_CreateWindow("MPM Suite", 10, 30, i_ScreenWidth, i_ScreenHeight, SDL_WINDOW_OPENGL);// | SDL_WINDOW_MINIMIZED);
 	if(p_Window == NULL)	fatalError("Error int MainGame::initSystems, SDL window could not be created!");
+
+	SDL_SetWindowPosition(p_Window, 2000, 0);
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(p_Window);// passes the context to the window, so we don;t need to keep it
 	if(glContext == NULL)	fatalError("Error int MainGame::initSystems, SDL_GL context could not be created!");

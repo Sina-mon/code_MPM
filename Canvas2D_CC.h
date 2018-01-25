@@ -10,13 +10,18 @@ struct Voxel_ST
 {
 	bool b_Active = false;
 	bool b_Surface = false;
-	bool b_ESO = false;
+	bool b_Load = false;
+	bool b_ESO = false;// should/not be included for optimization
+	bool b_Redundant = false;// marked as redundant but still active
 
+	double d_Objective = 0.0;
 	double d_ESO_Opacity = 1.0;
 
 	unsigned long int u_ID = 0;
 
 	glm::dvec2 d2_Position = glm::dvec2(0.0, 0.0);
+
+	bool operator() (Voxel_ST V1, Voxel_ST V2) { return (V1.d_Objective < V2.d_Objective);}
 };
 // --------------------------------------------------------
 class Canvas2D_CC
@@ -39,8 +44,13 @@ class Canvas2D_CC
 		void cutRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation);
 
 		void setESORectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
+		void setLoadRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
 
 		std::vector<Voxel_ST> getVoxels(bool bState);
+
+		unsigned long int getCount_Active(bool bState);
+		unsigned long int getCount_ESO(bool bState);
+		unsigned long int getCount_Redundant(bool bState);
 
 		static unsigned long int getIndex(glm::uvec2 u2Index, glm::uvec2 u2Size)
 		{

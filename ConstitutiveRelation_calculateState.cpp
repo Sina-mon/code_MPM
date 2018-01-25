@@ -132,17 +132,8 @@ double ConstitutiveRelation::getState_I3(double d6State[6])
 // ----------------------------------------------------------------------------
 double ConstitutiveRelation::getState_J2(double d6State[6])
 {
-	double dStress_Hydrostatic = 1.0/3.0 * (d6State[0] + d6State[1] + d6State[2]);
-
-	double d6Stress_Deviatoric[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	for(int index = 0; index < 6; index++)
-		d6Stress_Deviatoric[index] = d6State[index];
-
-	d6Stress_Deviatoric[0] -= dStress_Hydrostatic;
-	d6Stress_Deviatoric[1] -= dStress_Hydrostatic;
-	d6Stress_Deviatoric[2] -= dStress_Hydrostatic;
-
 	double dResult = 0.0;
+
 	dResult += 1.0/6.0 * (d6State[0] - d6State[1])*(d6State[0] - d6State[1]);
 	dResult += 1.0/6.0 * (d6State[1] - d6State[2])*(d6State[1] - d6State[2]);
 	dResult += 1.0/6.0 * (d6State[2] - d6State[0])*(d6State[2] - d6State[0]);

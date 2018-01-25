@@ -3,6 +3,14 @@
 // ----------------------------------------------------------------------------
 void GraphicsEngine::drawGame(void)
 {
+	// global colors
+	glm::vec4 f4Color_Default	= _BLUE;
+	glm::vec4 f4Color_State_Mid	= _RED;
+	glm::vec4 f4Color_State_Max	= _GREEN;
+	glm::vec4 f4Color_DisplacementControl	= _WHITE;
+	glm::vec4 f4Color_Surface	= _GREEN;
+	glm::vec4 f4Color_ESO_False	= _GRAY;
+
 	if(true)
 	{// create shadow map
 		gl_Shadow_Texture->bindRenderTarget();
@@ -224,7 +232,7 @@ void GraphicsEngine::drawGame(void)
 			if(thisMP->b_DisplacementControl)
 				f4objectColor = _GRAY;
 			if(thisMP->b_Surface)
-				f4objectColor = _RED;
+				f4objectColor = _GREEN;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
@@ -482,17 +490,17 @@ void GraphicsEngine::drawGame(void)
 				continue;
 
 			// particle position
-			float fSize = 0.002;
-			glm::vec3 f3Size = glm::vec3(0.0002,0.0002,0.0002);
+			float fSize = 5.0*(mpm_PhysicsEngine->d3_Length_World.x) / 1.0e4;
+			glm::vec3 f3Size = glm::vec3(fSize,fSize,fSize);
 			if(thisGP->b3_Fixed.y == true)
 			{
-				f3Size.x = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.x *= 10.0;
+				f3Size.z *= 10.0;
 			}
 			else if(thisGP->b3_Fixed.x == true)
 			{
-				f3Size.y = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.y *= 10.0;
+				f3Size.z *= 10.0;
 			}
 //				0.002f*glm::vec3(thisGP->b3_Fixed) + glm::vec3(0.00001);
 //			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize,0.01*fSize,fSize));
@@ -548,25 +556,7 @@ void GraphicsEngine::drawGame(void)
 
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
-		//float fJ2_Maximum = 1.0/3.0*glm::pow(vMaterialPoint_CPDI[0]->d_YieldStress + 0.0*vMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1,2);
-//		double d6Stress_Minimum[6] = {0.8*vMaterialPoint_CPDI[0]->d_YieldStress, 0, 0, 0, 0, 0};
-//		double d6Stress_Maximum[6] = {vMaterialPoint_CPDI[0]->d_YieldStress+0.0057735*vMaterialPoint_CPDI[0]->d_Hardening_Isotropic_C1, 0, 0, 0, 0, 0};
-		// for wave speed
-//		double d6Stress_Minimum[6] = {0.0, 0, 0, 0, 0, 0};
-//		double d6Stress_Maximum[6] = {0.0, 0, 0, 0, 0, 0};
-//		if(vMaterialPoint.size() != 0)
-//		{
-//			d6Stress_Maximum[0] = 1.0*vMaterialPoint[0]->p_Material->d_YieldStress + 1.0*vMaterialPoint[0]->p_Material->d_Hardening_Isotropic_C1;
-//		}
-//		if(vMaterialPoint_CPDI.size() != 0)
-//		{
-//			d6Stress_Maximum[0] = 1.0*vMaterialPoint_CPDI[0]->p_Material->d_YieldStress + 1.0*vMaterialPoint_CPDI[0]->p_Material->d_Hardening_Isotropic_C1;
-//		}
-//		CR.calculateState_J2(d6Stress_Maximum);
-//		float fJ2_Maximum = CR.d_J2;
-//		CR.calculateState_J2(d6Stress_Minimum);
-//		float fJ2_Minimum = CR.d_J2;
-		float fJ2_Maximum = 1.0e-12;
+		float fJ2_Maximum = 0.0;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
@@ -574,13 +564,14 @@ void GraphicsEngine::drawGame(void)
 			if(thisMP->b_Monitor == false)
 				continue;
 
-			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
-			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
+			float fJ2 = CR.getState_J2(thisMP->d6_Stress);
+//			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
+//			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
 
 			if(fJ2 > fJ2_Maximum)
 				fJ2_Maximum = fJ2;
 		}
-		float fJ2_Minimum = 0.0*fJ2_Maximum;
+		float fJ2_Minimum = 0.05*fJ2_Maximum;
 //		float fJ2_Maximum = 240.0e6;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
@@ -589,18 +580,25 @@ void GraphicsEngine::drawGame(void)
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
-			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
-			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
-			glm::vec4 f4objectColor = _BLUE;
-			if(thisMP->b_Monitor == true)
+//			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
+//			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
+			float fJ2 = CR.getState_J2(thisMP->d6_Stress);
+
+			glm::vec4 f4objectColor = f4Color_Default;
+
+			if(thisMP->b_DisplacementControl)
+				f4objectColor = f4Color_DisplacementControl;
+			else if(thisMP->b_Surface)
+				f4objectColor = f4Color_Surface;
+			else if(thisMP->b_Monitor == true)
 			{
 				if(fJ2 > fJ2_Minimum)
-					f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _RED;
+					f4objectColor = (1.0f-fJ2/fJ2_Maximum) * f4Color_Default + fJ2/fJ2_Maximum * f4Color_State_Mid;
 				if(fJ2 > fJ2_Maximum)
-					f4objectColor  = _GREEN;
+					f4objectColor  = f4Color_State_Max;
 			}
-			if(thisMP->b_DisplacementControl)
-				f4objectColor = _GRAY;
+			else if(thisMP->b_Mark_ESO == false)
+				f4objectColor = f4Color_ESO_False;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
@@ -681,17 +679,17 @@ void GraphicsEngine::drawGame(void)
 				continue;
 
 			// particle position
-			float fSize = 0.002;
-			glm::vec3 f3Size = glm::vec3(0.0002,0.0002,0.0002);
+			float fSize = 5.0*(mpm_PhysicsEngine->d3_Length_World.x) / 1.0e4;
+			glm::vec3 f3Size = glm::vec3(fSize,fSize,fSize);
 			if(thisGP->b3_Fixed.y == true)
 			{
-				f3Size.x = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.x *= 10.0;
+				f3Size.z *= 10.0;
 			}
 			else if(thisGP->b3_Fixed.x == true)
 			{
-				f3Size.y = 0.0005;
-				f3Size.z = 0.0005;
+				f3Size.y *= 10.0;
+				f3Size.z *= 10.0;
 			}
 //				0.002f*glm::vec3(thisGP->b3_Fixed) + glm::vec3(0.00001);
 //			Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), glm::vec3(fSize,0.01*fSize,fSize));
