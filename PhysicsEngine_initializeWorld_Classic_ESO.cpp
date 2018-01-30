@@ -9,8 +9,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 	// grid points ------------------------------------------------------------
 	double dOffset = pCanvas->d_Offset;
 
-	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 4.0*3.0*pCanvas->d_Offset/1.0);
-	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(3.0*pCanvas->d_Offset));
+	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 4.0*2.0*pCanvas->d_Offset/1.0);
+	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(2.0*pCanvas->d_Offset));
 
 //	glm::dvec3 d3Length_Grid = glm::dvec3(0.020, 0.020, 0.004/0.5);
 //	glm::ivec3 i3Cells = glm::ivec3(0.5*20, 0.5*20, 4);
@@ -68,7 +68,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		}
 		if(fabs(dz - 0.0) < 2.0*d3Length_Grid.z)
 		{
-			//thisGridPoint->b3_Fixed.z = true;
+			thisGridPoint->b3_Fixed.z = true;
 		}
 		if(fabs(dz - d3Length_Grid.z) < dTolerance)
 		{
@@ -94,8 +94,6 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 	v_allMaterial.push_back(pMeta);
 	{
 		pMeta->i_ID = 0;
-//		pMeta->i_MaterialType = __VONMISESHARDENING;
-//		pMeta->i_MaterialType = __PLASTIC;
 		pMeta->i_MaterialType = __ELASTIC;
 
 		pMeta->d_Density = 2000.0;
@@ -107,52 +105,64 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		pMeta->d_Hardening_Isotropic_C0 = 15.0;
 		pMeta->d_Hardening_Isotropic_C1 = 350.0e6;
 	}
-	Material_BC *pSteel = new Material_BC;
-	v_allMaterial.push_back(pSteel);
+	Material_BC *pMeta_Reduced = new Material_BC;
+	v_allMaterial.push_back(pMeta_Reduced);
 	{
-		pSteel->i_ID = 0;
-		pSteel->i_MaterialType = __ELASTIC;
+		pMeta_Reduced->i_ID = 0;
+		pMeta_Reduced->i_MaterialType = __ELASTIC;
 
-		pSteel->d_Density = 7800.0;
+		pMeta_Reduced->d_Density = 2000.0;
 
-		pSteel->d_ElasticModulus = 210.0e9;
-		pSteel->d_PoissonRatio = 0.3;
+		pMeta_Reduced->d_ElasticModulus = 1.0e-3*100.0e9;
+		pMeta_Reduced->d_PoissonRatio = 0.3;
+
+		pMeta_Reduced->d_YieldStress = 350.0e6;
+		pMeta_Reduced->d_Hardening_Isotropic_C0 = 15.0;
+		pMeta_Reduced->d_Hardening_Isotropic_C1 = 350.0e6;
 	}
 
 	if(true)
 	{// sample based on canvas
-		std::vector<Voxel_ST> vVoxels = pCanvas->getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = pCanvas->getVoxels(true);
 
 		glm::dvec4 d4Position_Load = glm::dvec4(0.8*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z, 0.0005);
-		double dThickness = 1.0*dOffset;
+		double dThickness = 0.0;//1.0*dOffset;
 		for(double dLayer_Offset =-0.5*dThickness; dLayer_Offset <= 0.5*dThickness; dLayer_Offset += dOffset)
 		{
 			for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 			{// get canvas voxels and create material points
 				MaterialPoint_BC *newMP;
-				newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0));
+				newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0));
 
-				newMP->i_ID = vVoxels[index_Voxel].u_ID;
+				newMP->i_ID = vVoxels[index_Voxel]->u_ID;
 				newMP->p_Material = pMeta;
 
-				newMP->d_Volume_Initial = dOffset*dOffset*dOffset * vVoxels[index_Voxel].d_ESO_Opacity;
+				newMP->d_Volume_Initial = dOffset*dOffset*dOffset * vVoxels[index_Voxel]->d_ESO_Opacity;
 				newMP->d_Volume = newMP->d_Volume_Initial;
 
 				newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + dLayer_Offset);
+				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + dLayer_Offset);
 				newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 
 //				double dDistance = glm::length(glm::dvec2(newMP->d3_Position)-glm::dvec2(d4Position_Load));
 //				glm::dvec2 d2Distance = glm::abs(glm::dvec2(newMP->d3_Position)-glm::dvec2(d4Position_Load));
 //				if(dDistance < d4Position_Load.w)
 //				if(d2Distance.x < d4Position_Load.w && d2Distance.y < d4Position_Load.w)
-				if(vVoxels[index_Voxel].b_Load == true)
+				if(vVoxels[index_Voxel]->b_Load == true)
 				{
-					newMP->d3_Force_External = glm::dvec3(0.1, 0.0, 0.0);
-					newMP->b_Mark_ESO = false;
-					newMP->b_Monitor = false;
-					newMP->b_Surface = true;
+					//newMP->b_DisplacementControl = true;
+					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
+					newMP->f_DisplacementControl_Multiplier = -1.0;
+					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
+					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
+					v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
+
+//					newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -10.0, 0.0);
+//					newMP->b_Mark_ESO = false;
+//					newMP->b_Monitor = false;
+//					newMP->b_Surface = true;
 				}
 				else
 					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
@@ -161,7 +171,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 
 				// monitor
 				newMP->b_Monitor = false;
-				if(vVoxels[index_Voxel].b_ESO == true)
+				if(vVoxels[index_Voxel]->b_ESO == true)
 				{
 					newMP->b_Mark_ESO = true;
 					newMP->b_Monitor = true;
@@ -173,7 +183,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		}
 	}
 
-	double dPlatenSpeed = 0.1;
+	double dPlatenSpeed = 0.000001;
 	if(false)
 	{// top platen material points -------------------------------------------- platen MP
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.4*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(2.0*dOffset,2.0*dOffset,0.5*d3Length_Grid.z), dOffset);
@@ -185,7 +195,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 			thisMP->b_Monitor = false;
 			thisMP->b_Surface = true;
 
-			thisMP->p_Material = pSteel;
+			thisMP->p_Material = pMeta;
 
 			thisMP->i_Body = 1;
 

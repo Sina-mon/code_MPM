@@ -46,11 +46,13 @@ class Canvas2D_CC
 		void setESORectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
 		void setLoadRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
 
-		std::vector<Voxel_ST> getVoxels(bool bState);
+		std::vector<Voxel_ST *> getVoxels(bool bState);
 
 		unsigned long int getCount_Active(bool bState);
 		unsigned long int getCount_ESO(bool bState);
 		unsigned long int getCount_Redundant(bool bState);
+
+		void filterObjective_Smooth(double dRadius);
 
 		static unsigned long int getIndex(glm::uvec2 u2Index, glm::uvec2 u2Size)
 		{

@@ -220,16 +220,16 @@ void Canvas2D_CC::setLoadRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, doubl
 	}
 }
 // --------------------------------------------------------
-std::vector<Voxel_ST> Canvas2D_CC::getVoxels(bool bState = true)
+std::vector<Voxel_ST *> Canvas2D_CC::getVoxels(bool bState = true)
 {
-	std::vector<Voxel_ST> vResult;
+	std::vector<Voxel_ST *> vResult;
 	vResult.clear();
 
 	for(unsigned int index_Voxel = 0; index_Voxel < v_Voxels.size(); index_Voxel++)
 	{
 	//std::cout << "here" << std::endl;
 		if(v_Voxels[index_Voxel]->b_Active == bState)
-			vResult.push_back(*v_Voxels[index_Voxel]);
+			vResult.push_back(v_Voxels[index_Voxel]);
 	}
 
 	return(vResult);
@@ -274,3 +274,33 @@ unsigned long int Canvas2D_CC::getCount_Redundant(bool bState = true)
 	return(iResult);
 }
 // --------------------------------------------------------
+void Canvas2D_CC::filterObjective_Smooth(double dRadius)
+{
+	std::vector<Voxel_ST *> vVoxels_Active = this->getVoxels(true);
+	unsigned long int iVoxels_Active = vVoxels_Active.size();
+	std::vector<Voxel_ST> vVoxels_Active_Clone;
+	vVoxels_Active_Clone.resize(iVoxels_Active);
+	for(unsigned long int index = 0; index < iVoxels_Active; index++)
+	{
+		vVoxels_Active_Clone[index].u_ID = vVoxels_Active[index]->u_ID;
+		vVoxels_Active_Clone[index].d2_Position = vVoxels_Active[index]->d2_Position;
+		vVoxels_Active_Clone[index].d_Objective = 0.0;
+
+		int iVoxels_Neighbour = 0;
+		for(unsigned long int index_neighbour = 0; index_neighbour < iVoxels_Active; index_neighbour++)
+		{
+			double dDistance = glm::length(vVoxels_Active[index]->d2_Position - vVoxels_Active[index_neighbour]->d2_Position);
+
+			if(dDistance < dRadius)
+			{
+				iVoxels_Neighbour++;
+				vVoxels_Active_Clone[index].d_Objective += vVoxels_Active[index_neighbour]->d_Objective;
+			}
+		}
+		vVoxels_Active_Clone[index].d_Objective /= iVoxels_Neighbour;
+	}
+	for(unsigned long int index = 0; index < iVoxels_Active; index++)
+	{
+		vVoxels_Active[index]->d_Objective = vVoxels_Active_Clone[index].d_Objective;
+	}
+}

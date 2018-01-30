@@ -7,7 +7,7 @@ void GraphicsEngine::drawGame(void)
 	glm::vec4 f4Color_Default	= _BLUE;
 	glm::vec4 f4Color_State_Mid	= _RED;
 	glm::vec4 f4Color_State_Max	= _GREEN;
-	glm::vec4 f4Color_DisplacementControl	= _WHITE;
+	glm::vec4 f4Color_DisplacementControl	= _GRAY;
 	glm::vec4 f4Color_Surface	= _GREEN;
 	glm::vec4 f4Color_ESO_False	= _GRAY;
 
@@ -88,7 +88,7 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = _BLUE;
 				fSize *= 1.0;
 			}
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
@@ -118,7 +118,7 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = _RED;
 			if(thisMP->b_Surface)
 				f4objectColor = _BLUE;
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _BLACK;
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
 
@@ -229,7 +229,7 @@ void GraphicsEngine::drawGame(void)
 			glm::vec4 f4objectColor = _BLUE;
 			if(thisMP->b_Mark_Stress)
 				f4objectColor = _BLUE;
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 			if(thisMP->b_Surface)
 				f4objectColor = _GREEN;
@@ -261,9 +261,7 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = _BLUE;
 			if(thisMP->b_Surface)
 				f4objectColor = _GREEN;
-			if(thisMP->b_DisplacementControl)
-				f4objectColor = _BLUE;
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
@@ -411,7 +409,7 @@ void GraphicsEngine::drawGame(void)
 				if(fJ2 > fJ2_Maximum)
 					f4objectColor  = _GREEN;
 			}
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
@@ -444,7 +442,7 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = (1.0f-fJ2/fJ2_Maximum) * _BLUE + fJ2/fJ2_Maximum * _GREEN;
 			if(fJ2 > fJ2_Maximum)
 				f4objectColor  = _RED;
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 
 			glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
@@ -564,14 +562,16 @@ void GraphicsEngine::drawGame(void)
 			if(thisMP->b_Monitor == false)
 				continue;
 
-			float fJ2 = CR.getState_J2(thisMP->d6_Stress);
+			float fJ2 = thisMP->d_Energy_Strain;
+
+			//float fJ2 = CR.getState_J2(thisMP->d6_Stress);
 //			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
 //			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
 
 			if(fJ2 > fJ2_Maximum)
 				fJ2_Maximum = fJ2;
 		}
-		float fJ2_Minimum = 0.05*fJ2_Maximum;
+		float fJ2_Minimum = 0.0;//0.05*fJ2_Maximum;
 //		float fJ2_Maximum = 240.0e6;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
@@ -580,13 +580,14 @@ void GraphicsEngine::drawGame(void)
 			// particle position
 			float fSize = 2.0*0.4*glm::pow(thisMP->d_Volume, 1.0/3.0);
 			// particle color
+			float fJ2 = thisMP->d_Energy_Strain;
+//			float fJ2 = CR.getState_J2(thisMP->d6_Stress);
 //			glm::vec3 f3Principal = glm::abs(CR.getPrincipal(thisMP->d6_Stress));
 //			float fJ2 = glm::max(glm::max(f3Principal.x,f3Principal.y),f3Principal.z);
-			float fJ2 = CR.getState_J2(thisMP->d6_Stress);
 
 			glm::vec4 f4objectColor = f4Color_Default;
 
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = f4Color_DisplacementControl;
 			else if(thisMP->b_Surface)
 				f4objectColor = f4Color_Surface;
@@ -632,7 +633,7 @@ void GraphicsEngine::drawGame(void)
 			if(fJ2 > fJ2_Maximum)
 				f4objectColor  = _RED;
 
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 			if(thisMP->b_Mark_Stress)
 				f4objectColor = _GRAY;
@@ -867,7 +868,7 @@ void GraphicsEngine::drawGame(void)
 			glm::vec4 f4objectColor = _BLUE;
 			if(thisMP->b_Mark_Stress)
 				f4objectColor = _BLUE;
-			if(thisMP->b_DisplacementControl)
+			if(thisMP->b3_DisplacementControl.x || thisMP->b3_DisplacementControl.y || thisMP->b3_DisplacementControl.z)
 				f4objectColor = _GRAY;
 			if(thisMP->b_Surface)
 				f4objectColor = _RED;

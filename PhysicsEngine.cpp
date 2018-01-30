@@ -47,7 +47,7 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
 	{ // displacement
-        strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,4);
+        strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,14);
 	}
 
 	{// force

@@ -23,7 +23,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	1
+#define _MAX_N_THREADS	8
 #define _MAX_N_BODIES	2
 
 class PhysicsEngine

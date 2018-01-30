@@ -153,17 +153,17 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 				}
 			}
 		}
-		std::vector<Voxel_ST> vVoxels = Canvas.getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels(true);
 		std::cout << "Canvas voxels: " << Script(Canvas.v_Voxels.size()) << " (" << Script(Canvas.u2_Size.x) << "," << Script(Canvas.u2_Size.y) << ")" << std::endl;
 		std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
 
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points
 			MaterialPoint_BC *newMP;
-			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0));
+			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0));
 
-			newMP->i_ID = vVoxels[index_Voxel].u_ID;
-			newMP->b_Surface = vVoxels[index_Voxel].b_Surface;
+			newMP->i_ID = vVoxels[index_Voxel]->u_ID;
+			newMP->b_Surface = vVoxels[index_Voxel]->b_Surface;
 			newMP->p_Material = pInconel;
 
 			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
@@ -171,7 +171,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 
 			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
+			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
 			newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 
@@ -187,15 +187,15 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 
 		Canvas.drawRectangle(glm::dvec2(d3Center_Platen_Top), glm::dvec2(d3Dimension_Platen_Top), 0.0);
 
-		std::vector<Voxel_ST> vVoxels = Canvas.getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels(true);
 
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points
 			MaterialPoint_BC *newMP;
-			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0));
+			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0));
 
-			newMP->i_ID = vVoxels[index_Voxel].u_ID;
-			newMP->b_Surface = vVoxels[index_Voxel].b_Surface;
+			newMP->i_ID = vVoxels[index_Voxel]->u_ID;
+			newMP->b_Surface = vVoxels[index_Voxel]->b_Surface;
 			newMP->p_Material = pInconel;
 
 			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
@@ -203,7 +203,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 
 			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel].d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
+			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x+dOffset, d3Length_Cell.y+dOffset, 0.5*d3Length_Grid.z);
 			newMP->d3_Velocity = glm::dvec3(0.0, -1.0, 0.0);
 			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 
@@ -211,7 +211,8 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 			// displacement control
 //			if(thisMP->d3_Position.y > d3Center_Platen_Top.y + 0.375*d3Dimension_Platen_Top.y)
 			{
-				newMP->b_DisplacementControl = true;
+//				newMP->b_DisplacementControl = true;
+				newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
 				newMP->f_DisplacementControl_Multiplier = -1.0;
 				newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
 				v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);

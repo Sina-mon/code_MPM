@@ -30,7 +30,9 @@ class MaterialPoint_BC
 
 		Material_BC *p_Material = NULL;
 
-		bool b_DisplacementControl = false;
+//		bool b_DisplacementControl = false;
+		glm::bvec3 b3_DisplacementControl = glm::bvec3(false,false,false);
+
 		float f_DisplacementControl_Multiplier = 1.0;
 		bool b_Mark_ESO = false;
 		bool b_Monitor = true;
