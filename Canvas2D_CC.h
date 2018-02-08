@@ -11,6 +11,7 @@ struct Voxel_ST
 	bool b_Active = false;
 	bool b_Surface = false;
 	bool b_Load = false;
+	bool b_Support = false;
 	bool b_ESO = false;// should/not be included for optimization
 	bool b_Redundant = false;// marked as redundant but still active
 
@@ -45,8 +46,10 @@ class Canvas2D_CC
 
 		void setESORectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
 		void setLoadRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
+		void setSupportRectangle(glm::dvec2 d2Center, glm::dvec2 d2Size, double dRotation, bool bFlag);
 
-		std::vector<Voxel_ST *> getVoxels(bool bState);
+		std::vector<Voxel_ST *> getVoxels_Active(bool bState);
+		std::vector<Voxel_ST *> getVoxels_ESO(bool bState);
 
 		unsigned long int getCount_Active(bool bState);
 		unsigned long int getCount_ESO(bool bState);

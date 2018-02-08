@@ -39,7 +39,8 @@ void GraphicsEngine::initializeSystems(void)
 
 	this->initializeShaders();
 
-	gl_Shadow_Texture	= new Texture(2048, 2048);
+//	gl_Shadow_Texture	= new Texture(2048, 2048);
+	gl_Shadow_Texture	= new Texture(128, 128);
 
 	for(int index = 0; index < (int)enum_Canvas::COUNT; index++)
 	{
@@ -47,20 +48,20 @@ void GraphicsEngine::initializeSystems(void)
 		v_Canvas_Mesh[index]	= new Mesh("./res/square.obj");
 	}
 
-	gl_Canvas_Mesh		= new Mesh("./res/square.obj");
-	gl_Canvas_Texture	= new Texture(i_ScreenWidth, i_ScreenHeight);
-
-	gl_Canvas_Mesh_Grid_Mass	= new Mesh("./res/square.obj");
-	gl_Canvas_Texture_Grid_Mass	= new Texture(i_ScreenWidth, i_ScreenHeight);
-
-	gl_Canvas_Mesh_Grid_Kernel	= new Mesh("./res/square.obj");
-	gl_Canvas_Texture_Grid_Kernel	= new Texture(i_ScreenWidth, i_ScreenHeight);
-
-	gl_Canvas_Mesh_Grid_KernelGradient	= new Mesh("./res/square.obj");
-	gl_Canvas_Texture_Grid_KernelGradient	= new Texture(i_ScreenWidth, i_ScreenHeight);
-
-	gl_Canvas_Mesh_MP_KernelGradient	= new Mesh("./res/square.obj");
-	gl_Canvas_Texture_MP_KernelGradient	= new Texture(i_ScreenWidth, i_ScreenHeight);
+//	gl_Canvas_Mesh		= new Mesh("./res/square.obj");
+//	gl_Canvas_Texture	= new Texture(i_ScreenWidth, i_ScreenHeight);
+//
+//	gl_Canvas_Mesh_Grid_Mass	= new Mesh("./res/square.obj");
+//	gl_Canvas_Texture_Grid_Mass	= new Texture(i_ScreenWidth, i_ScreenHeight);
+//
+//	gl_Canvas_Mesh_Grid_Kernel	= new Mesh("./res/square.obj");
+//	gl_Canvas_Texture_Grid_Kernel	= new Texture(i_ScreenWidth, i_ScreenHeight);
+//
+//	gl_Canvas_Mesh_Grid_KernelGradient	= new Mesh("./res/square.obj");
+//	gl_Canvas_Texture_Grid_KernelGradient	= new Texture(i_ScreenWidth, i_ScreenHeight);
+//
+//	gl_Canvas_Mesh_MP_KernelGradient	= new Mesh("./res/square.obj");
+//	gl_Canvas_Texture_MP_KernelGradient	= new Texture(i_ScreenWidth, i_ScreenHeight);
 
 //	float fScreenRatio = 1.0 / (int)enum_Canvas::COUNT;
 //	gl_Camera = new Camera(f3_Camera_Position_Original, f3_Camera_Target_Original, _PI/180.0*30.0f, fScreenRatio*(float)(i_ScreenWidth/i_ScreenHeight), 0.01f, 0.5f);
@@ -69,8 +70,7 @@ void GraphicsEngine::initializeSystems(void)
 	gl_Light = new Light(glm::vec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,-0.025));
 	gl_Light->f4_Color = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
-//	gl_Texture_01 = new Texture("./res/bricks.jpg");
-	gl_Diffuse_Texture = new Texture("./res/Sand_01.jpg");
+	gl_Diffuse_Texture = new Texture("./res/blank.jpg");
 	gl_Particle_Mesh = new Mesh("./res/sphere.obj");
 }
 // ----------------------------------------------------------------------------

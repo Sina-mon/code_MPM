@@ -60,15 +60,21 @@ class Texture
 			glBindRenderbuffer(GL_RENDERBUFFER, gl_DepthBuffer);
 			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, i_Width, i_Height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, gl_DepthBuffer);
-
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gl_Texture, 0);//bind texture to frame buffer
-
-			glDrawBuffer(GL_COLOR_ATTACHMENT0);
 			//check for errors
 			if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			{
-				std::cout << "TextureCC::TextureCC, error: problem with creating frame buffer." << std::endl;
+				std::cout << "Texture::Texture, error: problem with glFramebufferRenderbuffer." << std::endl;
 			}
+
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gl_Texture, 0);//bind texture to frame buffer
+			//check for errors
+			if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+			{
+				std::cout << "Texture::Texture, error: problem with glFramebufferTexture2D." << std::endl;
+			}
+
+			glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
 			//set screen as default rendering target
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 			glViewport(0, 0, iScreenWidth, iScreenHeight);

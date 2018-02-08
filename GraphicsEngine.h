@@ -60,16 +60,13 @@ class GraphicsEngine
 		GLSLProgram gl_ShadowProgram;
 		GLSLProgram gl_FinalProgram;
 
-//		Texture *gl_Texture_01;
-		Texture *gl_Diffuse_Texture;
+		Texture *gl_Diffuse_Texture = NULL;
+		Texture	*gl_Shadow_Texture  = NULL;
 
-		Camera *gl_Camera;
+		Camera *gl_Camera = NULL;
+		Light *gl_Light = NULL;
+		Mesh *gl_Particle_Mesh = NULL;
 
-		Light *gl_Light;
-
-		Mesh *gl_Particle_Mesh;
-
-		Texture	*gl_Shadow_Texture;
 
 		enum class enum_Canvas : int {
 			MAIN = 0,
@@ -86,27 +83,9 @@ class GraphicsEngine
 		Texture	*v_Canvas_Texture[(int)enum_Canvas::COUNT];
 		Mesh	*v_Canvas_Mesh[(int)enum_Canvas::COUNT];
 
-		// canvas for every drawable item
-		Texture	*gl_Canvas_Texture;
-		Mesh	*gl_Canvas_Mesh;
-		// canvas for MPM grid-mass data
-		Texture	*gl_Canvas_Texture_Grid_Mass;
-		Mesh	*gl_Canvas_Mesh_Grid_Mass;
-		// canvas for MPM grid-kernel data
-		Texture	*gl_Canvas_Texture_Grid_Kernel;
-		Mesh	*gl_Canvas_Mesh_Grid_Kernel;
-		// canvas for MPM grid-kernelGradient data
-		Texture	*gl_Canvas_Texture_Grid_KernelGradient;
-		Mesh	*gl_Canvas_Mesh_Grid_KernelGradient;
-		// canvas for MPM materialPoint-kernelGradient data
-		Texture	*gl_Canvas_Texture_MP_KernelGradient;
-		Mesh	*gl_Canvas_Mesh_MP_KernelGradient;
-
 		float f_Time = 0.0;
 
 		PhysicsEngine *mpm_PhysicsEngine;
-//		unsigned int n_Particles = 0;
-//		std::vector<DEM_Particle *> v_DEMParticles;
 
 		void initializeShaders(void);
 		void gameLoop(bool bExit);

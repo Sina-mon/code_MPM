@@ -153,7 +153,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 				}
 			}
 		}
-		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels_Active(true);
 		std::cout << "Canvas voxels: " << Script(Canvas.v_Voxels.size()) << " (" << Script(Canvas.u2_Size.x) << "," << Script(Canvas.u2_Size.y) << ")" << std::endl;
 		std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
 
@@ -187,7 +187,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand_Hexagonal(void)
 
 		Canvas.drawRectangle(glm::dvec2(d3Center_Platen_Top), glm::dvec2(d3Dimension_Platen_Top), 0.0);
 
-		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels_Active(true);
 
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points

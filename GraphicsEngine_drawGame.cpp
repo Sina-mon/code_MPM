@@ -571,7 +571,7 @@ void GraphicsEngine::drawGame(void)
 			if(fJ2 > fJ2_Maximum)
 				fJ2_Maximum = fJ2;
 		}
-		float fJ2_Minimum = 0.0;//0.05*fJ2_Maximum;
+		float fJ2_Minimum = 0.*fJ2_Maximum;
 //		float fJ2_Maximum = 240.0e6;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
@@ -593,8 +593,10 @@ void GraphicsEngine::drawGame(void)
 				f4objectColor = f4Color_Surface;
 			else if(thisMP->b_Monitor == true)
 			{
+				//float fScale = fJ2/fJ2_Maximum;
+				float fScale = (fJ2-fJ2_Minimum)/(fJ2_Maximum-fJ2_Minimum);
 				if(fJ2 > fJ2_Minimum)
-					f4objectColor = (1.0f-fJ2/fJ2_Maximum) * f4Color_Default + fJ2/fJ2_Maximum * f4Color_State_Mid;
+					f4objectColor = (1.0f-fScale) * f4Color_Default + fScale * f4Color_State_Mid;
 				if(fJ2 > fJ2_Maximum)
 					f4objectColor  = f4Color_State_Max;
 			}
@@ -1152,7 +1154,8 @@ void GraphicsEngine::drawGame(void)
 			glm::vec2 f2PositionRatio = glm::vec2((float)(int)enum_Canvas::MAIN/(int)enum_Canvas::COUNT,0.0);
 			glViewport(f2PositionRatio.x*i_ScreenWidth, f2PositionRatio.y*i_ScreenHeight, f2ScreenRatio.x*i_ScreenWidth, f2ScreenRatio.y*i_ScreenHeight);
 			//draw
-			gl_Canvas_Mesh->Draw();
+//			gl_Canvas_Mesh->Draw();
+			v_Canvas_Mesh[(int)enum_Canvas::MAIN]->Draw();
 		}
 		if((int)enum_Canvas::SOLID < (int)enum_Canvas::COUNT)
 		{

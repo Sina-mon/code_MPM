@@ -23,7 +23,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	8
+#define _MAX_N_THREADS	1
 #define _MAX_N_BODIES	2
 
 class PhysicsEngine
@@ -32,7 +32,7 @@ class PhysicsEngine
 		PhysicsEngine() {;}
 		virtual ~PhysicsEngine();
 
-		void	initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas);
+		void	initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::string sFileName_Log = "", std::string sFileName_Snapshot = "", std::string sDescription = "");
 
 		void 	initializeWorld_Classic_Ring_Fan(void);
 		void	initializeWorld_Classic_Cellular_Langrand(void);

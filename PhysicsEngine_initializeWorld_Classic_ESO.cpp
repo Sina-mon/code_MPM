@@ -1,7 +1,7 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
+void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::string sFileName_Log, std::string sFileName_Snapshot, std::string sDescription)
 {
 	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory					GP_Factory;
@@ -47,7 +47,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		if(fabs(dx - 0.0) < 1.5*d3Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
-			thisGridPoint->b3_Fixed.y = true;
+			//thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dx - d3Length_Grid.x) < dTolerance)
 		{
@@ -76,9 +76,9 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		}
 	}
 
-	// multi-body implementation
+
 	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-	{
+	{// multi-body implementation
 		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
 	}
 
@@ -96,34 +96,26 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		pMeta->i_ID = 0;
 		pMeta->i_MaterialType = __ELASTIC;
 
-		pMeta->d_Density = 2000.0;
+		pMeta->d_Density = 5000.0;
 
 		pMeta->d_ElasticModulus = 100.0e9;
 		pMeta->d_PoissonRatio = 0.3;
-
-		pMeta->d_YieldStress = 350.0e6;
-		pMeta->d_Hardening_Isotropic_C0 = 15.0;
-		pMeta->d_Hardening_Isotropic_C1 = 350.0e6;
 	}
-	Material_BC *pMeta_Reduced = new Material_BC;
-	v_allMaterial.push_back(pMeta_Reduced);
+	Material_BC *pAluminum = new Material_BC;
+	v_allMaterial.push_back(pAluminum);
 	{
-		pMeta_Reduced->i_ID = 0;
-		pMeta_Reduced->i_MaterialType = __ELASTIC;
+		pAluminum->i_ID = 0;
+		pAluminum->i_MaterialType = __ELASTIC;
 
-		pMeta_Reduced->d_Density = 2000.0;
+		pAluminum->d_Density = 2760.0;
 
-		pMeta_Reduced->d_ElasticModulus = 1.0e-3*100.0e9;
-		pMeta_Reduced->d_PoissonRatio = 0.3;
-
-		pMeta_Reduced->d_YieldStress = 350.0e6;
-		pMeta_Reduced->d_Hardening_Isotropic_C0 = 15.0;
-		pMeta_Reduced->d_Hardening_Isotropic_C1 = 350.0e6;
+		pAluminum->d_ElasticModulus = 70.0e9;
+		pAluminum->d_PoissonRatio = 0.3;
 	}
 
 	if(true)
 	{// sample based on canvas
-		std::vector<Voxel_ST *> vVoxels = pCanvas->getVoxels(true);
+		std::vector<Voxel_ST *> vVoxels = pCanvas->getVoxels_Active(true);
 
 		glm::dvec4 d4Position_Load = glm::dvec4(0.8*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z, 0.0005);
 		double dThickness = 0.0;//1.0*dOffset;
@@ -135,7 +127,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 				newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0));
 
 				newMP->i_ID = vVoxels[index_Voxel]->u_ID;
-				newMP->p_Material = pMeta;
+				newMP->p_Material = pAluminum;
 
 				newMP->d_Volume_Initial = dOffset*dOffset*dOffset * vVoxels[index_Voxel]->d_ESO_Opacity;
 				newMP->d_Volume = newMP->d_Volume_Initial;
@@ -145,24 +137,28 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + dLayer_Offset);
 				newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 
-//				double dDistance = glm::length(glm::dvec2(newMP->d3_Position)-glm::dvec2(d4Position_Load));
-//				glm::dvec2 d2Distance = glm::abs(glm::dvec2(newMP->d3_Position)-glm::dvec2(d4Position_Load));
-//				if(dDistance < d4Position_Load.w)
-//				if(d2Distance.x < d4Position_Load.w && d2Distance.y < d4Position_Load.w)
 				if(vVoxels[index_Voxel]->b_Load == true)
 				{
-					//newMP->b_DisplacementControl = true;
-					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
-					newMP->f_DisplacementControl_Multiplier = -1.0;
-					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
-					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
-					v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
+//					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
+//					newMP->f_DisplacementControl_Multiplier = -1.0;
+//					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+//					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
+//					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
+//					v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
 
-//					newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -10.0, 0.0);
+					newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -10.0, 0.0);
 //					newMP->b_Mark_ESO = false;
 //					newMP->b_Monitor = false;
 //					newMP->b_Surface = true;
+				}
+				else if(vVoxels[index_Voxel]->b_Support == true)
+				{
+					//newMP->b_DisplacementControl = true;
+					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
+					newMP->f_DisplacementControl_Multiplier = 0.0;
+					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
+					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
 				}
 				else
 					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
@@ -183,7 +179,9 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		}
 	}
 
-	double dPlatenSpeed = 0.000001;
+	double dDisplacement_Max = 1.0e-9;
+	double dTime_Loading = 1.0e-4;
+	double dPlatenSpeed = 1.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
 	if(false)
 	{// top platen material points -------------------------------------------- platen MP
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.4*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(2.0*dOffset,2.0*dOffset,0.5*d3Length_Grid.z), dOffset);
@@ -224,15 +222,15 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
-	d_TimeEnd = 2.0e-4;
-	d_TimeConsole_Interval = 1e-5;
+	d_TimeIncrement_Maximum = 1.0/1.0*5.0e-8;
+	d_TimeEnd = 5.0*dTime_Loading;
+	d_TimeConsole_Interval = 5e-5;
 
 	// timeline events -------------------------------------------------------
 //	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(1.0e-4,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(1.0e-4+1.0e-24,			glm::dvec3(0.0, 0.0, 0.0));
+	m_TimeLine.addTimePoint(dTime_Loading,			glm::dvec3(0.0, +dPlatenSpeed, 0.0));
+	m_TimeLine.addTimePoint(dTime_Loading+1.0e-24,	glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, 0.0, 0.0));
 //	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 
@@ -245,7 +243,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 	a_Runtime.fill(0.0);
 	d_DampingCoefficient = 0.1;
 
-	std::string sDescription = "";
+//	std::string sDescription = "";
 	{
 		time_t rawtime;
 		struct tm * timeinfo;
@@ -268,13 +266,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3Cells.x) + "," + Script(i3Cells.y) + "," + Script(i3Cells.z) + ")" + "(" + Script(d3Length_Cell.x,3) + ")\n";
 		sDescription += "dOffset: " + Script(dOffset,4) + "\n";
-//		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
-//		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
-//		sDescription += "Division (Longitudinal): " + Script(iDivision_Longitudinal) + " (offset: " + Script(dLength_Ring/iDivision_Longitudinal,4) + ")" + "\n";
-//		sDescription += "Tube average_diameter: " + Script(dDiameter_Average,3) + "\n";
-//		sDescription += "Tube thickness: " + Script(dThickness_Ring,3) + "\n";
-//		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
-		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
+		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(0.0).y, 3) + " m/s" + "\n";
 //		sDescription += "Yield: " + Script(pInconel->d_YieldStress, 3) + " N/m^2" + "\n";
 //		sDescription += "Modulus: " + Script(pInconel->d_ElasticModulus, 3) + " N/m^2" + "\n";
 //		sDescription += "Hardening0: " + Script(pInconel->d_Hardening_Isotropic_C0, 3) + "\n";
@@ -285,8 +277,10 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 //		sDescription += "Elastic-Perfectly plastic\n";
 	}
 
+	if(sFileName_Log.empty())
 	{// save to file
 		d_TimeConsole_Last = 0.0;
+
 		time_t rawtime;
 		struct tm * timeinfo;
 		char buffer[80];
@@ -299,6 +293,14 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas)
 
 		str_Log_FileName = _STR_LOGFILE + strTime + ".txt";
 		str_Snapshot_FileName = _STR_SNAPFILE + strTime + "_";
+		this->reportConsole(sDescription);
+	}
+	else
+	{
+		d_TimeConsole_Last = 0.0;
+
+		str_Log_FileName = _STR_LOGFILE + sFileName_Log + ".txt";
+		str_Snapshot_FileName = _STR_SNAPFILE + sFileName_Snapshot + "_";
 		this->reportConsole(sDescription);
 	}
 }

@@ -14,7 +14,7 @@ void GraphicsEngine::gameLoop(bool bExit)
 		if(f_Time - f_TimeSnapshot_LastSave > f_TimeSnapshot_Interval)
 		{
 			drawGame();
-			drawGame();
+//			drawGame();
 
 			f_TimeSnapshot_LastSave = f_Time;
 //			std::string strFileName = _STR_SNAPFILE;
