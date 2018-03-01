@@ -49,16 +49,18 @@ double	getObjective(std::vector<MaterialPoint_BC *> vMP)
 
 int main (int argc, char ** argv)
 {
-/*	single simulation
+	//single simulation
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
-	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand_Hexagonal();
+	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
+
+//	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand();
 	// graphics engine initialization -----------------------------------------
 	GraphicsEngine theGraphicsEngine;
 	// run simulation
-	theGraphicsEngine.runVisualization(&thePhysicsEngine);
-*/
+	theGraphicsEngine.runVisualization(&thePhysicsEngine, false);
 
+/*
 	// Create canvas, cantilever problem
 //	double dOffset = 0.0010;
 //	glm::dvec2 d2Size = glm::dvec2(0.100,0.100);
@@ -72,8 +74,8 @@ int main (int argc, char ** argv)
 //	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+0.0*dOffset,0.5*d2Size.y), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, true);
 
 	// Create canvas, beam problem
-	double dOffset = 0.001;
-	double dOpacity_Min = 1.0e-3;
+	double dOffset = 0.0005;
+	double dOpacity_Min = 1.0e-6;
 	double dOpacity_Max = 1.0;
 	glm::dvec2 d2Size = glm::dvec2(0.150,0.050);
 	Canvas2D_CC Canvas2D(d2Size, dOffset);
@@ -94,10 +96,10 @@ int main (int argc, char ** argv)
 	std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
 
 	for(unsigned int index = 0; index < vVoxels.size(); index++)
-	{
-		double dToopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.7*0.040;
+	{// start from lower portion
+		double dTopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.4*0.040;
 
-		if(vVoxels[index]->d2_Position.y > dToopEdge)
+		if(vVoxels[index]->d2_Position.y > dTopEdge)
 		{
 			vVoxels[index]->d_ESO_Opacity = dOpacity_Min;
 		}
@@ -106,8 +108,8 @@ int main (int argc, char ** argv)
 	}
 
 	// ESO iterations
-	double dRatio_Rejection = 0.7;
-	double dRatio_Rejection_Increment = 0.0;
+	double dRatio_Rejection = 0.4;
+	double dRatio_Rejection_Increment = 0.1;
 	double dRatio_Rejection_Volume_Upper = 0.1;
 	double dRatio_Rejection_Volume_Lower = 0.0;
 	double dRatio_Inclusion = 1.0 - dRatio_Rejection;
@@ -246,7 +248,7 @@ int main (int argc, char ** argv)
 //			iCounter_Restored++;
 		}
 //		std::cout << "iCounter_Restored: " << iCounter_Restored << std::endl;
-		if(iCounter_Removed < 2 || iIteration_Local == 200)
+		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 200)
 //		if(iCounter_Removed < 2)
 		{
 			dRatio_Rejection += dRatio_Rejection_Increment;
@@ -257,7 +259,7 @@ int main (int argc, char ** argv)
 
 		//iActiveMPs = Canvas2D.getVoxels(true).size();
 	}
-
+*/
 	std::cout << "Execution finished, have a nice day!" << std::endl;
 
 	return(0);

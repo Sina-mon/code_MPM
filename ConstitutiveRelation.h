@@ -53,7 +53,9 @@ class ConstitutiveRelation
 		void calculateState_I3(double d6State[6]);
 		void calculateState_J2(double d6State[6]);
 		void calculateState_J3(double d6State[6]);
-//		void calculatePrincipal(double d6State[6]);
+
+		glm::dmat3 getExp(glm::dmat3 d33A);// https://en.wikipedia.org/wiki/Matrix_exponential
+		glm::dmat3 getLog(glm::dmat3 d33A);// https://en.wikipedia.org/wiki/Logarithm_of_a_matrix
 	protected:
 
 	private:

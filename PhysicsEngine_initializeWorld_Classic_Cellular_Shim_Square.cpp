@@ -1,32 +1,51 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
+void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 {
 	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.040, 0.030, 0.001/10.0);
-//	glm::ivec3 i3_Cells = glm::ivec3(10.0*40, 10.0*30, 1);
-	glm::dvec3 d3Length_Grid = glm::dvec3(0.030, 0.030, 0.001/10.0);
-	glm::ivec3 i3Cells = glm::ivec3(10.0*30, 10.0*30, 1);
-	glm::dvec3 d3Length_Cell = d3Length_Grid / glm::dvec3(i3Cells);
-	glm::ivec3 i3Nodes = i3Cells + glm::ivec3(1, 1, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.028, 0.050, 0.002/2.0);// for 2x2
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*28, 2.0*50, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.02675, 0.050, 0.002/4.0);// for 2x2
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*26.75, 4.0*50, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.026, 0.050, 0.002/8.0);// for 2x2
+//	glm::ivec3 i3_Cells = glm::ivec3(8.0*26.0, 8.0*50, 2);
+
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0545, 0.100, 0.002/2.0);// for 4x4
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*54.5, 2.0*100, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0525, 0.100, 0.002/4.0);// for 4x4
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*52.5, 4.0*100, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.05175, 0.100, 0.002/8.0);// for 4x4
+//	glm::ivec3 i3_Cells = glm::ivec3(8.0*51.75, 8.0*100, 2);
+
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1335, 0.150, 0.002/2.0);// for 10x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*133.5, 2.0*150, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1390, 0.150, 0.002/2.0);// for 10x10 with 2-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*139.0, 2.0*150, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.13025, 0.150, 0.001/4.0);// for 10x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*130.25, 4.0*150, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1330, 0.150, 0.001/4.0);// for 10x10 with 2-cell gap
+	glm::ivec3 i3_Cells = glm::ivec3(4.0*133.0, 4.0*150, 1);
+
+	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
+	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
 
 	for(int indexThread = 0; indexThread < _MAX_N_THREADS; indexThread++)
 	{// initialize GP mediator
 
-		d3_Length_World = d3Length_Grid;
+		d3_Length_World = d3_Length_Grid;
 
-		mpm_GP_Mediator_Thread[indexThread].d3_Length_Grid = d3Length_Grid;
-		mpm_GP_Mediator_Thread[indexThread].d3_Length_Cell = d3Length_Cell;
-		mpm_GP_Mediator_Thread[indexThread].i3_Cells = i3Cells;
-		mpm_GP_Mediator_Thread[indexThread].i3_Node_Count = i3Nodes;
+		mpm_GP_Mediator_Thread[indexThread].d3_Length_Grid = d3_Length_Grid;
+		mpm_GP_Mediator_Thread[indexThread].d3_Length_Cell = d3_Length_Cell;
+		mpm_GP_Mediator_Thread[indexThread].i3_Cells = i3_Cells;
+		mpm_GP_Mediator_Thread[indexThread].i3_Node_Count = i3_Nodes;
 
 		//allGridPoint_Thread[iThread] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
-	allGridPoint = GP_Factory.createGrid(d3Length_Grid, i3Cells);
+	allGridPoint = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 
 	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
 	{// grid point boundary conditions
@@ -35,36 +54,39 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		double dx = thisGridPoint->d3_Position[0];
 		double dy = thisGridPoint->d3_Position[1];
 		double dz = thisGridPoint->d3_Position[2];
-		double dTolerance = 0.1*d3Length_Cell.x;
+		double dTolerance = 0.1*d3_Length_Cell.x;
 
 		//fixed grid points
 		thisGridPoint->b3_Fixed = glm::bvec3(false, false, false);
 
-		if(fabs(dx - 0.0) < 1.5*d3Length_Cell.x)
+		if(fabs(dx - 0.0) < 1.5*d3_Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.y = true;
 		}
-		if(fabs(dx - d3Length_Grid.x) < dTolerance)
+		if(fabs(dx - d3_Length_Grid.x) < 1.5*d3_Length_Cell.x)
 		{
+			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.y = true;
 		}
-		if(fabs(dy - 0.0) < 1.5*d3Length_Cell.y)
+		if(fabs(dy - 0.0) < 1.5*d3_Length_Cell.y)
 		{
 			thisGridPoint->b3_Fixed.y = true;
 //			thisGridPoint->b3_Fixed.z = true;
 //			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
 		}
-		if(fabs(dy - d3Length_Grid.y) < dTolerance)
+		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
 		{
 		}
-		if(fabs(dz - 0.0) < 0.5*d3Length_Cell.z)
-		{
-			thisGridPoint->b3_Fixed.z = true;
-		}
-		if(fabs(dz - 0.0) < 2.0*d3Length_Grid.z)
+		if(fabs(dz - 0.0) < 0.5*d3_Length_Cell.z)
 		{
 			thisGridPoint->b3_Fixed.z = true;
 		}
-		if(fabs(dz - d3Length_Grid.z) < dTolerance)
+		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
+		{
+			thisGridPoint->b3_Fixed.z = true;
+		}
+		if(fabs(dz - d3_Length_Grid.z) < dTolerance)
 		{
 //			thisGridPoint->b3_Fixed.z = true;
 		}
@@ -73,7 +95,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 	// multi-body implementation
 	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
 	{
-		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
+		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
 	}
 	// locks on grid points for atomic operations
 	v_GridPoint_Lock.resize(allGridPoint.size());
@@ -111,35 +133,52 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		pSteel->d_ElasticModulus = 10.0*210.0e9;
 		pSteel->d_PoissonRatio = 0.3;
 	}
+	Material_BC *pAluminum = new Material_BC;
+	v_allMaterial.push_back(pAluminum);
+	{
+		pAluminum->i_ID = 0;
+		pAluminum->i_MaterialType = __VONMISESHARDENING;
+//		pAluminum->i_MaterialType = __PLASTIC;
 
+		pAluminum->d_Density = 2700.0;
 
-	double dThickness_Ring = 0.0005;
-	double dDiameter_Outer = 0.005;
+		pAluminum->d_ElasticModulus = 70.0e9;
+		pAluminum->d_PoissonRatio = 0.3;
+
+		pAluminum->d_YieldStress = 100.0e6;
+		pAluminum->d_Hardening_Isotropic_C0 = 15.0;
+		pAluminum->d_Hardening_Isotropic_C1 = 20.0e6;
+	}
+
+	double dThickness_Ring = 0.00071;
+	double dDiameter_Outer = 0.01269;
 
 	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 
 	double dDiameter_Average = 0.5*(dDiameter_Outer + dDiameter_Inner);
 
-	glm::ivec2 i2Array_Count = glm::ivec2(4,4);// ------------------------------------------------------------------
-	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+.0*d3Length_Cell.x, dDiameter_Outer+.0*d3Length_Cell.y);
+	glm::ivec2 i2Array_Count = glm::ivec2(10,10);// ------------------------------------------------------------------
+	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+2.0*d3_Length_Cell.x, dDiameter_Outer+2.0*d3_Length_Cell.y);
 
 	double dPlatenSpeed = +1.0*i2Array_Count.y;
-	double dOffset = dThickness_Ring/16.0;
+	double dOffset = dThickness_Ring/8.0;
 
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
 	double dLength_Ring = dOffset;
-	if(dLength_Ring > d3Length_Cell.z)
-		dLength_Ring = d3Length_Cell.z;
+	if(dLength_Ring > d3_Length_Cell.z)
+		dLength_Ring = d3_Length_Cell.z;
 
-	glm::dvec2 d2Dimension_Platen_Top		= glm::dvec2(i2Array_Count.x*dDiameter_Outer,2.0*d3Length_Cell.y);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.95*d3_Length_Grid.x,2.0*d3_Length_Cell.y,dOffset);
 
-	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*dDiameter_Outer + 1.0*d3Length_Cell.x-0.0*dOffset, 0.5*dDiameter_Outer+1.0*d3Length_Cell.y-0.0*dOffset);
-	glm::dvec2 d2Center_Platen_Top		= glm::dvec2(2.0*d3Length_Cell.x+0.5*d2Dimension_Platen_Top.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d2Dimension_Platen_Top.y+1.0*d3Length_Cell.y);
+//	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer + 1.0*d3_Length_Cell.x-0.0*dOffset, 0.5*dDiameter_Outer+1.0*d3_Length_Cell.y-0.0*dOffset,0.5*d3_Length_Grid.z);
+//	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(2.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
+	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*d3_Length_Grid.x - 0.5*i2Array_Count.x*d2Array_Offset.x + 0.5*d2Array_Offset.x, 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y);
+	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3_Length_Grid.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
 
 	if(true)
 	{// sample
-		Canvas2D_CC Canvas(glm::dvec2(d3Length_Grid.x, d3Length_Grid.y), dOffset);
+		Canvas2D_CC Canvas(glm::dvec2(d3_Length_Grid.x, d3_Length_Grid.y), dOffset);
 		for(int ix = 0; ix < i2Array_Count.x; ix++)
 		{// sample array
 			for(int iy = 0; iy < i2Array_Count.y; iy++)
@@ -147,13 +186,15 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 				glm::dvec2 d2Center_Ring = d2Center_Array + glm::dvec2(ix*d2Array_Offset.x,iy*d2Array_Offset.y);
 
 				Canvas.drawRing(d2Center_Ring, dRadius_Outer, dRadius_Inner);
+				/*
 				{// braze
 					for(float fAngle = 0.0; fAngle < 2.0*_PI; fAngle += 0.5*_PI)
 					{
-						glm::dvec2 d2Center_Braze = d2Center_Ring + glm::dvec2(0.5*dDiameter_Average*glm::cos(fAngle), 0.5*dDiameter_Average*glm::sin(fAngle));
-						Canvas.drawRectangle(d2Center_Braze, glm::dvec2(0.0015,dThickness_Ring), fAngle+0.5*_PI);
+						glm::dvec3 d3Center_Braze = d3Center_Ring + glm::dvec3(0.5*dDiameter_Average*glm::cos(fAngle), 0.5*dDiameter_Average*glm::sin(fAngle), 0.0);
+						Canvas.drawRectangle(d3Center_Braze, glm::dvec3(0.0015,dThickness_Ring,d3_Length_Cell.z), glm::dvec3(0.0,0.0,fAngle+0.5*_PI));
 					}
 				}
+				*/
 			}
 		}
 		std::vector<Voxel_ST *> vVoxels = Canvas.getVoxels_Active(true);
@@ -163,18 +204,17 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points
 			MaterialPoint_BC *newMP;
-			newMP = MP_Factory.createMaterialPoint(glm::dvec3(0.0,0.0,0.0));
+			newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position, 0.0));
 
 			newMP->i_ID = vVoxels[index_Voxel]->u_ID;
-			newMP->p_Material = pInconel;
+			newMP->p_Material = pAluminum;
 
 			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
 			newMP->d_Volume = newMP->d_Volume_Initial;
 
 			newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-			glm::dvec3 d3Shift = glm::dvec3(0.0,0.0,0.5*d3Length_Grid.z);
-			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position, 0.0) + d3Shift;
+			newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position, 0.0) + glm::dvec3(0.0,0.0, 0.5*d3_Length_Grid.z);
 			newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 			newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, 0.0, 0.0);
 
@@ -186,7 +226,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 
 	if(true)
 	{// top platen material points -------------------------------------------- platen MP
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(d2Center_Platen_Top, 0.5*d3Length_Grid.z), glm::dvec3(d2Dimension_Platen_Top, dLength_Ring), dOffset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(d3Center_Platen_Top, d3Dimension_Platen_Top, dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -220,10 +260,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/10.0*5.0e-8;
-	d_TimeEnd = 0.5*d2Center_Platen_Top.y / glm::abs(dPlatenSpeed);
-//	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
-	d_TimeConsole_Interval = 0.1e-4 / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 1.0/4.0*5.0e-8;
+	d_TimeEnd = 0.4*d3Center_Platen_Top.y / glm::abs(dPlatenSpeed);
+	d_TimeConsole_Interval = 0.01*d_TimeEnd;
+	d_TimeSnapshot_Interval = d_TimeConsole_Interval;
 
 	// timeline events -------------------------------------------------------
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
@@ -254,7 +294,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		std::string strTime(buffer);
 
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "Classic formulation, Cellular, Langrand (2017) --------------\n";
+		sDescription += "Classic formulation, Cellular, Shim (1986) --------------\n";
 		sDescription += "Process started on: " + strTime + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
@@ -262,7 +302,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		sDescription += "Material Point count: " + Script(allMaterialPoint.size()) + "\n";
 		sDescription += "Mass: " + Script(dMass_Domain,6) + "\n";
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "Grid Resolution: (" + Script(i3Cells.x) + "," + Script(i3Cells.y) + "," + Script(i3Cells.z) + ")" + "(" + Script(d3Length_Cell.x,3) + ")\n";
+		sDescription += "Grid Resolution: (" + Script(i3_Cells.x) + "," + Script(i3_Cells.y) + "," + Script(i3_Cells.z) + ")" + "(" + Script(d3_Length_Cell.x,3) + ")\n";
 		sDescription += "dOffset: " + Script(dOffset,4) + "\n";
 //		sDescription += "Division (Angular): " + Script(iDivision_Angular) + " (offset: " + Script(_PI*dDiameter_Average/iDivision_Angular,4) + ")" + "\n";
 //		sDescription += "Division (Radial): " + Script(iDivision_Radial) + " (offset: " + Script(dThickness_Ring/iDivision_Radial,4) + ")" + "\n";
@@ -271,10 +311,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		sDescription += "Tube thickness: " + Script(dThickness_Ring,3) + "\n";
 		sDescription += "Tube length: " + Script(dLength_Ring,3) + "\n";
 		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(1.0e-4).y, 3) + " m/s" + "\n";
-		sDescription += "Yield: " + Script(pInconel->d_YieldStress, 3) + " N/m^2" + "\n";
-		sDescription += "Modulus: " + Script(pInconel->d_ElasticModulus, 3) + " N/m^2" + "\n";
-		sDescription += "Hardening0: " + Script(pInconel->d_Hardening_Isotropic_C0, 3) + "\n";
-		sDescription += "Hardening1: " + Script(pInconel->d_Hardening_Isotropic_C1, 3) + "\n";
+		sDescription += "Yield: " + Script(pAluminum->d_YieldStress, 3) + " N/m^2" + "\n";
+		sDescription += "Modulus: " + Script(pAluminum->d_ElasticModulus, 3) + " N/m^2" + "\n";
+		sDescription += "Hardening0: " + Script(pAluminum->d_Hardening_Isotropic_C0, 3) + "\n";
+		sDescription += "Hardening1: " + Script(pAluminum->d_Hardening_Isotropic_C1, 3) + "\n";
 
 		sDescription += "Global Damping: " + Script(d_DampingCoefficient, 3) + "\n";
 		sDescription += "Non-slip contact\n";
@@ -283,6 +323,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 
 	{// save to file
 		d_TimeConsole_Last = 0.0;
+
 		time_t rawtime;
 		struct tm * timeinfo;
 		char buffer[80];

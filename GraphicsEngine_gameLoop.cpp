@@ -51,7 +51,7 @@ void GraphicsEngine::gameLoop(bool bExit)
 			e_GameState = GameState::EXIT;
 		}
 
-		processInput();
+		//processInput();
 		this->f_Time = mpm_PhysicsEngine->getTime_Current();
 	}
 }

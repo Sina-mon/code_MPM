@@ -76,7 +76,6 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-
 	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
 	{// multi-body implementation
 		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
@@ -112,6 +111,17 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		pAluminum->d_ElasticModulus = 70.0e9;
 		pAluminum->d_PoissonRatio = 0.3;
 	}
+	Material_BC *pAluminum_Degraded = new Material_BC;
+	v_allMaterial.push_back(pAluminum_Degraded);
+	{
+		pAluminum_Degraded->i_ID = 0;
+		pAluminum_Degraded->i_MaterialType = __ELASTIC;
+
+		pAluminum_Degraded->d_Density = 2760.0;
+
+		pAluminum_Degraded->d_ElasticModulus = 70.0e9;
+		pAluminum_Degraded->d_PoissonRatio = 0.3;
+	}
 
 	if(true)
 	{// sample based on canvas
@@ -137,16 +147,18 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + dLayer_Offset);
 				newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 
+				v_MarkedMaterialPoints_Monitor_Energy.push_back(newMP);
+
 				if(vVoxels[index_Voxel]->b_Load == true)
 				{
-//					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
-//					newMP->f_DisplacementControl_Multiplier = -1.0;
-//					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
-//					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
-//					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
-//					v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
+					newMP->b3_DisplacementControl = glm::bvec3(false,true,false);
+					newMP->f_DisplacementControl_Multiplier = -1.0;
+					newMP->d3_Velocity = glm::dvec3(0.0,0.0,0.0);
+					newMP->d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
+					v_MarkedMaterialPoints_Displacement_Control.push_back(newMP);
+					v_MarkedMaterialPoints_Displacement_Monitor.push_back(newMP);
 
-					newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -10.0, 0.0);
+//					newMP->d3_Force_External = newMP->d_Mass * glm::dvec3(0.0, -1.0e3, 0.0);
 //					newMP->b_Mark_ESO = false;
 //					newMP->b_Monitor = false;
 //					newMP->b_Surface = true;
@@ -222,7 +234,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/1.0*5.0e-8;
+	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
 	d_TimeEnd = 5.0*dTime_Loading;
 	d_TimeConsole_Interval = 5e-5;
 

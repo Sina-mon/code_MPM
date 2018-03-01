@@ -62,6 +62,8 @@ class MaterialPoint_BC
 		glm::dvec3 d3_Force_External = glm::dvec3(0.0, 0.0, 0.0);
 
 		glm::dmat3 d33_DeformationGradient = glm::dmat3(1.0);
+		glm::dmat3 d33_DeformationGradient_Elastic = glm::dmat3(1.0);
+		glm::dmat3 d33_DeformationGradient_Plastic = glm::dmat3(1.0);
 
 		double d6_Strain[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Stress[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};

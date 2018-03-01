@@ -23,7 +23,7 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	1
+#define _MAX_N_THREADS	8
 #define _MAX_N_BODIES	2
 
 class PhysicsEngine
@@ -32,12 +32,18 @@ class PhysicsEngine
 		PhysicsEngine() {;}
 		virtual ~PhysicsEngine();
 
-		void	initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::string sFileName_Log = "", std::string sFileName_Snapshot = "", std::string sDescription = "");
+		void initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::string sFileName_Log = "", std::string sFileName_Snapshot = "", std::string sDescription = "");
 
-		void 	initializeWorld_Classic_Ring_Fan(void);
-		void	initializeWorld_Classic_Cellular_Langrand(void);
-		void	initializeWorld_Classic_Cellular_Langrand_Hexagonal(void);
-		void	initializeWorld_Classic_Foam(void);
+		void initializeWorld_Classic_Bar(void);
+		void initializeWorld_Classic_HalfRing_Xiang_PlainStress(void);
+		void initializeWorld_Classic_Ring_Fan(void);
+
+		void initializeWorld_Classic_Cellular_Langrand(void);
+		void initializeWorld_Classic_Cellular_Langrand_Hexagonal(void);
+
+		void initializeWorld_Classic_Cellular_Shim_Square(void);
+
+		void initializeWorld_Classic_Foam(void);
 
 		glm::dvec3 d3_Length_World = glm::dvec3(0.0, 0.0, 0.0);
 		// MPM ----------------------------------------------------------------
@@ -45,12 +51,20 @@ class PhysicsEngine
 		int	runSimulation_Classic_DoublePass_MPLocks(double dTimeIncrement_Total);
 		int	runSimulation_Classic_DoublePass_MPLocks_Contact(double dTimeIncrement_Total);
 
+		// simulation components
+		int runSimulation_ResetGrid(void);
+		int runSimulation_FindAGPs(int iThread);
+		int runSimulation_M2G(int nThread);
+		int runSimulation_DisplacementControl(void);
+		int runSimulation_G2P_P2_SmallStrain(double dTimeIncrement);
+		int runSimulation_G2P_P2_LargeStrain(double dTimeIncrement);
 		// function to communicate with outside -------------------------------
 		double getTime_Runtime(void) {return(d_Runtime_Total);}
 		double getTime_Current(void) {return(d_Time);}
 		double getTime_End(void) {return(d_TimeEnd);}
 		double getTime_Increment(void) {return(d_TimeIncrement_Maximum);}
 		double getTime_ConsoleInterval(void) {return(d_TimeConsole_Interval);}
+		double getTime_SnapshotInterval(void) {return(d_TimeSnapshot_Interval);}
 		// graphics interface -------------------------------------------------
 		unsigned int	getCount_MaterialPoint(void) {return(allMaterialPoint.size());}
 		unsigned int	getCount_MaterialPoint_CPDI(void) {return(allMaterialPoint_CPDI.size());}
@@ -95,6 +109,7 @@ class PhysicsEngine
 		int i_TimeCycle = 0;
 
 		double d_TimeConsole_Interval = 500.0*d_TimeIncrement_Maximum;
+		double d_TimeSnapshot_Interval = 1.0e24;
 		double d_TimeConsole_Last = -1.0e12; // before creation
 
 		std::string str_Log_FileName = _STR_LOGFILE;

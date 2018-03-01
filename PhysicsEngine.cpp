@@ -47,7 +47,15 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 
 	if(v_MarkedMaterialPoints_Displacement_Monitor.size() > 0)
 	{ // displacement
-        strConsole += "\tPosition_y: " + Script(v_MarkedMaterialPoints_Displacement_Monitor[0]->d3_Position.y,14);
+		glm::dvec3 d3Position = glm::dvec3(0.0,0.0,0.0);
+		glm::dvec3 d3Force_External = glm::dvec3(0.0,0.0,0.0);
+		for(int index = 0; index < v_MarkedMaterialPoints_Displacement_Monitor.size(); index++)
+		{
+			d3Position += v_MarkedMaterialPoints_Displacement_Monitor[index]->d3_Position;
+			d3Force_External += v_MarkedMaterialPoints_Displacement_Monitor[index]->d3_Force_External;
+		}
+        strConsole += "\tPosition_y: " + Script(d3Position.y/v_MarkedMaterialPoints_Displacement_Monitor.size(),14);
+        //strConsole += "\tForce_External_y: " + Script(d3Force_External.y,6);
 	}
 
 	{// force

@@ -6,7 +6,7 @@ void GraphicsEngine::drawGame(void)
 	// global colors
 	glm::vec4 f4Color_Default	= _BLUE;
 	glm::vec4 f4Color_State_Mid	= _RED;
-	glm::vec4 f4Color_State_Max	= _GREEN;
+	glm::vec4 f4Color_State_Max	= _RED;
 	glm::vec4 f4Color_DisplacementControl	= _GRAY;
 	glm::vec4 f4Color_Surface	= _GREEN;
 	glm::vec4 f4Color_ESO_False	= _GRAY;
@@ -554,7 +554,15 @@ void GraphicsEngine::drawGame(void)
 
 		// material points ----------------------------------------------------
 		ConstitutiveRelation CR;
+		float fJ2_Minimum = 0.0;
 		float fJ2_Maximum = 0.0;
+		float fJ2_Average = 0.0;
+		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
+		{
+			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
+
+			fJ2_Average += thisMP->d_Energy_Strain / vMaterialPoint.size();
+		}
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
@@ -571,8 +579,7 @@ void GraphicsEngine::drawGame(void)
 			if(fJ2 > fJ2_Maximum)
 				fJ2_Maximum = fJ2;
 		}
-		float fJ2_Minimum = 0.*fJ2_Maximum;
-//		float fJ2_Maximum = 240.0e6;
+		fJ2_Maximum = 2.0*fJ2_Average;
 		for(int index_MP = 0; index_MP < vMaterialPoint.size(); index_MP++)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
