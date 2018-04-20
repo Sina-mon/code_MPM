@@ -55,6 +55,7 @@ class PhysicsEngine
 		int runSimulation_ResetGrid(void);
 		int runSimulation_FindAGPs(int iThread);
 		int runSimulation_M2G(int nThread);
+		int runSimulation_IntegrateGrid(double dTimeIncrement);
 		int runSimulation_DisplacementControl(void);
 		int runSimulation_G2P_P2_SmallStrain(double dTimeIncrement);
 		int runSimulation_G2P_P2_LargeStrain(double dTimeIncrement);

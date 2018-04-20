@@ -87,6 +87,59 @@ int PhysicsEngine::runSimulation_M2G(int nThread)
 		}
 	}
 }
+int PhysicsEngine::runSimulation_IntegrateGrid(double dTimeIncrement)
+{
+	#pragma omp for
+	for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
+	{
+		GridPoint *thisGP = allGridPoint[index_GP];
+
+		if(thisGP->b_Active == false)
+			continue;
+
+		if(glm::length(thisGP->d3_Momentum) > 1.0e-24)
+			thisGP->d3_Force -= d_DampingCoefficient * glm::length(glm::dot(thisGP->d3_Force,glm::normalize(thisGP->d3_Momentum))) * glm::normalize(thisGP->d3_Momentum);
+
+//		if(thisGP->d_Mass > d_Mass_Minimum)
+//			thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;
+
+		if(thisGP->b3_Fixed.x == true)
+		{
+			glm::dvec3 d3Momentum_Trial = thisGP->d3_Momentum + thisGP->d3_Force * dTimeIncrement;
+
+			if(glm::abs(d3Momentum_Trial.y*dTimeIncrement) > 1.0e-24 && thisGP->d3_Force.x > 0.0)
+			{// friction forces
+				glm::dvec3 d3Force_Friction = glm::dvec3(0.0,0.0,0.0);
+				d3Force_Friction.y = thisGP->d_FrictionCoefficient * glm::sign(-d3Momentum_Trial.y) * glm::abs(thisGP->d3_Force.x);
+
+				if(glm::abs(d3Force_Friction.y * dTimeIncrement) > glm::abs(d3Momentum_Trial.y))
+					d3Force_Friction.y *= glm::abs(d3Momentum_Trial.y / dTimeIncrement) / glm::abs(d3Force_Friction.y);
+
+				thisGP->d3_Force.y += d3Force_Friction.y;
+			}
+
+			thisGP->d3_Velocity.x = 0.0;
+			thisGP->d3_Momentum.x = 0.0;
+			thisGP->d3_Force.x = 0.0;
+		}
+		if(thisGP->b3_Fixed.y == true)
+		{
+			thisGP->d3_Velocity.y = 0.0;
+			thisGP->d3_Momentum.y = 0.0;
+			thisGP->d3_Force_Temp.y += thisGP->d3_Force.y;
+			thisGP->d3_Force.y = 0.0;
+		}
+		if(thisGP->b3_Fixed.z == true)
+		{
+			thisGP->d3_Velocity.z = 0.0;
+			thisGP->d3_Momentum.z = 0.0;
+			thisGP->d3_Force.z = 0.0;
+		}
+
+		thisGP->d3_Momentum += thisGP->d3_Force * dTimeIncrement;
+
+	}
+}
 int PhysicsEngine::runSimulation_DisplacementControl(void)
 {
 	#pragma omp for
@@ -414,45 +467,8 @@ int PhysicsEngine::runSimulation_Classic_DoublePass_MPLocks(double dTimeIncremen
 			this->runSimulation_DisplacementControl();
 
 			#pragma omp barrier
-			dRuntime_Block = omp_get_wtime();
 			// update grid momentum and apply boundary conditions ------------- update GP momentum
-			#pragma omp for
-			for(unsigned int index_GP = 0; index_GP < allGridPoint.size(); index_GP++)
-			{
-				GridPoint *thisGP = allGridPoint[index_GP];
-
-				if(thisGP->b_Active == false)
-					continue;
-
-				if(glm::length(thisGP->d3_Momentum) > 1.0e-24)
-					thisGP->d3_Force -= d_DampingCoefficient * glm::length(glm::dot(thisGP->d3_Force,glm::normalize(thisGP->d3_Momentum))) * glm::normalize(thisGP->d3_Momentum);
-
-//				if(thisGP->d_Mass > d_Mass_Minimum)
-//					thisGP->d3_Velocity += thisGP->d3_Force / thisGP->d_Mass * dTimeIncrement;
-
-				thisGP->d3_Momentum += thisGP->d3_Force * dTimeIncrement;
-
-				if(thisGP->b3_Fixed.x == true)
-				{
-					thisGP->d3_Velocity.x = 0.0;
-					thisGP->d3_Momentum.x = 0.0;
-					thisGP->d3_Force.x = 0.0;
-				}
-				if(thisGP->b3_Fixed.y == true)
-				{
-					thisGP->d3_Velocity.y = 0.0;
-					thisGP->d3_Momentum.y = 0.0;
-					thisGP->d3_Force_Temp.y += thisGP->d3_Force.y;
-					thisGP->d3_Force.y = 0.0;
-				}
-				if(thisGP->b3_Fixed.z == true)
-				{
-					thisGP->d3_Velocity.z = 0.0;
-					thisGP->d3_Momentum.z = 0.0;
-					thisGP->d3_Force.z = 0.0;
-				}
-			}
-			a_Runtime[4] += omp_get_wtime() - dRuntime_Block;
+			this->runSimulation_IntegrateGrid(dTimeIncrement);
 
 			#pragma omp barrier
 			dRuntime_Block = omp_get_wtime();

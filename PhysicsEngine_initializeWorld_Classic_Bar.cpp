@@ -7,8 +7,8 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-	glm::dvec3 d3Length_Grid = glm::dvec3(0.025, 0.025, 0.002/1.0);
-	glm::ivec3 i3Cells = glm::ivec3(1.0*25, 1.0*25, 2);
+	glm::dvec3 d3Length_Grid = glm::dvec3(0.025, 0.025, 0.025);
+	glm::ivec3 i3Cells = glm::ivec3(1.0*25, 1.0*25, 1*25);
 	glm::dvec3 d3Length_Cell = d3Length_Grid / glm::dvec3(i3Cells);
 	glm::ivec3 i3Nodes = i3Cells + glm::ivec3(1, 1, 1);
 
@@ -55,7 +55,7 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 		}
 		if(fabs(dz - 0.0) < 0.5*d3Length_Cell.z)
 		{
-			thisGridPoint->b3_Fixed.z = true;
+			//thisGridPoint->b3_Fixed.z = true;
 		}
 		if(fabs(dz - 0.0) < 2.0*d3Length_Grid.z)
 		{
@@ -88,14 +88,14 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 		thisMaterial->i_ID = 0;
 		thisMaterial->i_MaterialType = __VONMISESHARDENING;
 
-		thisMaterial->d_Density = 2760.0;
+		thisMaterial->d_Density = 2700.0;
 
 		thisMaterial->d_ElasticModulus = 70.0e9;
 		thisMaterial->d_PoissonRatio = 0.3;
 
-		thisMaterial->d_YieldStress = 190.0e6;
-		thisMaterial->d_Hardening_Isotropic_C0 = 30.0;
-		thisMaterial->d_Hardening_Isotropic_C1 = 50.0e6;
+		thisMaterial->d_YieldStress = 70.0e6;
+		thisMaterial->d_Hardening_Isotropic_C0 = 35.0;
+		thisMaterial->d_Hardening_Isotropic_C1 = 55.0e6;
 	}
 	Material_BC *pSteel = new Material_BC;
 	v_allMaterial.push_back(pSteel);
@@ -116,12 +116,12 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 		thisMaterial->d_Hardening_Isotropic_C1 = 150.0e6;
 	}
 
-	double dOffset = 0.25*d3Length_Cell.x;
+	double dOffset = d3Length_Cell.x/8.0;
 
 	double dPlatenSpeed = +1.0;
 	double dBar_Length = 0.02;
-	double dBar_Width = 0.002;
-	double dBar_Thickness = 2.0*dOffset;
+	double dBar_Width = 0.004;
+	double dBar_Thickness = 0.004;//2.0*dOffset;
 
 	glm::dvec2 d2Bar_Center = glm::dvec2(0.5*d3Length_Grid.x, 0.5*dBar_Length);
 	glm::dvec2 d2Bar_Dimension = glm::dvec2(dBar_Width, dBar_Length);
@@ -149,7 +149,7 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 			newMP = MP_Factory.createMaterialPoint(glm::dvec3(0.0, 0.0, 0.0));
 
 			newMP->i_ID = vVoxels[index_Voxel]->u_ID;
-			newMP->p_Material = pSteel;
+			newMP->p_Material = pAluminum;
 
 			newMP->d_Volume_Initial = dOffset*dOffset*dOffset;
 			newMP->d_Volume = newMP->d_Volume_Initial;
@@ -183,8 +183,8 @@ void PhysicsEngine::initializeWorld_Classic_Bar(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/10.0*10.0e-8;
-	d_TimeEnd = 0.8*(d3Center_Platen_Top.y) / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 1.0/1.0*1.0e-8;
+	d_TimeEnd = 0.2*(d3Center_Platen_Top.y) / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-5 / glm::abs(dPlatenSpeed);
 
 	// timeline events -------------------------------------------------------

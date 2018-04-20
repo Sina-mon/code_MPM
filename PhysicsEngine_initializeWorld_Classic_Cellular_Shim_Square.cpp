@@ -23,12 +23,23 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1335, 0.150, 0.002/2.0);// for 10x10 with 1-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(2.0*133.5, 2.0*150, 2);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0665, 0.150, 0.002/2.0);// for 5x10 with 1-cell gap
+	glm::ivec3 i3_Cells = glm::ivec3(2.0*66.5, 2.0*150, 2);
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1390, 0.150, 0.002/2.0);// for 10x10 with 2-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(2.0*139.0, 2.0*150, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.5*0.1380, 0.150, 0.002/2.0);// for 5x10 with 2-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*0.5*138.0, 2.0*150, 2);
+
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.13025, 0.150, 0.001/4.0);// for 10x10 with 1-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(4.0*130.25, 4.0*150, 1);
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1330, 0.150, 0.001/4.0);// for 10x10 with 2-cell gap
-	glm::ivec3 i3_Cells = glm::ivec3(4.0*133.0, 4.0*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.5*0.130, 0.150, 0.001/4.0);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*0.5*130.0, 4.0*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.065, 0.150, 0.001/4.0);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*65.0, 4.0*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1330, 0.140, 0.001/4.0);// for 10x10 with 2-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*133.0, 4.0*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.5*0.1330, 0.140, 0.001/4.0);// for 5x10 with 2-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(4.0*0.5*133.0, 4.0*150, 1);
 
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
@@ -62,21 +73,18 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		if(fabs(dx - 0.0) < 1.5*d3_Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
-			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dx - d3_Length_Grid.x) < 1.5*d3_Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
-			thisGridPoint->b3_Fixed.y = true;
+			//thisGridPoint->b3_Fixed.y = true;
+			thisGridPoint->d_FrictionCoefficient = 0.4;
 		}
 		if(fabs(dy - 0.0) < 1.5*d3_Length_Cell.y)
 		{
 			thisGridPoint->b3_Fixed.y = true;
 //			thisGridPoint->b3_Fixed.z = true;
 //			thisGridPoint->b3_Fixed = glm::bvec3(true, true, true);
-		}
-		if(fabs(dy - d3_Length_Grid.y) < dTolerance)
-		{
 		}
 		if(fabs(dz - 0.0) < 0.5*d3_Length_Cell.z)
 		{
@@ -85,10 +93,6 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		if(fabs(dz - 0.0) < 2.0*d3_Length_Grid.z)
 		{
 			thisGridPoint->b3_Fixed.z = true;
-		}
-		if(fabs(dz - d3_Length_Grid.z) < dTolerance)
-		{
-//			thisGridPoint->b3_Fixed.z = true;
 		}
 	}
 
@@ -157,10 +161,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 
 	double dDiameter_Average = 0.5*(dDiameter_Outer + dDiameter_Inner);
 
-	glm::ivec2 i2Array_Count = glm::ivec2(10,10);// ------------------------------------------------------------------
-	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+2.0*d3_Length_Cell.x, dDiameter_Outer+2.0*d3_Length_Cell.y);
+	glm::ivec2 i2Array_Count = glm::ivec2(5,10);// ------------------------------------------------------------------
+	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+1.0*d3_Length_Cell.x, dDiameter_Outer+1.0*d3_Length_Cell.y);
 
-	double dPlatenSpeed = +1.0*i2Array_Count.y;
+	double dPlatenSpeed = 2.0*+1.0*i2Array_Count.y;
 	double dOffset = dThickness_Ring/8.0;
 
 	double dRadius_Inner = 0.5*dDiameter_Inner;
@@ -169,12 +173,14 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 	if(dLength_Ring > d3_Length_Cell.z)
 		dLength_Ring = d3_Length_Cell.z;
 
-	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.95*d3_Length_Grid.x,2.0*d3_Length_Cell.y,dOffset);
+	glm::dvec3 d3Dimension_Platen_Top		= glm::dvec3(0.98*d3_Length_Grid.x,2.0*d3_Length_Cell.y,dOffset);
 
-//	glm::dvec3 d3Center_Array			= glm::dvec3(0.5*dDiameter_Outer + 1.0*d3_Length_Cell.x-0.0*dOffset, 0.5*dDiameter_Outer+1.0*d3_Length_Cell.y-0.0*dOffset,0.5*d3_Length_Grid.z);
-//	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(2.0*d3_Length_Cell.x+0.5*d3Dimension_Platen_Top.x, d3Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
-	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*d3_Length_Grid.x - 0.5*i2Array_Count.x*d2Array_Offset.x + 0.5*d2Array_Offset.x, 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y);
-	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3_Length_Grid.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
+	// for half model
+	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*dDiameter_Outer + 1.0*d3_Length_Cell.x, 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y);
+	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3Dimension_Platen_Top.x + 1.0*d3_Length_Cell.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
+	// for full model
+//	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*d3_Length_Grid.x - 0.5*i2Array_Count.x*d2Array_Offset.x + 0.5*d2Array_Offset.x, 0.5*dDiameter_Outer + 2.0*d3_Length_Cell.y);
+//	glm::dvec3 d3Center_Platen_Top		= glm::dvec3(0.5*d3_Length_Grid.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d3Dimension_Platen_Top.y+1.0*d3_Length_Cell.y,0.5*d3_Length_Grid.z);
 
 	if(true)
 	{// sample
@@ -221,6 +227,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 			allMaterialPoint.push_back(newMP);
 			// moment log
 			v_MarkedMaterialPoints_Momentum.push_back((MaterialPoint_Classic_CC *)newMP);
+			v_MarkedMaterialPoints_Monitor_Energy.push_back((MaterialPoint_Classic_CC *)newMP);
 		}
 	}
 
@@ -260,8 +267,8 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/4.0*5.0e-8;
-	d_TimeEnd = 0.4*d3Center_Platen_Top.y / glm::abs(dPlatenSpeed);
+	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
+	d_TimeEnd = 0.45*d3Center_Platen_Top.y / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.01*d_TimeEnd;
 	d_TimeSnapshot_Interval = d_TimeConsole_Interval;
 

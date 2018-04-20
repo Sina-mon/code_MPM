@@ -20,6 +20,7 @@ class GridPoint
 		glm::bvec3 b3_Fixed = glm::bvec3(false, false, false);
 		glm::dvec3 d3_Position = glm::dvec3(0.0, 0.0, 0.0);
 
+		double d_FrictionCoefficient = 0.0;
 		double d_Mass = 0.0;
 
 		glm::dvec3 d3_MassGradient	= glm::dvec3(0.0,0.0,0.0);

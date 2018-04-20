@@ -61,7 +61,7 @@ void Canvas2D_CC::drawRing(glm::dvec2 d2Center, double dRadius_Outer, double dRa
 
 		double dDistance = glm::length(d2Position - d2Center);
 
-		if(dDistance < dRadius_Inner || dRadius_Outer < dDistance)
+		if(dDistance < dRadius_Inner + 0.5*d_Offset || dRadius_Outer - 0.5*d_Offset < dDistance)
 			continue;
 
 		bool bSurface_Local = false;

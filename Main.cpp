@@ -52,7 +52,8 @@ int main (int argc, char ** argv)
 	//single simulation
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
-	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
+	thePhysicsEngine.initializeWorld_Classic_Bar();
+//	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
 
 //	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand();
 	// graphics engine initialization -----------------------------------------
