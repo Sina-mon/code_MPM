@@ -1,18 +1,19 @@
 #include "PhysicsEngine.h"
 
 // ----------------------------------------------------------------------------
-void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
+void PhysicsEngine::initializeWorld_Classic_Cellular_Graded(void)
 {
 	MaterialPoint_Factory_Classic_CC	MP_Factory;
 	GridPoint_Factory					GP_Factory;
 	// ------------------------------------------------------------------------
 	// grid points ------------------------------------------------------------
-//	glm::dvec3 d3Length_Grid = glm::dvec3(0.030, 0.050, 0.001/2.5);
-//	glm::ivec3 i3Cells = glm::ivec3(2.5*30, 2.5*50, 1);
+//	glm::dvec3 d3Length_Grid = glm::dvec3(0.050, 0.050, 0.001/2.5);
+//	glm::ivec3 i3Cells = glm::ivec3(2.5*50, 2.5*50, 1);
 	glm::dvec3 d3Length_Grid = glm::dvec3(0.030, 0.050, 0.001/5.0);
 	glm::ivec3 i3Cells = glm::ivec3(5.0*30, 5.0*50, 1);
 //	glm::dvec3 d3Length_Grid = glm::dvec3(0.030, 0.050, 0.001/10.0);
 //	glm::ivec3 i3Cells = glm::ivec3(10.0*30, 10.0*50, 1);
+
 	glm::dvec3 d3Length_Cell = d3Length_Grid / glm::dvec3(i3Cells);
 	glm::ivec3 i3Nodes = i3Cells + glm::ivec3(1, 1, 1);
 
@@ -115,11 +116,8 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 	}
 
 
-//	double dDiameter_Outer = 0.005;
-//	double dThickness_Ring = 0.0005;
-
+	double dThickness_Ring = 0.0005;
 	double dDiameter_Outer = 0.005;
-	double dThickness_Ring = 0.0019;
 
 	double dDiameter_Inner = dDiameter_Outer - 2.0*dThickness_Ring;
 
@@ -128,19 +126,22 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 	glm::ivec2 i2Array_Count = glm::ivec2(4,8);// ------------------------------------------------------------------
 	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+.0*d3Length_Cell.x, dDiameter_Outer+.0*d3Length_Cell.y);
 
-	double dPlatenSpeed = +10.0;
-	double dOffset = d3Length_Cell.x/8.0;
+	double dPlatenSpeed = +20.0;
+	double dOffset = d3Length_Cell.x/6.0;
+//	double dOffset = dThickness_Ring/16.0;
 
-	double dRadius_Inner = 0.5*dDiameter_Inner;
+	double dRadius_Inner = 0.5*dDiameter_Inner;//+0.5*0.00025;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
 	double dLength_Ring = dOffset;
 	if(dLength_Ring > d3Length_Cell.z)
 		dLength_Ring = d3Length_Cell.z;
 
-	glm::dvec2 d2Dimension_Platen_Top		= glm::dvec2(i2Array_Count.x*dDiameter_Outer,2.0*d3Length_Cell.y);
+//	glm::dvec2 d2Dimension_Platen_Top		= glm::dvec2(i2Array_Count.x*dDiameter_Outer,2.0*d3Length_Cell.y);
+	glm::dvec2 d2Dimension_Platen_Top		= glm::dvec2(0.005,2.0*d3Length_Cell.y);
 
 	glm::dvec2 d2Center_Array			= glm::dvec2(0.5*dDiameter_Outer + 1.0*d3Length_Cell.x-0.0*dOffset, 0.5*dDiameter_Outer+1.0*d3Length_Cell.y-0.0*dOffset);
-	glm::dvec2 d2Center_Platen_Top		= glm::dvec2(2.0*d3Length_Cell.x+0.5*d2Dimension_Platen_Top.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d2Dimension_Platen_Top.y+1.0*d3Length_Cell.y);
+//	glm::dvec2 d2Center_Platen_Top		= glm::dvec2(2.0*d3Length_Cell.x+0.5*d2Dimension_Platen_Top.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d2Dimension_Platen_Top.y+1.0*d3Length_Cell.y);
+	glm::dvec2 d2Center_Platen_Top		= glm::dvec2(1.0*d3Length_Cell.x+0.5*d2Dimension_Platen_Top.x, d2Center_Array.y + (i2Array_Count.y-0.5)*d2Array_Offset.y+0.5*d2Dimension_Platen_Top.y+1.0*d3Length_Cell.y);
 
 	if(true)
 	{// sample
@@ -151,12 +152,28 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 			{
 				glm::dvec2 d2Center_Ring = d2Center_Array + glm::dvec2(ix*d2Array_Offset.x,iy*d2Array_Offset.y);
 
+				// vertically graded
+//				if(iy >= 6)
+//					dRadius_Inner = 0.5*dDiameter_Inner - 0.0005;
+//				else
+//					dRadius_Inner = 0.5*dDiameter_Inner + 0.0010/7;
+//				dRadius_Inner = 0.5*dDiameter_Inner - (iy-3.5)/i2Array_Count.y * 0.00025;// top, bottom
+//				dRadius_Inner = 0.5*dDiameter_Inner - iy/i2Array_Count.y * 0.00025;
+//				dRadius_Inner = 0.5*dDiameter_Inner - 0.5*0.00025 + glm::abs(iy-3.5)/i2Array_Count.y * 2.0*0.00025;// middle
+				// horizontally graded
+				if(ix % 2 != 0)
+					dRadius_Inner = 0.5*dDiameter_Inner - 0.00025;
+				else
+					dRadius_Inner = 0.5*dDiameter_Inner + 0.00025;
+//				dRadius_Inner = 0.5*dDiameter_Inner + (ix-1.5)/i2Array_Count.x * 0.00025;
+
 				Canvas.drawRing(d2Center_Ring, dRadius_Outer, dRadius_Inner);
 				{// braze
 					for(float fAngle = 0.0; fAngle < 2.0*_PI; fAngle += 0.5*_PI)
 					{
-						glm::dvec2 d2Center_Braze = d2Center_Ring + glm::dvec2(0.5*dDiameter_Average*glm::cos(fAngle), 0.5*dDiameter_Average*glm::sin(fAngle));
-						Canvas.drawRectangle(d2Center_Braze, glm::dvec2(0.0015,dThickness_Ring), fAngle+0.5*_PI);
+//						glm::dvec2 d2Center_Braze = d2Center_Ring + glm::dvec2(0.5*dDiameter_Average*glm::cos(fAngle), 0.5*dDiameter_Average*glm::sin(fAngle));
+						glm::dvec2 d2Center_Braze = d2Center_Ring + glm::dvec2(0.5*(dRadius_Inner+dRadius_Outer)*glm::cos(fAngle), 0.5*(dRadius_Inner+dRadius_Outer)*glm::sin(fAngle));
+						Canvas.drawRectangle(d2Center_Braze, glm::dvec2(0.0015,(dRadius_Outer-dRadius_Inner)), fAngle+0.5*_PI);
 					}
 				}
 			}
@@ -226,7 +243,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Langrand(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/5.0*5.0e-8;
+	d_TimeIncrement_Maximum = 1.0/2.5*5.0e-8;
 	d_TimeEnd = 0.5*d2Center_Platen_Top.y / glm::abs(dPlatenSpeed);
 //	d_TimeEnd = 0.8*dDiameter_Outer / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 1.0e-4 / glm::abs(dPlatenSpeed);

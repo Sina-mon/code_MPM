@@ -68,10 +68,10 @@ void PhysicsEngine::initializeWorld_Classic_HalfRing_Xiang_PlainStress(void)
 	}
 
 	// multi-body implementation
-	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-	{
-		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
-	}
+//	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+//	{
+//		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
+//	}
 	// locks on grid points for atomic operations
 	v_GridPoint_Lock.resize(allGridPoint.size());
 	for(int index = 0; index < v_GridPoint_Lock.size(); index++)

@@ -23,8 +23,8 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1335, 0.150, 0.002/2.0);// for 10x10 with 1-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(2.0*133.5, 2.0*150, 2);
-	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0665, 0.150, 0.002/2.0);// for 5x10 with 1-cell gap
-	glm::ivec3 i3_Cells = glm::ivec3(2.0*66.5, 2.0*150, 2);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0665, 0.150, 0.002/2.0);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(2.0*66.5, 2.0*150, 2);
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.1390, 0.150, 0.002/2.0);// for 10x10 with 2-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(2.0*139.0, 2.0*150, 2);
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.5*0.1380, 0.150, 0.002/2.0);// for 5x10 with 2-cell gap
@@ -40,6 +40,16 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 //	glm::ivec3 i3_Cells = glm::ivec3(4.0*133.0, 4.0*150, 1);
 //	glm::dvec3 d3_Length_Grid = glm::dvec3(0.5*0.1330, 0.140, 0.001/4.0);// for 5x10 with 2-cell gap
 //	glm::ivec3 i3_Cells = glm::ivec3(4.0*0.5*133.0, 4.0*150, 1);
+
+	// calculated using 5D + 4C + 2C
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0688, 0.150, 0.001/1.25);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(1.25*68.8, 1.25*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.066, 0.150, 0.001/2.5);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(2.5*66.0, 2.5*150, 1);
+//	glm::dvec3 d3_Length_Grid = glm::dvec3(0.065, 0.150, 0.001/5.0);// for 5x10 with 1-cell gap
+//	glm::ivec3 i3_Cells = glm::ivec3(5.0*65.0, 5.0*150, 1);
+	glm::dvec3 d3_Length_Grid = glm::dvec3(0.0641, 0.130, 0.001/10.0);// for 5x10 with 1-cell gap
+	glm::ivec3 i3_Cells = glm::ivec3(10.0*64.1, 10.0*130, 1);
 
 	glm::dvec3 d3_Length_Cell = d3_Length_Grid / glm::dvec3(i3_Cells);
 	glm::ivec3 i3_Nodes = i3_Cells + glm::ivec3(1, 1, 1);
@@ -78,7 +88,7 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		{
 			thisGridPoint->b3_Fixed.x = true;
 			//thisGridPoint->b3_Fixed.y = true;
-			thisGridPoint->d_FrictionCoefficient = 0.4;
+			thisGridPoint->d_FrictionCoefficient = 0.3;
 		}
 		if(fabs(dy - 0.0) < 1.5*d3_Length_Cell.y)
 		{
@@ -97,10 +107,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 	}
 
 	// multi-body implementation
-	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-	{
-		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
-	}
+//	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+//	{
+//		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3_Length_Grid, i3_Cells);
+//	}
 	// locks on grid points for atomic operations
 	v_GridPoint_Lock.resize(allGridPoint.size());
 	for(int index = 0; index < v_GridPoint_Lock.size(); index++)
@@ -149,9 +159,9 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		pAluminum->d_ElasticModulus = 70.0e9;
 		pAluminum->d_PoissonRatio = 0.3;
 
-		pAluminum->d_YieldStress = 100.0e6;
-		pAluminum->d_Hardening_Isotropic_C0 = 15.0;
-		pAluminum->d_Hardening_Isotropic_C1 = 20.0e6;
+		pAluminum->d_YieldStress = 70.0e6;
+		pAluminum->d_Hardening_Isotropic_C0 = 35.0;
+		pAluminum->d_Hardening_Isotropic_C1 = 55.0e6;
 	}
 
 	double dThickness_Ring = 0.00071;
@@ -164,8 +174,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 	glm::ivec2 i2Array_Count = glm::ivec2(5,10);// ------------------------------------------------------------------
 	glm::dvec2 d2Array_Offset = glm::dvec2(dDiameter_Outer+1.0*d3_Length_Cell.x, dDiameter_Outer+1.0*d3_Length_Cell.y);
 
-	double dPlatenSpeed = 2.0*+1.0*i2Array_Count.y;
-	double dOffset = dThickness_Ring/8.0;
+//	double dPlatenSpeed = 2.0*+1.0*i2Array_Count.y;
+//	double dOffset = dThickness_Ring/16.0;
+	double dPlatenSpeed = 20.0;
+	double dOffset = d3_Length_Cell.x/4.0;
 
 	double dRadius_Inner = 0.5*dDiameter_Inner;
 	double dRadius_Outer = 0.5*dDiameter_Outer;
@@ -207,6 +219,8 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		std::cout << "Canvas voxels: " << Script(Canvas.v_Voxels.size()) << " (" << Script(Canvas.u2_Size.x) << "," << Script(Canvas.u2_Size.y) << ")" << std::endl;
 		std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
 
+		allMaterialPoint.reserve(vVoxels.size());
+
 		for(unsigned int index_Voxel = 0; index_Voxel < vVoxels.size(); index_Voxel++)
 		{// get canvas voxels and create material points
 			MaterialPoint_BC *newMP;
@@ -226,8 +240,12 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 
 			allMaterialPoint.push_back(newMP);
 			// moment log
-			v_MarkedMaterialPoints_Momentum.push_back((MaterialPoint_Classic_CC *)newMP);
-			v_MarkedMaterialPoints_Monitor_Energy.push_back((MaterialPoint_Classic_CC *)newMP);
+//			v_MarkedMaterialPoints_Momentum.push_back((MaterialPoint_Classic_CC *)newMP);
+//			v_MarkedMaterialPoints_Monitor_Energy.push_back((MaterialPoint_Classic_CC *)newMP);
+			if(index_Voxel % 10000 == 0)
+				std::cout << "here2: " << Script(index_Voxel) << std::endl;
+
+//			delete vVoxels[index_Voxel];
 		}
 	}
 
@@ -267,10 +285,10 @@ void PhysicsEngine::initializeWorld_Classic_Cellular_Shim_Square(void)
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
+	d_TimeIncrement_Maximum = 1.0/10.0*5.0e-8;
 	d_TimeEnd = 0.45*d3Center_Platen_Top.y / glm::abs(dPlatenSpeed);
 	d_TimeConsole_Interval = 0.01*d_TimeEnd;
-	d_TimeSnapshot_Interval = d_TimeConsole_Interval;
+	d_TimeSnapshot_Interval = 10.0*d_TimeConsole_Interval;
 
 	// timeline events -------------------------------------------------------
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));

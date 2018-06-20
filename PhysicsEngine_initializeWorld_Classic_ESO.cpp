@@ -76,10 +76,10 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
-	{// multi-body implementation
-		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
-	}
+//	for(int index_Body = 0; index_Body < _MAX_N_BODIES; index_Body++)
+//	{// multi-body implementation
+//		allGridPoint_Body[index_Body] = GP_Factory.createGrid(d3Length_Grid, i3Cells);
+//	}
 
 	// locks on grid points for atomic operations
 	v_GridPoint_Lock.resize(allGridPoint.size());

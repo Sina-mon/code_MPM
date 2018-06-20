@@ -48,20 +48,49 @@ double	getObjective(std::vector<MaterialPoint_BC *> vMP)
 }
 
 int main (int argc, char ** argv)
-{
+{// without graphics
+
+	std::cout << "size: " << sizeof(MaterialPoint_BC) << std::endl;
+
+	PhysicsEngine thePhysicsEngine;
+
+//	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand();
+	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
+
+	double dTimeRequest = thePhysicsEngine.getTime_End();
+	thePhysicsEngine.runSimulation_Classic_DoublePass_MPLocks(dTimeRequest);
+
+	std::cout << "Execution finished, have a nice day!" << std::endl;
+
+	return(0);
+}
+
+/*
+int main (int argc, char ** argv)
+{ // with graphics
 	//single simulation
 	// physics engine initialization ------------------------------------------
 	PhysicsEngine thePhysicsEngine;
-	thePhysicsEngine.initializeWorld_Classic_Bar();
-//	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
 
+//	thePhysicsEngine.initializeWorld_Classic_Bar();
 //	thePhysicsEngine.initializeWorld_Classic_Cellular_Langrand();
+	thePhysicsEngine.initializeWorld_Classic_Cellular_Shim_Square();
+
+//	thePhysicsEngine.initializeWorld_Classic_Cellular_Graded();
+
 	// graphics engine initialization -----------------------------------------
 	GraphicsEngine theGraphicsEngine;
 	// run simulation
 	theGraphicsEngine.runVisualization(&thePhysicsEngine, false);
 
+	std::cout << "Execution finished, have a nice day!" << std::endl;
+
+	return(0);
+}
+*/
 /*
+int main (int argc, char ** argv)
+{
 	// Create canvas, cantilever problem
 //	double dOffset = 0.0010;
 //	glm::dvec2 d2Size = glm::dvec2(0.100,0.100);
@@ -260,9 +289,9 @@ int main (int argc, char ** argv)
 
 		//iActiveMPs = Canvas2D.getVoxels(true).size();
 	}
-*/
+
 	std::cout << "Execution finished, have a nice day!" << std::endl;
 
 	return(0);
 }
-
+*/

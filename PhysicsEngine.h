@@ -1,6 +1,7 @@
 #ifndef PHYSICSENGINE_H
 #define PHYSICSENGINE_H
 
+#include <new>
 #include <math.h>
 #include <vector>
 #include <algorithm>
@@ -11,7 +12,7 @@
 #include "Definitions.h"
 ////#include ".\include\glm\glm.hpp" // windows
 //#include "./include/glm/glm.hpp"//sina, glm is a column major implementation
-
+// -Wl,--stack,10000000,--heap=10000000
 #include "Canvas2D_CC.h"
 #include "GridPoint.h"
 #include "GridPoint_Factory.h"
@@ -23,8 +24,8 @@
 #include "ConstitutiveRelation.h"
 #include "TimeLine.h"
 
-#define _MAX_N_THREADS	8
-#define _MAX_N_BODIES	2
+#define _MAX_N_THREADS	1
+#define _MAX_N_BODIES	1
 
 class PhysicsEngine
 {
@@ -42,6 +43,8 @@ class PhysicsEngine
 		void initializeWorld_Classic_Cellular_Langrand_Hexagonal(void);
 
 		void initializeWorld_Classic_Cellular_Shim_Square(void);
+
+		void initializeWorld_Classic_Cellular_Graded(void);
 
 		void initializeWorld_Classic_Foam(void);
 
@@ -98,7 +101,7 @@ class PhysicsEngine
 		std::vector<MaterialPoint_CPDI_CC *> v_MarkedMaterialPoints_CPDI_Displacement_Control;
 
 		// multi-body related parameters
-		std::vector<GridPoint *> allGridPoint_Body[_MAX_N_BODIES];
+		//std::vector<GridPoint *> allGridPoint_Body[_MAX_N_BODIES];
 
 		// parallelization related members
 		std::vector<omp_lock_t *> v_GridPoint_Lock;
