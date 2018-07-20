@@ -95,7 +95,7 @@ void PhysicsEngine::reportConsole(std::string sDescription)
 			MaterialPoint_BC *thisMP = v_MarkedMaterialPoints_Principal_Monitor[index_MP];
 
 			d3Strain		= CR.getPrincipal(thisMP->d6_Strain);
-			d3StrainRate	= CR.getPrincipal(thisMP->d6_Strain_Rate);
+			//d3StrainRate	= CR.getPrincipal(thisMP->d6_Strain_Rate);
 			d3Stress		= CR.getPrincipal(thisMP->d6_Stress);
 
 			d3Strain		= glm::abs(d3Strain);

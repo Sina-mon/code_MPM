@@ -46,7 +46,7 @@ double	getObjective(std::vector<MaterialPoint_BC *> vMP)
 
 	return dObjective;
 }
-
+/*
 int main (int argc, char ** argv)
 {// without graphics
 
@@ -64,7 +64,7 @@ int main (int argc, char ** argv)
 
 	return(0);
 }
-
+*/
 /*
 int main (int argc, char ** argv)
 { // with graphics
@@ -88,7 +88,7 @@ int main (int argc, char ** argv)
 	return(0);
 }
 */
-/*
+
 int main (int argc, char ** argv)
 {
 	// Create canvas, cantilever problem
@@ -104,12 +104,14 @@ int main (int argc, char ** argv)
 //	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+0.0*dOffset,0.5*d2Size.y), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, true);
 
 	// Create canvas, beam problem
-	double dOffset = 0.0005;
-	double dOpacity_Min = 1.0e-6;
+	double dOffset = 0.00025;
+	double dOpacity_Min = 1.0e-4;
 	double dOpacity_Max = 1.0;
 	glm::dvec2 d2Size = glm::dvec2(0.150,0.050);
 	Canvas2D_CC Canvas2D(d2Size, dOffset);
 
+//	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0);
+//	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0, true);
 	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0);
 	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0, true);
 	// loading location
@@ -127,7 +129,7 @@ int main (int argc, char ** argv)
 
 	for(unsigned int index = 0; index < vVoxels.size(); index++)
 	{// start from lower portion
-		double dTopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.4*0.040;
+		double dTopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.7*0.040;
 
 		if(vVoxels[index]->d2_Position.y > dTopEdge)
 		{
@@ -138,12 +140,13 @@ int main (int argc, char ** argv)
 	}
 
 	// ESO iterations
-	double dRatio_Rejection = 0.4;
-	double dRatio_Rejection_Increment = 0.1;
+	double dRatio_Redundant = 0.1; // ratio in terms of active voxels
+	double dRatio_Rejection = 0.7;
+	double dRatio_Rejection_Increment = 0.0;
 	double dRatio_Rejection_Volume_Upper = 0.1;
 	double dRatio_Rejection_Volume_Lower = 0.0;
 	double dRatio_Inclusion = 1.0 - dRatio_Rejection;
-	double dInfluence_Radius = .1*dOffset;
+	double dInfluence_Radius = sqrt(2.0)*2.1*dOffset;
 	int iActiveMPs = Canvas2D.getVoxels_Active(true).size();
 	int iIteration_Local = 0;
 	unsigned int iCounter_Removed = 0;
@@ -182,12 +185,6 @@ int main (int argc, char ** argv)
 			sDescription += "Restored in previous step: \t" + Script(iCounter_Restored) + "\n";
 			sDescription += "######################################################################\n";
 		}
-		//std::cout << sDescription << std::endl;
-
-//		std::cout << "######################################################################" << std::endl;
-//		std::cout << "iIteration_Global: " << Script(iIteration_Global) << std::endl;
-//		std::cout << "iIteration_Local: " << Script(iIteration_Local) << std::endl;
-//		std::cout << "dRatio_Rejection: " << Script(dRatio_Rejection, 3) << std::endl;
 		// initialize physics engine
 		PhysicsEngine thePhysicsEngine;
 		thePhysicsEngine.initializeWorld_Classic_ESO(&Canvas2D, sFilename_Log, sFilename_Snapshot, sDescription);
@@ -218,64 +215,47 @@ int main (int argc, char ** argv)
 			}
 		}
 		// filter-smooth objective values
-		Canvas2D.filterObjective_Smooth(2.1*dOffset);// 2.1 seems to be better than 6.1
+		Canvas2D.filterObjective_Smooth(dInfluence_Radius);// 2.1 seems to be better than 6.1
 
 		std::vector<Voxel_ST *> vVoxels_Active = Canvas2D.getVoxels_Active(true);
 		std::vector<Voxel_ST *> vVoxels_ESO = Canvas2D.getVoxels_ESO(true);
-		// sort active voxels based on value
+		// sort active voxels based on value, small to large
 		{
 			std::sort(vVoxels_ESO.begin(), vVoxels_ESO.end(), isSmaller);
+			std::sort(vVoxels_Active.begin(), vVoxels_Active.end(), isSmaller);
 		}
 		// remove redundant voxels
-//		unsigned int iCounter_Removed = 0;
 		iCounter_Removed = 0;
 		unsigned int iVoxels_Active = vVoxels_Active.size();
 		unsigned int iVoxels_ESO = vVoxels_ESO.size();
 		for(unsigned long int index_Voxel = 0; index_Voxel < dRatio_Rejection*iVoxels_ESO; index_Voxel++)
 		{
-//			if((double)iCounter_Removed > dRatio_Rejection*iVoxels_Active && iCounter_Removed % 2 == 0)
-////			if(iCounter_Removed == 32)
+//			if((double)iCounter_Removed > dRatio_Redundant*iVoxels_Active)
 //				break;
 
 			if(vVoxels_ESO[index_Voxel]->b_ESO == false)
 				continue;
 
-			if(vVoxels_ESO[index_Voxel]->d_ESO_Opacity > 0.5)
+			if(vVoxels_ESO[index_Voxel]->d_ESO_Opacity > 0.8)
 			{
 				vVoxels_ESO[index_Voxel]->d_ESO_Opacity = dOpacity_Min;
 				iCounter_Removed++;
 			}
-
-//			if(vVoxels_Active[index_Voxel]->d_ESO_Opacity < glm::pow(0.5,3))
-//			{
-//				vVoxels_Active[index_Voxel]->d_Objective = 0.0;
-//				vVoxels_Active[index_Voxel]->b_Active = false;
-//				vVoxels_Active[index_Voxel]->b_ESO = false;
-//				vVoxels_Active[index_Voxel]->b_Redundant = false;
-//			}
-
-//			iCounter_Removed++;
 		}
 //		std::cout << "iCounter_Removed: " << iCounter_Removed << std::endl;
 		// restore essential voxels
-//		unsigned int iCounter_Restored = 0;
 		iCounter_Restored = 0;
 		double dRatio_Inclusion = 1.0 - dRatio_Rejection;
 		for(unsigned long int index_Voxel = dRatio_Rejection*iVoxels_ESO; index_Voxel < iVoxels_ESO; index_Voxel++)
 		{
-//			if((double)iCounter_Restored > dRatio_Inclusion*iVoxels_Active && iCounter_Removed % 2 == 0)
-//				break;
-
 			if(vVoxels_ESO[index_Voxel]->b_ESO == false)
 				continue;
 
-			if(vVoxels_ESO[index_Voxel]->d_ESO_Opacity < 0.5)
+			if(vVoxels_ESO[index_Voxel]->d_ESO_Opacity < 0.8)
 			{
 				vVoxels_ESO[index_Voxel]->d_ESO_Opacity = dOpacity_Max;
 				iCounter_Restored++;
 			}
-
-//			iCounter_Restored++;
 		}
 //		std::cout << "iCounter_Restored: " << iCounter_Restored << std::endl;
 		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 200)
@@ -294,4 +274,3 @@ int main (int argc, char ** argv)
 
 	return(0);
 }
-*/

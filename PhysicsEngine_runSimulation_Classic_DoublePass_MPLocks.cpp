@@ -13,7 +13,7 @@ int PhysicsEngine::runSimulation_ResetGrid(void)
 
 		thisGP->b_Active = false;
 		thisGP->d_Mass = 0.0;
-		thisGP->d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
+		//thisGP->d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
 		thisGP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 		thisGP->d3_Momentum = glm::dvec3(0.0, 0.0, 0.0);
 		thisGP->d3_Force = glm::dvec3(0.0, 0.0, 0.0);
@@ -247,8 +247,8 @@ int PhysicsEngine::runSimulation_G2P_P2_SmallStrain (double dTimeIncrement)
 		for(int index = 0; index < 6; index++)
 			thisMP->d6_Strain[index] += d6Strain_Increment[index];
 		// strain rate
-		for(int index = 0; index < 6; index++)
-			thisMP->d6_Strain_Rate[index] = d6Strain_Increment[index] / dTimeIncrement;
+//		for(int index = 0; index < 6; index++)
+//			thisMP->d6_Strain_Rate[index] = d6Strain_Increment[index] / dTimeIncrement;
 		// stress
 		for(int index = 0; index < 6; index++)
 			thisMP->d6_Stress[index] += CR_Thread.d6StressIncrement[index];
@@ -404,8 +404,8 @@ int PhysicsEngine::runSimulation_G2P_P2_LargeStrain (double dTimeIncrement)
 		for(int index = 0; index < 6; index++)
 			thisMP->d6_Strain[index] = d6Strain_Total[index];//+= d6StrainIncrement[index];
 		// strain rate
-		for(int index = 0; index < 6; index++)
-			thisMP->d6_Strain_Rate[index] = d6Strain_Increment[index] / dTimeIncrement;
+//		for(int index = 0; index < 6; index++)
+//			thisMP->d6_Strain_Rate[index] = d6Strain_Increment[index] / dTimeIncrement;
 		// stress
 		for(int index = 0; index < 6; index++)
 			thisMP->d6_Stress[index] = (1.0/dDet_F) * CR_Thread.d6StressIncrement[index];

@@ -9,8 +9,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	// grid points ------------------------------------------------------------
 	double dOffset = pCanvas->d_Offset;
 
-	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 4.0*2.0*pCanvas->d_Offset/1.0);
-	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(2.0*pCanvas->d_Offset));
+	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 1.0*4.0*pCanvas->d_Offset/1.0);
+	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(4.0*pCanvas->d_Offset));
 
 //	glm::dvec3 d3Length_Grid = glm::dvec3(0.020, 0.020, 0.004/0.5);
 //	glm::ivec3 i3Cells = glm::ivec3(0.5*20, 0.5*20, 4);
@@ -192,8 +192,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	double dDisplacement_Max = 1.0e-9;
-	double dTime_Loading = 1.0e-4;
-	double dPlatenSpeed = 1.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
+	double dTime_Loading = 5.0e-4;
+	double dPlatenSpeed = 2.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
 	if(false)
 	{// top platen material points -------------------------------------------- platen MP
 		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.4*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(2.0*dOffset,2.0*dOffset,0.5*d3Length_Grid.z), dOffset);
@@ -235,14 +235,17 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
-	d_TimeEnd = 5.0*dTime_Loading;
-	d_TimeConsole_Interval = 5e-5;
+	d_TimeEnd = 1.0*dTime_Loading;
+	d_TimeConsole_Interval = 2e-5;
+
+	d_TimeSnapshot_Interval = 0.95*d_TimeEnd;
 
 	// timeline events -------------------------------------------------------
 //	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
-	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(dTime_Loading,			glm::dvec3(0.0, +dPlatenSpeed, 0.0));
-	m_TimeLine.addTimePoint(dTime_Loading+1.0e-24,	glm::dvec3(0.0, 0.0, 0.0));
+	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
+	m_TimeLine.addTimePoint(0.5*dTime_Loading,		glm::dvec3(0.0, +dPlatenSpeed, 0.0));
+	m_TimeLine.addTimePoint(1.0*dTime_Loading,		glm::dvec3(0.0, 0.0, 0.0));
+//	m_TimeLine.addTimePoint(dTime_Loading+1.0e-24,	glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, 0.0, 0.0));
 //	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 
@@ -253,7 +256,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.1;
+	d_DampingCoefficient = 0.0;
 
 //	std::string sDescription = "";
 	{

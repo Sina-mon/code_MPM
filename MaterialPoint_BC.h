@@ -48,14 +48,14 @@ class MaterialPoint_BC
 		unsigned int i_MaterialType = _ELASTIC;
 
 		double d_Mass = 0.0;
-		glm::dvec3 d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
+//		glm::dvec3 d3_MassGradient = glm::dvec3(0.0,0.0,0.0);
 		double d_Volume = 0.0;
 		double d_Volume_Initial = 0.0;
 
 		double d_ElasticModulus = 0.0;
 		double d_PoissonRatio = 0.0;
 		double d_YieldStress = 0.0;
-		double d_Viscosity = 0.0;
+//		double d_Viscosity = 0.0;
 
 		glm::dvec3 d3_Position = glm::dvec3(0.0, 0.0, 0.0);
 		glm::dvec3 d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
@@ -68,7 +68,7 @@ class MaterialPoint_BC
 		double d6_Strain[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Stress[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 		double d6_Strain_Plastic[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-		double d6_Strain_Rate[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+//		double d6_Strain_Rate[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 		double d_Energy_Strain = 0.0;
 		double d_Energy_Plastic = 0.0;

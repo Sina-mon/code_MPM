@@ -23,9 +23,9 @@ class GridPoint
 		double d_FrictionCoefficient = 0.0;
 		double d_Mass = 0.0;
 
-		glm::dvec3 d3_MassGradient	= glm::dvec3(0.0,0.0,0.0);
-		glm::dvec3 d3_Velocity		= glm::dvec3(0.0,0.0,0.0);
+//		glm::dvec3 d3_MassGradient	= glm::dvec3(0.0,0.0,0.0);
 		glm::dvec3 d3_Momentum		= glm::dvec3(0.0,0.0,0.0);
+		glm::dvec3 d3_Velocity		= glm::dvec3(0.0,0.0,0.0);
 		glm::dvec3 d3_Force			= glm::dvec3(0.0,0.0,0.0);
 
 		glm::dvec3 d3_Force_Temp	= glm::dvec3(0.0,0.0,0.0);

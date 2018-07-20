@@ -758,8 +758,8 @@ void GraphicsEngine::drawGame(void)
 		{
 			GridPoint *thisGP = vGridPoint[index_GP];
 
-			if(glm::length(thisGP->d3_MassGradient) > fMassGradient_Maximum)
-				fMassGradient_Maximum = glm::length(thisGP->d3_MassGradient);
+//			if(glm::length(thisGP->d3_MassGradient) > fMassGradient_Maximum)
+//				fMassGradient_Maximum = glm::length(thisGP->d3_MassGradient);
 		}
 
 		for(int index_GP = 0; index_GP < vGridPoint.size(); index_GP++)
@@ -788,36 +788,36 @@ void GraphicsEngine::drawGame(void)
 //
 //			gl_Particle_Mesh->Draw();
 
-			if(glm::length(thisGP->d3_MassGradient) > 0.01*fMassGradient_Maximum)
-			{
-				// nodal positions
-				f4objectColor = _RED;
-				if(thisGP->b_Contact_Negative == true && thisGP->b_Contact_Positive == true)
-				{
-					f4objectColor = _GRAY;
-					f3Size *= 5.0f;
-				}
-				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-				Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), f3Size);
-				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-				gl_Particle_Mesh->Draw();
-
-				// nodal gradient vectors
-				f4objectColor = _GREEN;
-				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-				Transformation glTransformation_Vector(glm::dvec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,0.0), glm::vec3(1.0));
-				m4TransformationMatrix_Model = glTransformation_Vector.GetModelMatrix();
-				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-				glBegin(GL_LINES);
-					glm::vec3 f3Start = thisGP->d3_Position;
-					glm::vec3 f3End = glm::vec3(thisGP->d3_Position) + 20.0f*fSize/fMassGradient_Maximum * glm::vec3(thisGP->d3_MassGradient);
-					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-					glVertex3f(f3End.x, f3End.y, f3End.z);
-				glEnd();
-			}
+//			if(glm::length(thisGP->d3_MassGradient) > 0.01*fMassGradient_Maximum)
+//			{
+//				// nodal positions
+//				f4objectColor = _RED;
+//				if(thisGP->b_Contact_Negative == true && thisGP->b_Contact_Positive == true)
+//				{
+//					f4objectColor = _GRAY;
+//					f3Size *= 5.0f;
+//				}
+//				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+//				Transformation glTransformation(thisGP->d3_Position, glm::vec3(0.0, 0.0, 0.0), f3Size);
+//				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+//				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+//
+//				gl_Particle_Mesh->Draw();
+//
+//				// nodal gradient vectors
+//				f4objectColor = _GREEN;
+//				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+//				Transformation glTransformation_Vector(glm::dvec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,0.0), glm::vec3(1.0));
+//				m4TransformationMatrix_Model = glTransformation_Vector.GetModelMatrix();
+//				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+//
+//				glBegin(GL_LINES);
+//					glm::vec3 f3Start = thisGP->d3_Position;
+//					glm::vec3 f3End = glm::vec3(thisGP->d3_Position) + 20.0f*fSize/fMassGradient_Maximum * glm::vec3(thisGP->d3_MassGradient);
+//					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
+//					glVertex3f(f3End.x, f3End.y, f3End.z);
+//				glEnd();
+//			}
 		}
 
 		gl_BasicProgram.unuse();
@@ -858,8 +858,8 @@ void GraphicsEngine::drawGame(void)
 		{
 			MaterialPoint_BC *thisMP = vMaterialPoint[index_MP];
 
-			if(glm::length(thisMP->d3_MassGradient) > fMassGradient_Maximum)
-				fMassGradient_Maximum = glm::length(thisMP->d3_MassGradient);
+//			if(glm::length(thisMP->d3_MassGradient) > fMassGradient_Maximum)
+//				fMassGradient_Maximum = glm::length(thisMP->d3_MassGradient);
 		}
 
 		// material points, classic -------------------------------------------
@@ -896,31 +896,31 @@ void GraphicsEngine::drawGame(void)
 
 			//gl_Particle_Mesh->Draw();
 
-			if(glm::length(thisMP->d3_MassGradient) > 0.0*fMassGradient_Maximum)
-			{
-				// nodal positions
-				f4objectColor = _RED;
-				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-				Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), f3Size);
-				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
-				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-				gl_Particle_Mesh->Draw();
-
-				// nodal gradient vectors
-				f4objectColor = _GREEN;
-				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
-				Transformation glTransformation_Vector(glm::dvec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,0.0), glm::vec3(1.0));
-				m4TransformationMatrix_Model = glTransformation_Vector.GetModelMatrix();
-				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
-
-				glBegin(GL_LINES);
-					glm::vec3 f3Start = thisMP->d3_Position;
-					glm::vec3 f3End = glm::vec3(thisMP->d3_Position) + 20.0f*fSize/fMassGradient_Maximum * glm::vec3(thisMP->d3_MassGradient);
-					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
-					glVertex3f(f3End.x, f3End.y, f3End.z);
-				glEnd();
-			}
+//			if(glm::length(thisMP->d3_MassGradient) > 0.0*fMassGradient_Maximum)
+//			{
+//				// nodal positions
+//				f4objectColor = _RED;
+//				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+//				Transformation glTransformation(thisMP->d3_Position, glm::vec3(0.0, 0.0, 0.0), f3Size);
+//				glm::mat4 m4TransformationMatrix_Model = glTransformation.GetModelMatrix();
+//				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+//
+//				gl_Particle_Mesh->Draw();
+//
+//				// nodal gradient vectors
+//				f4objectColor = _GREEN;
+//				glUniform4fv(objectColorLocation, 1, &f4objectColor[0]);
+//				Transformation glTransformation_Vector(glm::dvec3(0.0,0.0,0.0), glm::vec3(0.0,0.0,0.0), glm::vec3(1.0));
+//				m4TransformationMatrix_Model = glTransformation_Vector.GetModelMatrix();
+//				glUniformMatrix4fv(transformationModelLocation, 1, GL_FALSE, &m4TransformationMatrix_Model[0][0]); // 1 for sending only 1 matrix, GL_FALSE because we don;t want transposition
+//
+//				glBegin(GL_LINES);
+//					glm::vec3 f3Start = thisMP->d3_Position;
+//					glm::vec3 f3End = glm::vec3(thisMP->d3_Position) + 20.0f*fSize/fMassGradient_Maximum * glm::vec3(thisMP->d3_MassGradient);
+//					glVertex3f(f3Start.x, f3Start.y, f3Start.z);
+//					glVertex3f(f3End.x, f3End.y, f3End.z);
+//				glEnd();
+//			}
 		}
 
 		gl_BasicProgram.unuse();
