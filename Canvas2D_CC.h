@@ -56,6 +56,7 @@ class Canvas2D_CC
 		unsigned long int getCount_Redundant(bool bState);
 
 		void filterObjective_Smooth(double dRadius);
+		double getObjective_Sum(void);
 
 		static unsigned long int getIndex(glm::uvec2 u2Index, glm::uvec2 u2Size)
 		{

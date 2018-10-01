@@ -47,7 +47,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		if(fabs(dx - 0.0) < 1.5*d3Length_Cell.x)
 		{
 			thisGridPoint->b3_Fixed.x = true;
-			//thisGridPoint->b3_Fixed.y = true;
+			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dx - d3Length_Grid.x) < dTolerance)
 		{
@@ -95,9 +95,9 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		pMeta->i_ID = 0;
 		pMeta->i_MaterialType = __ELASTIC;
 
-		pMeta->d_Density = 5000.0;
+		pMeta->d_Density = 100.0*40.0;
 
-		pMeta->d_ElasticModulus = 100.0e9;
+		pMeta->d_ElasticModulus = 100.0*1.0e9;
 		pMeta->d_PoissonRatio = 0.3;
 	}
 	Material_BC *pAluminum = new Material_BC;
@@ -137,14 +137,14 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 				newMP = MP_Factory.createMaterialPoint(glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0));
 
 				newMP->i_ID = vVoxels[index_Voxel]->u_ID;
-				newMP->p_Material = pAluminum;
+				newMP->p_Material = pMeta;
 
 				newMP->d_Volume_Initial = dOffset*dOffset*dOffset * vVoxels[index_Voxel]->d_ESO_Opacity;
 				newMP->d_Volume = newMP->d_Volume_Initial;
 
 				newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + dLayer_Offset);
+				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + 0.0*dLayer_Offset);
 				newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 
 				v_MarkedMaterialPoints_Monitor_Energy.push_back(newMP);
@@ -191,12 +191,18 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-	double dDisplacement_Max = 1.0e-9;
+	// cantilever
+//	double dDisplacement_Max = 0.01*1.0e-3;
+	double dDisplacement_Max = 10.0*1.0e-3;
+	// simple beam
+//	double dDisplacement_Max = 1.17e-2*1.0e-3;
+//	double dDisplacement_Max = 10.0*1.0e-3;
 	double dTime_Loading = 5.0e-4;
+	double dTime_Response = 1.0*dTime_Loading;
 	double dPlatenSpeed = 2.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
 	if(false)
 	{// top platen material points -------------------------------------------- platen MP
-		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.4*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(2.0*dOffset,2.0*dOffset,0.5*d3Length_Grid.z), dOffset);
+		std::vector<MaterialPoint_BC *> thisMaterialDomain = MP_Factory.createDomain_Cuboid(glm::dvec3(0.4*d3Length_Grid.x+d3Length_Cell.x,0.5*d3Length_Grid.y,0.5*d3Length_Grid.z), glm::dvec3(4.0*dOffset,4.0*dOffset,0.5*d3Length_Grid.z), dOffset);
 		for(unsigned int index_MP = 0; index_MP < thisMaterialDomain.size(); index_MP++)
 		{// assign material point initial values
 			MaterialPoint_BC *thisMP = thisMaterialDomain[index_MP];
@@ -235,13 +241,12 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
-	d_TimeEnd = 1.0*dTime_Loading;
-	d_TimeConsole_Interval = 2e-5;
+	d_TimeEnd = 1.0*dTime_Response;
+	d_TimeConsole_Interval = 0.05*d_TimeEnd;
 
-	d_TimeSnapshot_Interval = 0.95*d_TimeEnd;
+	d_TimeSnapshot_Interval = d_TimeEnd-1.0*d_TimeConsole_Interval;
 
 	// timeline events -------------------------------------------------------
-//	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(0.5*dTime_Loading,		glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 	m_TimeLine.addTimePoint(1.0*dTime_Loading,		glm::dvec3(0.0, 0.0, 0.0));
@@ -281,7 +286,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Grid Resolution: (" + Script(i3Cells.x) + "," + Script(i3Cells.y) + "," + Script(i3Cells.z) + ")" + "(" + Script(d3Length_Cell.x,3) + ")\n";
 		sDescription += "dOffset: " + Script(dOffset,4) + "\n";
-		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(0.0).y, 3) + " m/s" + "\n";
+		sDescription += "Peak platen speed: " + Script(dPlatenSpeed, 3) + " m/s" + "\n";
+//		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(0.0).y, 3) + " m/s" + "\n";
 //		sDescription += "Yield: " + Script(pInconel->d_YieldStress, 3) + " N/m^2" + "\n";
 //		sDescription += "Modulus: " + Script(pInconel->d_ElasticModulus, 3) + " N/m^2" + "\n";
 //		sDescription += "Hardening0: " + Script(pInconel->d_Hardening_Isotropic_C0, 3) + "\n";

@@ -91,67 +91,76 @@ int main (int argc, char ** argv)
 
 int main (int argc, char ** argv)
 {
+// ----------------------------------------------------------------------------
+	// sina, adjust the boundary conditions
 	// Create canvas, cantilever problem
-//	double dOffset = 0.0010;
-//	glm::dvec2 d2Size = glm::dvec2(0.100,0.100);
-//	Canvas2D_CC Canvas2D(d2Size, dOffset);
-//
-//	Canvas2D.drawRectangle	(glm::dvec2(0.040,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0);
-//	Canvas2D.setESORectangle(glm::dvec2(0.040,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0, true);
-//	// loading location
-//	Canvas2D.drawRectangle		(glm::dvec2(0.080+0.0*dOffset,0.5*d2Size.y), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0);
-//	Canvas2D.setESORectangle	(glm::dvec2(0.080+0.0*dOffset,0.5*d2Size.y), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, false);
-//	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+0.0*dOffset,0.5*d2Size.y), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, true);
-
-	// Create canvas, beam problem
 	double dOffset = 0.00025;
-	double dOpacity_Min = 1.0e-4;
+	double dOpacity_Min = 1.0e-3;
 	double dOpacity_Max = 1.0;
-	glm::dvec2 d2Size = glm::dvec2(0.150,0.050);
+	glm::dvec2 d2Size = glm::dvec2(0.100,0.100);
 	Canvas2D_CC Canvas2D(d2Size, dOffset);
 
-//	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0);
-//	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0, true);
-	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0);
-	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0, true);
+	Canvas2D.drawRectangle	(glm::dvec2(0.040+0.0*dOffset,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0);
+	Canvas2D.setESORectangle(glm::dvec2(0.040+0.0*dOffset,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0, true);
 	// loading location
-	Canvas2D.drawRectangle		(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0);
-	Canvas2D.setESORectangle	(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, false);
-	Canvas2D.setLoadRectangle	(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, true);
-	// Support location
-	Canvas2D.drawRectangle		(glm::dvec2(0.120,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0);
-	Canvas2D.setESORectangle	(glm::dvec2(0.120,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, false);
-	Canvas2D.setSupportRectangle(glm::dvec2(0.120,0.5*d2Size.y - 0.020), glm::dvec2(1.1*dOffset, 1.1*dOffset), 0.0, true);
-
-	std::vector<Voxel_ST *> vVoxels = Canvas2D.getVoxels_Active(true);
-	std::cout << "Canvas voxels: " << Script(Canvas2D.v_Voxels.size()) << " (" << Script(Canvas2D.u2_Size.x) << "," << Script(Canvas2D.u2_Size.y) << ")" << std::endl;
-	std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
-
-	for(unsigned int index = 0; index < vVoxels.size(); index++)
-	{// start from lower portion
-		double dTopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.7*0.040;
-
-		if(vVoxels[index]->d2_Position.y > dTopEdge)
-		{
-			vVoxels[index]->d_ESO_Opacity = dOpacity_Min;
-		}
-		else
-			vVoxels[index]->d_ESO_Opacity = dOpacity_Max;
-	}
+	Canvas2D.drawRectangle		(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0);
+	Canvas2D.setESORectangle	(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, false);
+	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, true);
+// ----------------------------------------------------------------------------
+//	// sina, adjust the boundary conditions
+//	// Create canvas, beam problem
+//	double dOffset = 0.0005;
+//	double dOpacity_Min = 1.0e-3;
+//	double dOpacity_Max = 1.0;
+//	glm::dvec2 d2Size = glm::dvec2(0.150,0.100);
+//	Canvas2D_CC Canvas2D(d2Size, dOffset);
+//
+////	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0);
+////	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y-0.5*0.040 + 0.5*0.012), glm::dvec2(0.120, 0.012), 0.0, true);
+//	Canvas2D.drawRectangle	(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0);
+//	Canvas2D.setESORectangle(glm::dvec2(0.060,0.5*d2Size.y), glm::dvec2(0.120, 0.040), 0.0, true);
+//	// loading location
+//	Canvas2D.drawRectangle		(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(8.1*dOffset, 8.1*dOffset), 0.0);
+//	Canvas2D.setESORectangle	(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(8.1*dOffset, 8.1*dOffset), 0.0, false);
+//	Canvas2D.setLoadRectangle	(glm::dvec2(0.0,0.5*d2Size.y - 0.020), glm::dvec2(8.1*dOffset, 8.1*dOffset), 0.0, true);
+//	// Support location
+//	Canvas2D.drawRectangle		(glm::dvec2(0.120-2.0*dOffset,0.5*d2Size.y - 0.020-4.0*dOffset), glm::dvec2(4.1*dOffset, 8.1*dOffset), 0.0);
+//	Canvas2D.setESORectangle	(glm::dvec2(0.120-2.0*dOffset,0.5*d2Size.y - 0.020-4.0*dOffset), glm::dvec2(4.1*dOffset, 8.1*dOffset), 0.0, false);
+//	Canvas2D.setSupportRectangle(glm::dvec2(0.120-2.0*dOffset,0.5*d2Size.y - 0.020-4.0*dOffset), glm::dvec2(4.1*dOffset, 8.1*dOffset), 0.0, true);
+//
+//	std::vector<Voxel_ST *> vVoxels = Canvas2D.getVoxels_Active(true);
+//	std::cout << "Canvas voxels: " << Script(Canvas2D.v_Voxels.size()) << " (" << Script(Canvas2D.u2_Size.x) << "," << Script(Canvas2D.u2_Size.y) << ")" << std::endl;
+//	std::cout << "Active voxels: " << Script(vVoxels.size()) << std::endl;
+//
+//	for(unsigned int index = 0; index < vVoxels.size(); index++)
+//	{// start from lower portion
+//		double dTopEdge = 0.5*d2Size.y + 0.5*0.040 - 0.0000*0.040;
+//
+//		if(vVoxels[index]->d2_Position.y > dTopEdge)
+//		{
+//			vVoxels[index]->d_ESO_Opacity = dOpacity_Min;
+//		}
+//		else
+//			vVoxels[index]->d_ESO_Opacity = dOpacity_Max;
+//	}
+// ----------------------------------------------------------------------------
 
 	// ESO iterations
 	double dRatio_Redundant = 0.1; // ratio in terms of active voxels
-	double dRatio_Rejection = 0.7;
-	double dRatio_Rejection_Increment = 0.0;
+	double dRatio_Rejection = 0.05;
+	double dRatio_Rejection_Increment = 0.05;
 	double dRatio_Rejection_Volume_Upper = 0.1;
 	double dRatio_Rejection_Volume_Lower = 0.0;
 	double dRatio_Inclusion = 1.0 - dRatio_Rejection;
-	double dInfluence_Radius = sqrt(2.0)*2.1*dOffset;
+	double dInfluence_Radius = 0.003;//2.0*dOffset;//sqrt(2.0)*2.0*dOffset;
 	int iActiveMPs = Canvas2D.getVoxels_Active(true).size();
 	int iIteration_Local = 0;
 	unsigned int iCounter_Removed = 0;
 	unsigned int iCounter_Restored = 0;
 
+	// log BESO results
+	std::string sFilename_Log_BESO = "";
+	// log MPM results
 	std::string sFilename_Log = "";
 	std::string sFilename_Snapshot = "";
 	{
@@ -167,10 +176,33 @@ int main (int argc, char ** argv)
 		std::string strTime_Filename(buffer);
 
 		sFilename_Log = strTime_Filename;
+		sFilename_Log_BESO += _STR_LOGFILE;
+		sFilename_Log_BESO += "BESO_";
+		sFilename_Log_BESO += strTime_Filename;
+		sFilename_Log_BESO += ".txt";
 	}
 
 	for(int iIteration_Global = 0; iIteration_Global < 10000; iIteration_Global++)
 	{
+		// save BESO stuff
+		std::string sDescription_BESO = "";
+		{
+			sDescription_BESO += "iIteration_Global: \t" + Script(iIteration_Global) + "\t";
+			sDescription_BESO += "iIteration_Local: \t" + Script(iIteration_Local) + "\t";
+			sDescription_BESO += "dRatio_Rejection: \t" + Script(dRatio_Rejection, 3) + "\t";
+			sDescription_BESO += "Removed: \t" + Script(iCounter_Removed) + "\t";
+			sDescription_BESO += "Restored: \t" + Script(iCounter_Restored) + "\t";
+
+			double dObjectiveSum = Canvas2D.getObjective_Sum();
+			sDescription_BESO += "Objective_Sum: \t" + Script(dObjectiveSum, 5) + "\t";
+			sDescription_BESO += "\n";
+
+			// save to file
+			std::ofstream OutputFile(sFilename_Log_BESO.c_str(), std::ios_base::app);
+			OutputFile << sDescription_BESO;
+			OutputFile.close();
+		}
+		// description for MPM
 		std::string sDescription = "";
 		{
 			sFilename_Snapshot = sFilename_Log + "_" + Script(iIteration_Global);
@@ -258,7 +290,7 @@ int main (int argc, char ** argv)
 			}
 		}
 //		std::cout << "iCounter_Restored: " << iCounter_Restored << std::endl;
-		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 200)
+		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 50)
 //		if(iCounter_Removed < 2)
 		{
 			dRatio_Rejection += dRatio_Rejection_Increment;

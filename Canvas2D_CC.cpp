@@ -351,3 +351,19 @@ void Canvas2D_CC::filterObjective_Smooth(double dRadius)
 		vVoxels_Active[index]->d_Objective = vVoxels_Active_Clone[index].d_Objective;
 	}
 }
+// --------------------------------------------------------
+double Canvas2D_CC::getObjective_Sum(void)
+{
+	double dResult = 0.0;
+
+	std::vector<Voxel_ST *> vVoxels_Active = this->getVoxels_Active(true);
+	unsigned long int iVoxels_Active = vVoxels_Active.size();
+
+
+	for(unsigned long int index = 0; index < iVoxels_Active; index++)
+	{
+		dResult += vVoxels_Active[index]->d_Objective;
+	}
+
+	return(dResult);
+}

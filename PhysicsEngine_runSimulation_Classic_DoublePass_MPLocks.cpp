@@ -256,11 +256,19 @@ int PhysicsEngine::runSimulation_G2P_P2_SmallStrain (double dTimeIncrement)
 		for(int index = 0; index < 6; index++)
 			thisMP->d6_Strain_Plastic[index] += CR_Thread.d6PlasticStrainIncrement[index];
 		// total strain energy
+		double dStrainEnergy_Increment = 0.0;
 		for(int index = 0; index < 6; index++)
-			thisMP->d_Energy_Strain += thisMP->d6_Stress[index]*d6Strain_Increment[index] * thisMP->d_Volume;
+			dStrainEnergy_Increment += (thisMP->d6_Stress[index]-0.5*CR_Thread.d6StressIncrement[index]) * d6Strain_Increment[index] * thisMP->d_Volume; // sina, be careful, the "-0.5*CR_Thread.d6StressIncrement[index]" is important for getting correct results
+		thisMP->d_Energy_Strain += dStrainEnergy_Increment;
+//		double strainEnergy = 0.0;
+//		for(int index = 0; index < 6; index++)
+//			strainEnergy += 0.5*thisMP->d6_Stress[index] * thisMP->d6_Strain[index] * thisMP->d_Volume;
+//		thisMP->d_Energy_Strain = strainEnergy;
 		// plastic strain energy
+		double dPlasticEnergy_Increment = 0.0;
 		for(int index = 0; index < 6; index++)
-			thisMP->d_Energy_Plastic += thisMP->d6_Stress[index]*CR_Thread.d6PlasticStrainIncrement[index] * thisMP->d_Volume;
+			dPlasticEnergy_Increment += (thisMP->d6_Stress[index]-0.5*CR_Thread.d6StressIncrement[index]) * CR_Thread.d6PlasticStrainIncrement[index] * thisMP->d_Volume;
+		thisMP->d_Energy_Plastic += dPlasticEnergy_Increment;
 		// hardening variables
 		thisMP->d_BackStress_Isotropic += CR_Thread.dBackstress_IsotropicIncrement;
 	}
