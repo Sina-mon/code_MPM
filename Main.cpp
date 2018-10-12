@@ -97,15 +97,15 @@ int main (int argc, char ** argv)
 	double dOffset = 0.00025;
 	double dOpacity_Min = 1.0e-3;
 	double dOpacity_Max = 1.0;
-	glm::dvec2 d2Size = glm::dvec2(0.100,0.100);
+	glm::dvec2 d2Size = glm::dvec2(0.150,0.150);
 	Canvas2D_CC Canvas2D(d2Size, dOffset);
 
 	Canvas2D.drawRectangle	(glm::dvec2(0.040+0.0*dOffset,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0);
 	Canvas2D.setESORectangle(glm::dvec2(0.040+0.0*dOffset,0.5*d2Size.y), glm::dvec2(0.080, 0.050), 0.0, true);
 	// loading location
-	Canvas2D.drawRectangle		(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0);
-	Canvas2D.setESORectangle	(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, false);
-	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+1.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, true);
+	Canvas2D.drawRectangle		(glm::dvec2(0.080+.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0);
+	Canvas2D.setESORectangle	(glm::dvec2(0.080+.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, false);
+	Canvas2D.setLoadRectangle	(glm::dvec2(0.080+.0*dOffset,0.5*d2Size.y), glm::dvec2(2.1*dOffset, 2.1*dOffset), 0.0, true);
 // ----------------------------------------------------------------------------
 //	// sina, adjust the boundary conditions
 //	// Create canvas, beam problem
@@ -290,7 +290,7 @@ int main (int argc, char ** argv)
 			}
 		}
 //		std::cout << "iCounter_Restored: " << iCounter_Restored << std::endl;
-		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 50)
+		if(iCounter_Removed < 0.001*iVoxels_Active || iIteration_Local == 20)
 //		if(iCounter_Removed < 2)
 		{
 			dRatio_Rejection += dRatio_Rejection_Increment;

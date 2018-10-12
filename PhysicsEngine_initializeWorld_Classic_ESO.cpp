@@ -9,8 +9,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	// grid points ------------------------------------------------------------
 	double dOffset = pCanvas->d_Offset;
 
-	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 1.0*4.0*pCanvas->d_Offset/1.0);
-	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(4.0*pCanvas->d_Offset));
+	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 1.0*16.0*pCanvas->d_Offset/1.0);
+	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(16.0*pCanvas->d_Offset));
 
 //	glm::dvec3 d3Length_Grid = glm::dvec3(0.020, 0.020, 0.004/0.5);
 //	glm::ivec3 i3Cells = glm::ivec3(0.5*20, 0.5*20, 4);
@@ -144,7 +144,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 
 				newMP->d_Mass = newMP->p_Material->d_Density * newMP->d_Volume;
 
-				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z + 0.0*dLayer_Offset);
+				newMP->d3_Position = glm::dvec3(vVoxels[index_Voxel]->d2_Position,0.0) + glm::dvec3(d3Length_Cell.x,0.0,0.5*d3Length_Grid.z);
 				newMP->d3_Velocity = glm::dvec3(0.0, 0.0, 0.0);
 
 				v_MarkedMaterialPoints_Monitor_Energy.push_back(newMP);
@@ -193,11 +193,12 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 
 	// cantilever
 //	double dDisplacement_Max = 0.01*1.0e-3;
-	double dDisplacement_Max = 10.0*1.0e-3;
+//	double dDisplacement_Max = 10.0*1.0e-3;
+	double dDisplacement_Max = 4.0*10.0*1.0e-3;
 	// simple beam
 //	double dDisplacement_Max = 1.17e-2*1.0e-3;
 //	double dDisplacement_Max = 10.0*1.0e-3;
-	double dTime_Loading = 5.0e-4;
+	double dTime_Loading = 2.0*5.0e-4;
 	double dTime_Response = 1.0*dTime_Loading;
 	double dPlatenSpeed = 2.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
 	if(false)
@@ -240,7 +241,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/2.0*5.0e-8;
+	d_TimeIncrement_Maximum = 1.0/1.0*5.0e-8;
 	d_TimeEnd = 1.0*dTime_Response;
 	d_TimeConsole_Interval = 0.05*d_TimeEnd;
 
