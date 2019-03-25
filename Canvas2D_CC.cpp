@@ -327,18 +327,20 @@ void Canvas2D_CC::filterObjective_Smooth(double dRadius)
 		vVoxels_Active_Clone[index].d_Objective = 0.0;
 
 		int iVoxels_Neighbour = 0;
-		double dIntegral_Result = 0.0;
 		double dIntegral_Weight = 0.0;
 		for(unsigned long int index_neighbour = 0; index_neighbour < iVoxels_Active; index_neighbour++)
 		{
 			double dDistance = glm::length(vVoxels_Active[index]->d2_Position - vVoxels_Active[index_neighbour]->d2_Position);
+
+			if(vVoxels_Active[index_neighbour]->b_ESO == false)
+				continue;
 
 			if(dDistance < dRadius)
 			{
 //				iVoxels_Neighbour++;
 //				vVoxels_Active_Clone[index].d_Objective += vVoxels_Active[index_neighbour]->d_Objective;
 
-				double dWeight = dRadius - dDistance;
+				double dWeight = (dRadius - dDistance)/dRadius;
 				dIntegral_Weight += dWeight;
 				vVoxels_Active_Clone[index].d_Objective += dWeight * vVoxels_Active[index_neighbour]->d_Objective;
 			}

@@ -260,6 +260,11 @@ int PhysicsEngine::runSimulation_G2P_P2_SmallStrain (double dTimeIncrement)
 		for(int index = 0; index < 6; index++)
 			dStrainEnergy_Increment += (thisMP->d6_Stress[index]-0.5*CR_Thread.d6StressIncrement[index]) * d6Strain_Increment[index] * thisMP->d_Volume; // sina, be careful, the "-0.5*CR_Thread.d6StressIncrement[index]" is important for getting correct results
 		thisMP->d_Energy_Strain += dStrainEnergy_Increment;
+
+		thisMP->d_Energy_Strain_TimeIntegral += thisMP->d_Energy_Strain * dTimeIncrement;
+
+		if(thisMP->d_Energy_Strain > thisMP->d_Energy_Strain_MaxHistory)
+			thisMP->d_Energy_Strain_MaxHistory = thisMP->d_Energy_Strain;
 //		double strainEnergy = 0.0;
 //		for(int index = 0; index < 6; index++)
 //			strainEnergy += 0.5*thisMP->d6_Stress[index] * thisMP->d6_Strain[index] * thisMP->d_Volume;

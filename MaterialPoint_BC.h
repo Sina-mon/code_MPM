@@ -71,6 +71,8 @@ class MaterialPoint_BC
 //		double d6_Strain_Rate[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 		double d_Energy_Strain = 0.0;
+		double d_Energy_Strain_MaxHistory = 0.0;
+		double d_Energy_Strain_TimeIntegral = 0.0;
 		double d_Energy_Plastic = 0.0;
 
 		double d_BackStress_Isotropic = 0.0;

@@ -9,8 +9,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	// grid points ------------------------------------------------------------
 	double dOffset = pCanvas->d_Offset;
 
-	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 1.0*16.0*pCanvas->d_Offset/1.0);
-	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(16.0*pCanvas->d_Offset));
+	glm::dvec3 d3Length_Grid = glm::dvec3(pCanvas->d2_Size, 1.0*2.0*pCanvas->d_Offset/1.0);
+	glm::ivec3 i3Cells = glm::floor((d3Length_Grid)/(2.0*pCanvas->d_Offset));
 
 //	glm::dvec3 d3Length_Grid = glm::dvec3(0.020, 0.020, 0.004/0.5);
 //	glm::ivec3 i3Cells = glm::ivec3(0.5*20, 0.5*20, 4);
@@ -46,12 +46,12 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 
 		if(fabs(dx - 0.0) < 1.5*d3Length_Cell.x)
 		{
-			thisGridPoint->b3_Fixed.x = true;
-			thisGridPoint->b3_Fixed.y = true;
+//			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dx - d3Length_Grid.x) < dTolerance)
 		{
-			thisGridPoint->b3_Fixed.x = true;
+//			thisGridPoint->b3_Fixed.x = true;
 		}
 		if(fabs(dy - 0.0) < 1.5*d3Length_Cell.y)
 		{
@@ -61,6 +61,8 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 		if(fabs(dy - d3Length_Grid.y) < dTolerance)
 		{
+			thisGridPoint->b3_Fixed.x = true;
+			thisGridPoint->b3_Fixed.y = true;
 		}
 		if(fabs(dz - 0.0) < 0.5*d3Length_Cell.z)
 		{
@@ -94,33 +96,18 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	{
 		pMeta->i_ID = 0;
 		pMeta->i_MaterialType = __ELASTIC;
+//		pMeta->i_MaterialType = __PLASTIC;
+//		pMeta->i_MaterialType = __VONMISESHARDENING;
 
-		pMeta->d_Density = 100.0*40.0;
+//		pMeta->d_Density = 100.0*40.0; // for cantilever BESO
+		pMeta->d_Density = 10.0*40.0;
 
-		pMeta->d_ElasticModulus = 100.0*1.0e9;
+		pMeta->d_ElasticModulus = 10.0*1.0e9;
 		pMeta->d_PoissonRatio = 0.3;
-	}
-	Material_BC *pAluminum = new Material_BC;
-	v_allMaterial.push_back(pAluminum);
-	{
-		pAluminum->i_ID = 0;
-		pAluminum->i_MaterialType = __ELASTIC;
 
-		pAluminum->d_Density = 2760.0;
-
-		pAluminum->d_ElasticModulus = 70.0e9;
-		pAluminum->d_PoissonRatio = 0.3;
-	}
-	Material_BC *pAluminum_Degraded = new Material_BC;
-	v_allMaterial.push_back(pAluminum_Degraded);
-	{
-		pAluminum_Degraded->i_ID = 0;
-		pAluminum_Degraded->i_MaterialType = __ELASTIC;
-
-		pAluminum_Degraded->d_Density = 2760.0;
-
-		pAluminum_Degraded->d_ElasticModulus = 70.0e9;
-		pAluminum_Degraded->d_PoissonRatio = 0.3;
+		pMeta->d_YieldStress = 0.001 * pMeta->d_ElasticModulus;
+		pMeta->d_Hardening_Isotropic_C0 = 35.0;
+		pMeta->d_Hardening_Isotropic_C1 = 0.5 * pMeta->d_YieldStress;
 	}
 
 	if(true)
@@ -192,13 +179,12 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	// cantilever
-//	double dDisplacement_Max = 0.01*1.0e-3;
+	double dDisplacement_Max = 0.001*1.0e-3;
 //	double dDisplacement_Max = 10.0*1.0e-3;
-	double dDisplacement_Max = 4.0*10.0*1.0e-3;
 	// simple beam
 //	double dDisplacement_Max = 1.17e-2*1.0e-3;
 //	double dDisplacement_Max = 10.0*1.0e-3;
-	double dTime_Loading = 2.0*5.0e-4;
+	double dTime_Loading = 2.0*1.0e-4;
 	double dTime_Response = 1.0*dTime_Loading;
 	double dPlatenSpeed = 2.0*dDisplacement_Max/dTime_Loading;// *2 because the speed rises from zero
 	if(false)
@@ -241,7 +227,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		}
 	}
 
-	d_TimeIncrement_Maximum = 1.0/1.0*5.0e-8;
+	d_TimeIncrement_Maximum = 1.0/4.0*5.0e-8;
 	d_TimeEnd = 1.0*dTime_Response;
 	d_TimeConsole_Interval = 0.05*d_TimeEnd;
 
@@ -251,9 +237,6 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	m_TimeLine.addTimePoint(0.0,					glm::dvec3(0.0, 0.0, 0.0));
 	m_TimeLine.addTimePoint(0.5*dTime_Loading,		glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 	m_TimeLine.addTimePoint(1.0*dTime_Loading,		glm::dvec3(0.0, 0.0, 0.0));
-//	m_TimeLine.addTimePoint(dTime_Loading+1.0e-24,	glm::dvec3(0.0, 0.0, 0.0));
-	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, 0.0, 0.0));
-//	m_TimeLine.addTimePoint(d_TimeEnd,				glm::dvec3(0.0, +dPlatenSpeed, 0.0));
 
 	double dMass_Domain = 0.0;
 	for(unsigned int index_MP = 0; index_MP < allMaterialPoint.size(); index_MP++)
@@ -262,7 +245,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 	}
 
 	a_Runtime.fill(0.0);
-	d_DampingCoefficient = 0.0;
+	d_DampingCoefficient = 0.1;
 
 //	std::string sDescription = "";
 	{
@@ -277,7 +260,7 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		std::string strTime(buffer);
 
 		sDescription += "-------------------------------------------------------------\n";
-		sDescription += "CPDI formulation, Cellular, Langrand (2017) ------\n";
+		sDescription += "Standard formulation, BESO ------\n";
 		sDescription += "Process started on: " + strTime + "\n";
 		sDescription += "-------------------------------------------------------------\n";
 		sDescription += "Number of threads: " + Script(_MAX_N_THREADS) + "\n";
@@ -289,13 +272,13 @@ void PhysicsEngine::initializeWorld_Classic_ESO(Canvas2D_CC *pCanvas, std::strin
 		sDescription += "dOffset: " + Script(dOffset,4) + "\n";
 		sDescription += "Peak platen speed: " + Script(dPlatenSpeed, 3) + " m/s" + "\n";
 //		sDescription += "Timeline Speed: " + Script(m_TimeLine.getVelocity(0.0).y, 3) + " m/s" + "\n";
-//		sDescription += "Yield: " + Script(pInconel->d_YieldStress, 3) + " N/m^2" + "\n";
-//		sDescription += "Modulus: " + Script(pInconel->d_ElasticModulus, 3) + " N/m^2" + "\n";
+		sDescription += "Yield: " + Script(pMeta->d_YieldStress, 3) + " N/m^2" + "\n";
+		sDescription += "Modulus: " + Script(pMeta->d_ElasticModulus, 3) + " N/m^2" + "\n";
 //		sDescription += "Hardening0: " + Script(pInconel->d_Hardening_Isotropic_C0, 3) + "\n";
 //		sDescription += "Hardening1: " + Script(pInconel->d_Hardening_Isotropic_C1, 3) + "\n";
 
 		sDescription += "Global Damping: " + Script(d_DampingCoefficient, 3) + "\n";
-		sDescription += "Non-slip contact\n";
+//		sDescription += "Non-slip contact\n";
 //		sDescription += "Elastic-Perfectly plastic\n";
 	}
 
